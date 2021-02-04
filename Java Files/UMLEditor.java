@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class UMLEditor {
 
-  private ArrayList<UMLClass> classes;
+  private static ArrayList<UMLClass> classes;
 
   public static void main(String[] args) {
     classes = new ArrayList<UMLClass>();
@@ -25,7 +25,7 @@ public class UMLEditor {
   }
 
   // Deletes a class from the list of classes given a class name that exists
-  public void deleteClass(className) {
+  public void deleteClass(String className) {
     // Loop through the list of classes to ensure that the requested class to delete exists
     for (int i = 0; i < classes.size(); ++i) {
       if (classes.get(i).name == className) {
