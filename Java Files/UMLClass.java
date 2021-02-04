@@ -17,7 +17,7 @@ public class UMLClass {
 
   // Constructs this new UMLClass given a class name
   public UMLClass(String className) {
-    const int defaultSize = 100;
+    final int defaultSize = 100;
     name = className;
     relationships = new ArrayList<ArrayList<String>(2)>(defaultSize);
     attributes = new ArrayList<String>(defaultSize);
@@ -65,7 +65,7 @@ public class UMLClass {
   }
 
   // Renames an attribute given the old name and a new name for the attribute
-  public boolean renameAttr(String oldName, newName) {
+  public boolean renameAttr(String oldName, String newName) {
     for (int i = 0; i < attributes.size(); ++i) {
       if (attributes.get(i).get(0) == oldName) {
         attributes.get(i).set(0, newName);
