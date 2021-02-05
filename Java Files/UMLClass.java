@@ -19,7 +19,11 @@ public class UMLClass {
   public UMLClass(String className) {
     final int defaultSize = 100;
     name = className;
-    relationships = new ArrayList<ArrayList<String>(2)>(defaultSize);
+    relationships = new ArrayList<ArrayList<String>>(defaultSize);
+    ArrayList<String> emptyRelationship = new ArrayList<String>(2);
+    emptyRelationship.add("empty");
+    emptyRelationship.add("");
+    relationships.add(emptyRelationship);
     attributes = new ArrayList<String>(defaultSize);
   }
 
@@ -32,9 +36,19 @@ public class UMLClass {
   // Boolean should be true if the other class is the source, else should be
   //    false if this class is the source (the other class is the destination)
   public boolean addRel(String className, boolean isSrc) {
+    // Ensure there is space for the new relationship
     relationships.ensureCapacity(relationships.size() + 1);
+
+    // Convert isSrc to a string
     String ext = isSrc ? "src" : "dest";
-    return relationships.add({className, ext});
+
+    // Create a new relationship ArrayList to hold the class name and src/dest status
+    ArrayList<String> rel = new ArrayList<String>(2);
+    rel.add(className);
+    rel.add(ext);
+
+    // Add the relationship to the list
+    return relationships.add(rel);
   }
 
   // Delete a relationship given the name of the other class
