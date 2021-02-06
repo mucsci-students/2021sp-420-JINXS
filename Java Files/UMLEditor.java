@@ -155,6 +155,39 @@ public class UMLEditor {
 
   public void renameAttr();
 
+    // Prints the relationships of a given classname 
+    public void printRel(String className){
+      //intialize an empty arraylist which will hold our relationships
+      ArrayList<String> rels = null; 
+  
+      /*
+      loop will go through the class list, find the given classname and populatates our relationship
+      arraylist with relationships from the given classname
+      */
+      for (int i = 0; i < classes.size(); ++i) {
+        if (classes.get(i).name == className) {
+          rels = classes.get(i).getRels();
+          break;  
+        }
+      }
+      System.out.println(className + " is a source to these classes: ");
+      
+      // Determines if our class is source prints out the relationships
+      for(int i = 0; i < rels.size(); ++i){
+        if(rels.get(i).get(1) == "src"){
+          System.out.println(rels.get(i).get(0));
+        }
+      }
+      System.out.println(className + " is a destination for these classes: ");
+  
+      // Determines if our class is destination and prints out the relationships
+      for(int i = 0; i < rels.size(); ++i){
+        if(rels.get(i).get(1) == "dest"){
+          System.out.println(rels.get(i).get(0));
+        }
+      }
+    }
+
   private repl() {
     // Interface stuff goes here
     // Check for the user's command input here
