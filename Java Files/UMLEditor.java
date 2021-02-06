@@ -70,6 +70,11 @@ public class UMLEditor {
       }
     }
 
+    if (c1 == null || c2 == null){
+      System.out.println("Class does not exsist");
+      return;
+    }
+
     // Get the current relationships from class1
     ArrayList<ArrayList<String>> c1Rels = c1.getRels();
 
@@ -91,7 +96,57 @@ public class UMLEditor {
     System.out.println("Relationship between \"" + class1 + "\" and \"" + class2 + "\" added successfully");
   }
 
-  public void delRel(String class1, String class2);
+  public void delRel(String class1, String class2){
+    // Make sure each given class name is unique
+    if (class1 == class2) {
+      System.out.println("Class names must be different");
+      return;
+    }
+
+    // Store classes when found in the class list
+    UMLClass c1 = null;
+    UMLClass c2 = null;
+
+    // Look through the class list for both classes
+    for (int i = 0; i < classes.size(); ++i) {
+      if (classes.get(i).name == class1 && c1 == null) {
+        c1 = classes.get(i);
+      }
+      if (classes.get(i).name == class2 && c2 == null) {
+        c2 = classes.get(i);
+      }
+    }
+
+    if (c1 == null || c2 == null){
+      System.out.println("Class does not exsist");
+      return;
+    }
+
+    // Get the current relationships from class1
+    ArrayList<ArrayList<String>> c1Rels = c1.getRels();
+
+    boolean found = false;
+
+    for (int i = 0; i < c1Rels.size(); ++i) {
+      if (c1Rels.get(i).get(0) == class2){
+        found = true;
+      }
+    }
+
+    if (found == false){
+      System.out.println("Relationship between \"" + class1 + "\" and \"" + class2 + "\" does not exsist");
+      return;
+    }
+
+    else{
+      c1.deleteRel(c2.name);
+      c2.deleteRel(c1.name);
+
+      System.out.println("Relationship deleted");
+  
+    }
+
+  }
 
   // Remember to use ensureCapacity before adding
   public void addAttr();
