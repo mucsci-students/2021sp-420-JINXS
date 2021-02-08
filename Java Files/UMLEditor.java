@@ -1,8 +1,10 @@
 import java.util.ArrayList;
 
+import jdk.internal.org.jline.terminal.Size;
+
 public class UMLEditor {
 
-  private ArrayList<UMLClass> classes;
+  private static ArrayList<UMLClass> classes;
 
   public static void main(String[] args) {
     classes = new ArrayList<UMLClass>();
@@ -25,7 +27,7 @@ public class UMLEditor {
   }
 
   // Deletes a class from the list of classes given a class name that exists
-  public void deleteClass(className) {
+  public void deleteClass(String className) {
     // Loop through the list of classes to ensure that the requested class to delete exists
     for (int i = 0; i < classes.size(); ++i) {
       if (classes.get(i).name == className) {
@@ -55,7 +57,37 @@ public class UMLEditor {
   // Remember to use ensureCapacity before adding
   public void addAttr();
 
-  public void delAttr();
+  /*
+  * DelAttr will delete the given attribute form the specified class
+  * Variables:
+  * - className = name of class to be accessed
+  * - attributes = name of attribute to be removed
+  * - attrExist = True means successfully deleted, False means attribute dose not exist
+  * - currClass = name called to access the methods in UMLClass
+  *
+  * This method calls the deleteAttr method from the UMLClass file. It searches through the
+  * Array List "classes" to find the given name and then passes the class name to currClass.
+  * currClass is then used to call the deleteAttr method and will attempt to delete the 
+  * attribtue. Changing the boolean variable "attrExist" to ture if it does.
+  */
+  public void delAttr(String className, String attributes){
+    boolean attrExist = false;
+
+    // Searches through arraylist classes, searching for className
+    for (int i = 0; i < classes.size(); i++){
+      if (className == classes.get(i).name){
+        UMLClass currClass = classes.get(i);
+        attrExist = currClass.deleteAttr(attributes);
+      }
+      // if false, then delete attempt has failed. attribute does not exist
+      if (!attrExist){
+        System.out.println ("Attribute \"" + attributes + "\" does not exist");
+      }
+      else {
+        System.out.println ("Attribute \"" + attributes + "\" was deleted successfully");
+      }
+    }
+  }
 
   public void renameAttr();
 
