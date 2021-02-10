@@ -68,8 +68,17 @@ public class UMLClass {
 
   // Add an attribute given a name
   public boolean addAttr(String attrName) {
+    // Look through the attribute list for the name to make sure it doesn't exist
+    for (int i = 0; i < attributes.size(); ++i) {
+      // If the attrName is found in the list, then the attribute already exists
+      if (attributes.get(i).equals(attrName)) {
+        return false;
+      }
+    }
+
+    // Ensure there is space in the ArrayList for the attribute
     attributes.ensureCapacity(attributes.size() + 1);
-    // Add code here to ensure that the requested attribute name to add doesn't already exist (return false if so)
+
     return attributes.add(attrName);
   }
 

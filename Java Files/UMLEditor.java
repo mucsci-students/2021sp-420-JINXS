@@ -148,8 +148,40 @@ public class UMLEditor {
 
   }
 
+  // Adds an attribute (attrName) to a given class (className) if it exists, 
+  // and the class does not currently have that attribute
   // Remember to use ensureCapacity before adding
-  public void addAttr();
+  public void addAttr(String className, String attrName) {
+    // Will store whether the given "className" exists
+    boolean classExists = false;
+    // Will store the result of attempting to add an attribute to the class
+    boolean attrAdded = false;
+    
+    // Search through the class list to find the desired class 
+    for (int i = 0; i < classes.size(); ++i) {
+      // If the class is found, attempt to add the desired attribute
+      if (classes.get(i).name.equals(className)) {
+        classExists = true;
+
+        UMLClass currClass = classes.get(i);
+        // True if added succesfully, false if duplicate
+        attrAdded = currClass.addAttr(attrName);
+      }
+    }
+
+    // Notify the user of the resuls of the attribute addition
+
+    if (!classExists) {
+      System.out.println("Class \"" + className + "\" does not exist");
+      return;
+    }
+
+    if (attrAdded) {
+      System.out.println("Attribute \"" + attrName + "\" added to class \"" + className + "\" succesfully");
+    } else {
+      System.out.println("Attribute \"" + attrName + "\" is already an attribute of class \"" + className);
+    }
+  }
 
   public void delAttr();
 
