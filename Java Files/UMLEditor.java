@@ -109,10 +109,10 @@ public class UMLEditor {
 
     // Look through the class list for both classes
     for (int i = 0; i < classes.size(); ++i) {
-      if (classes.get(i).name == class1 && c1 == null) {
+      if (classes.get(i).name.equals(class1) && c1 == null) {
         c1 = classes.get(i);
       }
-      if (classes.get(i).name == class2 && c2 == null) {
+      if (classes.get(i).name.equals(class2) && c2 == null) {
         c2 = classes.get(i);
       }
     }
@@ -186,6 +186,39 @@ public class UMLEditor {
           System.out.println(rels.get(i).get(0));
         }
       }
+    }
+
+    public void printClassContents(String className){
+
+      //finds the class of the specified names
+      UMLClass printClass = null;
+      for (int i = 0; i < classes.size(); ++i){
+        if (classes.get(i).name.equals(className)) {
+          printClass = classes.get(i);
+          break;
+        }
+      }
+      
+      //returns if the class does not exsist and prints an error
+      if (printClass == null){
+        System.out.println("Class does not exsist");
+        return;
+      }
+  
+      //prints out the class's name
+      System.out.println("Class: " + className);
+
+      //prints out the class's attributes
+      System.out.println("Attributes: ");
+      ArrayList<String> attrs = printClass.getAttrs();
+      for (int i = 0; i < attrs.size(); ++i ){
+        System.out.println(attrs.get(i));
+      }
+
+      //prints out the class's relationships
+      printRel(className);
+
+      return;
     }
 
   private repl() {
