@@ -221,6 +221,13 @@ public class UMLEditor {
       return;
     }
 
+    public void printClassList(){
+      //Prints out the name of each class
+      for (int i = 0; i < classes.size(); ++i){
+        System.out.println(classes.get(i).name);
+      }
+    }
+
   private repl() {
     // Interface stuff goes here
     // Check for the user's command input here
