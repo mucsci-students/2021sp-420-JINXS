@@ -15,8 +15,10 @@ public class UMLEditor {
         classes.ensureCapacity(classes.size() + 1);
         // Loop through the list of classes to ensure that a duplicate class name is not trying to be inserted
         for (int i = 0; i < classes.size(); ++i) {
-            if (classes.get(i).name.equals(className))
+            if (classes.get(i).name.equals(className)) {
                 System.out.println("The requested class name already exists");
+                return;
+            }
         }
         // Add the new class to the list of classes
         classes.add(new UMLClass(className));
@@ -39,6 +41,7 @@ public class UMLEditor {
                 // Finally remove the requested class to delete from the class list
                 classes.remove(i);
                 System.out.println("Class \"" + className + "\" was deleted successfully");
+                return;
             }
         }
         System.out.println("The requested class to delete does not exist");
