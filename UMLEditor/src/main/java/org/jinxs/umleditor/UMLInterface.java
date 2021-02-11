@@ -122,10 +122,10 @@ public class UMLInterface {
                 else if(commands.size() > 3){
                     System.out.println("Too many Arguments for deleteAtribute command");
                 }
-                // else{
-                //     project.delAttr(commands.get(1), commands.get(2)); 
-                // }
-                //     break;
+                else{
+                    project.delAttr(commands.get(1), commands.get(2)); 
+                }
+                    break;
 
                 case "renameAttr":
                 if(commands.size() < 4){
