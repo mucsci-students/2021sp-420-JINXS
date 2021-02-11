@@ -93,8 +93,8 @@ public class UMLEditor {
 
         // Add the relationship to both class's rel lists
         if (c1 != null && c2 != null) {
-            c1.addRel(class2, false);
-            c2.addRel(class1, true);
+            c1.addRel(class2, true);
+            c2.addRel(class1, false);
         }
         // Notify user of successful relationship addition
         System.out.println("Relationship between \"" + class1 + "\" and \"" + class2 + "\" added successfully");
@@ -237,7 +237,7 @@ public class UMLEditor {
 
         // returns if the class does not exsist and prints an error
         if (printClass == null) {
-            System.out.println("Class does not exsist");
+            System.out.println("Class does not exist");
             return;
         }
 

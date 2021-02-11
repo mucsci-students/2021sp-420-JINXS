@@ -79,7 +79,7 @@ public class UMLInterface {
                     }
                     break;
 
-                case "addRelationship":
+                case "addRel":
                 if(commands.size() < 3){
                     System.out.println("Too few Arguments for  addRelationship command");
                 }
@@ -91,7 +91,7 @@ public class UMLInterface {
                 }
                     break;
 
-                case "deleteRelationship":
+                case "deleteRel":
                 if(commands.size() < 3){
                     System.out.println("Too few Arguments for  deleteRelationship command");
                 }
@@ -103,7 +103,7 @@ public class UMLInterface {
                 }
                     break;
 
-                case "addAttribute":
+                case "addAttr":
                 if(commands.size() < 3){
                     System.out.println("Too few Arguments for  addAtrribute command");
                 }
@@ -115,29 +115,29 @@ public class UMLInterface {
                 }
                     break;
 
-                case "deleteAttribute":
+                case "deleteAttr":
                 if(commands.size() < 3){
                     System.out.println("Too few Arguments for  deleteAtrribute command");
                 }
                 else if(commands.size() > 3){
                     System.out.println("Too many Arguments for deleteAtribute command");
                 }
-                else{
-                    project.delAttr(commands.get(1), commands.get(2)); 
-                }
-                    break;
+                // else{
+                //     project.delAttr(commands.get(1), commands.get(2)); 
+                // }
+                //     break;
 
-                case "renameAttribute":
+                case "renameAttr":
                 if(commands.size() < 4){
                     System.out.println("Too few Arguments for  renameAtrribute command");
                 }
                 else if(commands.size() > 3){
                     System.out.println("Too many Arguments for renameAtribute command");
                 }
-                else{
-                    project.renameAttr(commands.get(1), commands.get(2), commands.get(3)); 
-                }
-                    break;
+                // else{
+                //     project.renameAttr(commands.get(1), commands.get(2), commands.get(3)); 
+                // }
+                //     break;
 
                 case "save":
                 if(commands.size() < 2){
@@ -146,10 +146,10 @@ public class UMLInterface {
                 else if(commands.size() > 2){
                     System.out.println("Too many Arguments for save command");
                 }
-                else{
-                    project.save(commands.get(1)); 
-                }
-                    break;
+                // else{
+                //     project.save(commands.get(1)); 
+                // }
+                //     break;
 
                 case "load":
                 if(commands.size() < 2){
@@ -158,16 +158,16 @@ public class UMLInterface {
                 else if(commands.size() > 2){
                     System.out.println("Too many Arguments for load command");
                 }
-                else{
-                    project.load(commands.get(1)); 
-                }
+                // else{
+                //     project.load(commands.get(1)); 
+                // }
                 break;
                 
-                case "printClassList":
-                    project.printClasses();
+                case "printList":
+                    project.printClassList();
                 break;
 
-                case "printClassContents":
+                case "printContents":
                 if(commands.size() < 2){
                     System.out.println("Too few Arguments for printClassContents command");
                 }
@@ -218,7 +218,7 @@ public class UMLInterface {
 
     public static void main(String[] args) {
         UMLEditor project = new UMLEditor();
-        CommandInterface(project);
+        commandInterface(project);
         System.exit(0);
     }
 }
