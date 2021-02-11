@@ -15,7 +15,7 @@ public class UMLInterface {
     // fields that we will use
     // boolean helpfile = true; // asks if the helpfile is present
 
-    public static void CommandInterface(UMLEditor project) {
+    public static void commandInterface(UMLEditor project) {
         Scanner UserInput = new Scanner(System.in);
         while (true) {
             System.out.print("$ "); // Represents the start of our terminal input, maybe can change to "> " instead
@@ -80,25 +80,121 @@ public class UMLInterface {
                     break;
 
                 case "addRelationship":
+                if(commands.size() < 3){
+                    System.out.println("Too few Arguments for  addRelationship command");
+                }
+                else if(commands.size() > 3){
+                    System.out.println("Too many Arguments for addRelationship command");
+                }
+                else{
+                    project.addRel(commands.get(1), commands.get(2)); 
+                }
                     break;
 
                 case "deleteRelationship":
+                if(commands.size() < 3){
+                    System.out.println("Too few Arguments for  deleteRelationship command");
+                }
+                else if(commands.size() > 3){
+                    System.out.println("Too many Arguments for deleteRelationship command");
+                }
+                else{
+                    project.delRel(commands.get(1), commands.get(2)); 
+                }
                     break;
 
                 case "addAttribute":
+                if(commands.size() < 3){
+                    System.out.println("Too few Arguments for  addAtrribute command");
+                }
+                else if(commands.size() > 3){
+                    System.out.println("Too many Arguments for addAtribute command");
+                }
+                else{
+                    project.addAttr(commands.get(1), commands.get(2)); 
+                }
                     break;
 
                 case "deleteAttribute":
+                if(commands.size() < 3){
+                    System.out.println("Too few Arguments for  deleteAtrribute command");
+                }
+                else if(commands.size() > 3){
+                    System.out.println("Too many Arguments for deleteAtribute command");
+                }
+                else{
+                    project.delAttr(commands.get(1), commands.get(2)); 
+                }
                     break;
 
                 case "renameAttribute":
+                if(commands.size() < 4){
+                    System.out.println("Too few Arguments for  renameAtrribute command");
+                }
+                else if(commands.size() > 3){
+                    System.out.println("Too many Arguments for renameAtribute command");
+                }
+                else{
+                    project.renameAttr(commands.get(1), commands.get(2), commands.get(3)); 
+                }
                     break;
 
                 case "save":
+                if(commands.size() < 2){
+                    System.out.println("Too few Arguments for save command");
+                }
+                else if(commands.size() > 2){
+                    System.out.println("Too many Arguments for save command");
+                }
+                else{
+                    project.save(commands.get(1)); 
+                }
                     break;
 
                 case "load":
-                    break;
+                if(commands.size() < 2){
+                    System.out.println("Too few Arguments for load command");
+                }
+                else if(commands.size() > 2){
+                    System.out.println("Too many Arguments for load command");
+                }
+                else{
+                    project.load(commands.get(1)); 
+                }
+                break;
+                
+                case "printClassList":
+                    project.printClasses();
+                break;
+
+                case "printClassContents":
+                if(commands.size() < 2){
+                    System.out.println("Too few Arguments for printClassContents command");
+                }
+                else if(commands.size() > 2){
+                    System.out.println("Too many Arguments for printClassContents command");
+                }
+                else{
+                    project.printClassContents(commands.get(1)); 
+                }
+                break;
+
+
+                case "printRel":
+                if(commands.size() < 2){
+                    System.out.println("Too few Arguments for printRel command");
+                }
+                else if(commands.size() > 2){
+                    System.out.println("Too many Arguments for printRel command");
+                }
+                else{
+                    project.printRel(commands.get(1)); 
+                }
+                break;
+
+
+                default:
+                    System.out.println("Error: " + commands.get(0) + " is not a recognized command");
 
             }
         }
