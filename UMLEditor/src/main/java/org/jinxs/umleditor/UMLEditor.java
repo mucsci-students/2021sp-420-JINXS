@@ -183,8 +183,36 @@ public class UMLEditor {
         }
     }
 
-    public void delAttr() {
+  /*
+  * DelAttr will delete the given attribute form the specified class
+  * Variables:
+  * - className = name of class to be accessed
+  * - attributes = name of attribute to be removed
+  * - attrExist = True means successfully deleted, False means attribute dose not exist
+  * - currClass = name called to access the methods in UMLClass
+  *
+  * This method calls the deleteAttr method from the UMLClass file. It searches through the
+  * Array List "classes" to find the given name and then passes the class name to currClass.
+  * currClass is then used to call the deleteAttr method and will attempt to delete the 
+  * attribtue. Changing the boolean variable "attrExist" to ture if it does.
+  */
+    public void delAttr(String className, String attributes){
+        boolean attrExist = false;
 
+    // Searches through arraylist classes, searching for className
+        for (int i = 0; i < classes.size(); i++){
+            if (className.equals(classes.get(i).name)){
+                UMLClass currClass = classes.get(i);
+                attrExist = currClass.deleteAttr(attributes);
+            }
+            // if false, then delete attempt has failed. attribute does not exist
+            if (!attrExist){
+                System.out.println ("Attribute \"" + attributes + "\" does not exist");
+            }
+            else {
+                System.out.println ("Attribute \"" + attributes + "\" was deleted successfully");
+            }
+        }
     }
 
     public void renameAttr() {
