@@ -106,7 +106,7 @@ public class UMLClass {
         }
     
         // If control reaches this point, the old attribute does not exist for this class
-        System.out.print("Attribute \"" + oldName + "\" is not an attribute of class\"" + name + "\""
+        System.out.print("Attribute \"" + oldName + "\" is not an attribute of class\"" + name + "\"");
         return false;
     }
 }
