@@ -2,6 +2,10 @@ package org.jinxs.umleditor;
 
 import java.util.ArrayList;
 
+// For building a JSON object for the class
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 public class UMLClass {
     // Name of this class
     public String name;
@@ -108,5 +112,44 @@ public class UMLClass {
         // If control reaches this point, the old attribute does not exist for this class
         System.out.print("Attribute \"" + oldName + "\" is not an attribute of class\"" + name + "\"");
         return false;
+    }
+
+    // Saves the contents of the class into a JSONObject
+    // The name of the class is a single pair while the relationships
+    // and attributes are saved as arrays. Due to the structure of the relationships,
+    // each individual relationship is saved as an object of two pairs
+    public JSONObject saveClass() {
+        // Create the class object and add the name of the class
+        JSONObject classJObject = new JSONObject();
+        classJObject.put("name", name);
+
+        // Add all relationships for the class into a JSON array
+        JSONArray relsJArray = new JSONArray();
+        for (int i = 0; i < relationships.size(); ++i) {
+            // Put each relationship into its own object containing two pairs:
+            // 1: the name of the other class in the relationship named "className"
+            // 2: the status of the relationship, either "src" or "dest" name "src/dest"
+            JSONObject relJObject = new JSONObject();
+            relJObject.put("className", relationships.get(i).get(0));
+            relJObject.put("src/dest", relationships.get(i).get(1));
+            
+            // Add each relationship object to the relationship array
+            relsJArray.add(relJObject);
+        }
+
+        // Add the rel array to the class object
+        classJObject.put("relationships", relsJArray);
+
+        // Add all attributes for the class into a JSON array
+        JSONArray attrsJArray = new JSONArray();
+        for (int i = 0; i < attributes.size(); ++i) {
+            attrsJArray.add(attributes.get(i));
+        }
+        
+        // Add the array of attributes to the class object
+        classJObject.put("attributes", attrsJArray);
+
+        // Everything is added, so the class object is finished
+        return classJObject;
     }
 }
