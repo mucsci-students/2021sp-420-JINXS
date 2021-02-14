@@ -89,12 +89,24 @@ public class UMLClass {
 
     // Renames an attribute given the old name and a new name for the attribute
     public boolean renameAttr(String oldName, String newName) {
+        // Make sure the new name is not already an attribute for this class
         for (int i = 0; i < attributes.size(); ++i) {
-            if (attributes.get(i).equals(oldName)) {
-                attributes.set(i, newName);
-                return true;
-            }
+          if (attributes.get(i).equals(oldName)) {
+            System.out.print("Attribute \"" + newName + "\" is already an attribute of class\"" + name + "\"");
+            return false;
+          }
         }
+    
+        // Look through the attributes ArrayList for the old attribute
+        for (int i = 0; i < attributes.size(); ++i) {
+          if (attributes.get(i).equals(oldName)) {
+            attributes.set(i, newName);
+            return true;
+          }
+        }
+    
+        // If control reaches this point, the old attribute does not exist for this class
+        System.out.print("Attribute \"" + oldName + "\" is not an attribute of class\"" + name + "\"");
         return false;
     }
 }

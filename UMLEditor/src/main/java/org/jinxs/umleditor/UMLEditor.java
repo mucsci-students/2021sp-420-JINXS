@@ -214,9 +214,32 @@ public class UMLEditor {
             }
         }
     }
-
-    public void renameAttr() {
-
+    
+    // Renames an attribute (oldAttr) of the given className to newAttr
+    public void renameAttr(String className, String oldAttr, String newAttr) {
+        // Ensure the new attribute name is different than the one being renamed
+        if (oldAttr.equals(newAttr)) {
+          System.out.println("The new attribute name must be different than the one being changed");
+          return;
+        }
+        
+        // Find the class that will have an attribute renamed
+        for (int i = 0; i < classes.size(); ++i) {
+          // If the class exists, attempt to rename the provided attribute name to the new name
+          if (classes.get(i).name.equals(className)) {
+            boolean success = classes.get(i).renameAttr(oldAttr, newAttr);
+            if (success) {
+              System.out.print("Attribute \"" + oldAttr + "\" for the class \"" + className + 
+                              "\" successfully renamed to \"" + newAttr + "\"");
+            }
+            // else the class function renameAttr will notify the user if the new attribute was a duplicate
+            // or if the old attribute was not found
+            return;
+          }
+        }
+    
+        // If the for loop cycles all the way through without returning, the class does not exist
+        System.out.print("Class \"" + className + "\" does not currently exist");
     }
 
     // Prints the relationships of a given classname 
