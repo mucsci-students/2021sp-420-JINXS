@@ -2,6 +2,13 @@ package org.jinxs.umleditor;
 
 import java.util.ArrayList;
 
+// For writing out to a file when saving
+import java.io.FileWriter;
+import java.io.IOException;
+
+// For the JSON array of classes to be written to file
+import org.json.simple.JSONArray;
+
 public class UMLEditor {
     
     private ArrayList<UMLClass> classes;
@@ -312,6 +319,26 @@ public class UMLEditor {
         // Prints out the name of each class
         for (int i = 0; i < classes.size(); ++i) {
             System.out.println(classes.get(i).name);
+        }
+    }
+
+    public void save(String fileName) {
+        // Create a JSON array to hold all of the classes
+        JSONArray classJArray = new JSONArray();
+
+        // Loop through the list of classes to save each class and add its
+        // resulting JSON object to the JSON class array
+        for (int i = 0; i < classes.size(); ++i) {
+            classJArray.add(classes.get(i).saveClass());
+        }
+
+        // Write out the JSON class array to the desired filename and catch
+        // IOExceptions if they occur (which will result in a stack trace)
+        try (FileWriter file = new FileWriter(fileName + ".json")) {
+            file.write(classJArray.toJSONString());
+            file.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
