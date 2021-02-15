@@ -9,7 +9,7 @@ This is a command line based UML Editor.
 To install the editor:
 1. Clone this repository
 ```
-$ git clone 
+$ git clone https://github.com/mucsci-students/2021sp-420-JINXS
 ```
 2. Navigate into the new directory "2021sp-420-JINXS"
 ```
