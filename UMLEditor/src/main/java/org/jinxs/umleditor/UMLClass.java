@@ -95,7 +95,7 @@ public class UMLClass {
     public boolean renameAttr(String oldName, String newName) {
         // Make sure the new name is not already an attribute for this class
         for (int i = 0; i < attributes.size(); ++i) {
-          if (attributes.get(i).equals(oldName)) {
+          if (attributes.get(i).equals(newName)) {
             System.out.print("Attribute \"" + newName + "\" is already an attribute of class\"" + name + "\"");
             return false;
           }
