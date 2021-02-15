@@ -414,12 +414,12 @@ public class UMLEditor {
                 }
             }
         // Relevant exception catching: each results in a stack trace
-        } catch (FileNotFoundException e){
+        } catch (Exception e){
             e.printStackTrace();
-        } catch (IOException e){
+        } /* catch (IOException e){
             e.printStackTrace();
         } catch (ParseException e){
             e.printStackTrace();
-        }
+        } */
     }
 }
