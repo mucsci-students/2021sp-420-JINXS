@@ -4,9 +4,9 @@ addClass <class1>                          Creates a new UML class
 
 deleteClass <class1>                       Deletes the specified class
 
-renameClass <class1, newName>              Renames a class to a new specified class name                                                                                                                                 
+renameClass <class1, newName>              Renames a class to a new specified class name
                                                                                                                                                        
-addRel <class1, class2>                    Adds a relationship between the two given classes                                                                      
+addRel <class1, class2>                    Adds a relationship between the two given classes
 
 deleteRel  <class1, class2>                Deletes a relationship between the two given classes 
 
@@ -14,7 +14,8 @@ addAttr  <class1, attrName>                Adds an attribute to a given class
 
 deleteAttr  <class1>                       Deletes the given attribute from the specified class
 
-renameAttr <class1, newAttrName>           Renames the given specified attribute in the given                                                                                                                                                                    class to a new name for the attribute
+renameAttr <class1, newAttrName>           Renames the given specified attribute in the given 
+                                           class to a new name for the attribute
 
 printList                                  Prints the names of all existing classes
 
@@ -28,4 +29,4 @@ quit                                       Exits the the program
 
 save  <fileName>                           Saves the project into a JSON file
 
-load  <fileName>                           Loads a project from a JSON file                                                                                                                                                                                                                                                                                                      
+load  <fileName>                           Loads a project from a JSON file
