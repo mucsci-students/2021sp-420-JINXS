@@ -4,10 +4,18 @@ import java.util.ArrayList;
 
 // For writing out to a file when saving
 import java.io.FileWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 
 // For the JSON array of classes to be written to file
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+//import jdk.internal.joptsimple.internal.Classes;
+//import jdk.tools.jaotc.collect.ClassSearch;
 
 public class UMLEditor {
     
@@ -54,9 +62,20 @@ public class UMLEditor {
         System.out.println("The requested class to delete does not exist");
     }
 
+    /*
+    * 
+    */
     public void renameClass(String oldName, String newName) {
-
+        for(int i = 0; i < classes.size(); i++){
+            if(classes.get(i).name.equals(oldName)){
+                classes.get(i).name = newName;
+            }
+            else {
+                System.out.println("Class \"" + oldName + "\" was not found");
+            }
+        }
     }
+    
 
     // Adds a relationship between class1 and class2 where class1 is the source
     // and class2 is the destination
@@ -190,7 +209,7 @@ public class UMLEditor {
         }
     }
 
-  /*
+  /*****************************************************************************************
   * DelAttr will delete the given attribute form the specified class
   * Variables:
   * - className = name of class to be accessed
@@ -202,7 +221,7 @@ public class UMLEditor {
   * Array List "classes" to find the given name and then passes the class name to currClass.
   * currClass is then used to call the deleteAttr method and will attempt to delete the 
   * attribtue. Changing the boolean variable "attrExist" to ture if it does.
-  */
+  *****************************************************************************************/
     public void delAttr(String className, String attributes){
         boolean attrExist = false;
 
@@ -341,4 +360,61 @@ public class UMLEditor {
             e.printStackTrace();
         }
     }
+
+    public void load(String fileName){
+        JSONParser jPar = new JSONParser();
+        
+        try (FileReader reader = new FileReader(fileName + ".json")){
+            Object obj = jPar.parse(reader);
+            JSONArray classList = (JSONArray) obj;
+            
+            classList.forEach(emp -> parseClassObject((JSONObject) emp));
+
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }catch (IOException e){
+            e.printStackTrace();
+        }catch (ParseException e){
+            e.printStackTrace();
+        }
+    }
+
+    private void parseClassObject (JSONObject Class){
+        String className = (String) Class.get("name");
+        ArrayList<JSONObject> Rel = (ArrayList<JSONObject>) Class.get("relationships");
+        JSONArray att = (JSONArray) Class.get("attributes");
+
+        this.addClass(className);
+        
+        for(int i = 0; i < Rel.size(); i++){
+            JSONObject relation = Rel.get(i);
+            if(relation.get("src/dest").equals("src")){
+                this.addRel(className, (String)relation.get("className"));
+            }else{
+                this.addRel((String)relation.get("className"), className);
+            }
+            
+        }
+        
+
+       // Rel.forEach(emp -> parseRelObj((JSONObject) emp));
+
+        for(int i = 0; i < att.size(); i++){
+            this.addAttr(className, (String) att.get(i));
+        }
+
+    }
+
+    /*
+    private void parseRelObj(JSONObject rel){
+        String className = (String) rel.get("className");
+        String relation = (String) rel.get("src/dest");
+
+        boolean relat = true;
+        if(relation.equals("dest"))
+            relat = false;
+
+        this.addRel(className, relation);
+    }
+    */  
 }
