@@ -21,7 +21,7 @@ $ source .setupEditor.sh
 ```
 4. Run the setup command
 ```
-$ editor
+$ setup
 ```
 
 ### Usage
