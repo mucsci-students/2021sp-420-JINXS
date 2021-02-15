@@ -362,59 +362,64 @@ public class UMLEditor {
     }
 
     public void load(String fileName){
+        // Initiate the JSON parser
         JSONParser jPar = new JSONParser();
         
-        try (FileReader reader = new FileReader(fileName + ".json")){
+        // Attempt to read the filename specified by the user or catch resulting exceptions
+        // if/when that fails
+        try (FileReader reader = new FileReader(fileName + ".json")) {
+            // Save the JSON array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
             
-            classList.forEach(emp -> parseClassObject((JSONObject) emp));
-
-        }catch (FileNotFoundException e){
-            e.printStackTrace();
-        }catch (IOException e){
-            e.printStackTrace();
-        }catch (ParseException e){
-            e.printStackTrace();
-        }
-    }
-
-    private void parseClassObject (JSONObject Class){
-        String className = (String) Class.get("name");
-        ArrayList<JSONObject> Rel = (ArrayList<JSONObject>) Class.get("relationships");
-        JSONArray att = (JSONArray) Class.get("attributes");
-
-        this.addClass(className);
-        
-        for(int i = 0; i < Rel.size(); i++){
-            JSONObject relation = Rel.get(i);
-            if(relation.get("src/dest").equals("src")){
-                this.addRel(className, (String)relation.get("className"));
-            }else{
-                this.addRel((String)relation.get("className"), className);
+            // Loop through each class object in the JSON array and add each class to the UMLEditor
+            // This ensures that each relationship can be added for each class during a second loop
+            // as addRel will fail if one or both classes do no already exist
+            for (int i = 0; i < classList.size(); ++i)  {
+                JSONObject singleClass = (JSONObject)classList.get(i);
+                String className = (String)singleClass.get("name");
+                this.addClass(className);
             }
-            
+
+            // Loop through each class object in the array again to add the relationships and
+            // attributes for each class
+            for (int classNum = 0; classNum < classList.size(); ++classNum)  {
+                JSONObject singleClass = (JSONObject) classList.get(classNum);
+
+                // Save the values of the name, relationships, and attributes from the class object
+                String className = (String) singleClass.get("name");
+                JSONArray Rel = (JSONArray) singleClass.get("relationships");
+                JSONArray att = (JSONArray) singleClass.get("attributes");
+
+                // Loop through each relationship in the relationship JSON array
+                // and add each relationship to the current class
+                for(int relNum = 0; relNum < Rel.size(); ++relNum) {
+                    JSONObject relation = (JSONObject) Rel.get(relNum);
+
+                    // Save the status of the relationship relative to the current class (src or dest)
+                    String relStatus = (String) relation.get("src/dest");
+
+                    // Add the relationship in the correct order based on whether the
+                    // current class is the source or destination
+                    if (relStatus.equals("src")){
+                        this.addRel(className, (String) relation.get("className"));
+                    } else { // status == dest
+                        this.addRel((String) relation.get("className"), className);
+                    }
+                }
+
+                // Loop through the attributes JSON array and add each attribute
+                for(int attrNum = 0; attrNum < att.size(); ++attrNum) {
+                    this.addAttr(className, (String) att.get(attrNum));
+                }
+            }
+        // Relevant exception catching: each results in a stack trace
+        } catch (FileNotFoundException e){
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        } catch (ParseException e){
+            e.printStackTrace();
         }
-        
-
-       // Rel.forEach(emp -> parseRelObj((JSONObject) emp));
-
-        for(int i = 0; i < att.size(); i++){
-            this.addAttr(className, (String) att.get(i));
-        }
-
     }
-
-    /*
-    private void parseRelObj(JSONObject rel){
-        String className = (String) rel.get("className");
-        String relation = (String) rel.get("src/dest");
-
-        boolean relat = true;
-        if(relation.equals("dest"))
-            relat = false;
-
-        this.addRel(className, relation);
-    }
-    */  
 }
