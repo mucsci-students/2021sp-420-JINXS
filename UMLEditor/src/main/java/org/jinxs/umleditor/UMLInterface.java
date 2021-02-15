@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.io.BufferedReader;
+import java.io.File;
 import java.util.Scanner;
 
 public class UMLInterface {
@@ -226,7 +227,8 @@ public class UMLInterface {
 
     public static void main(String[] args) {
         try{
-            brHelp = new BufferedReader (new FileReader("helpDocument.txt"));
+            String filePath = new File("").getAbsolutePath();
+            brHelp = new BufferedReader (new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/helpDocument.txt"));
             brHelp.mark(5000); 
         }catch(Exception FileNotFoundExcpetion){
             helpFile = false; 
