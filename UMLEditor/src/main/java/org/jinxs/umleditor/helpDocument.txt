@@ -1,33 +1,32 @@
-Command/shortcut	          Arguments		                                                      Description
--------------------------	  --------------	                                                      --------------
-addClass                          name of class                                                               Creates a new UML class 
+Command/shortcut	          	           Description
+-------------------------	               --------------
+addClass <class1>                          Creates a new UML class 
 
-deleteClass                       name of existing class                                                      Deletes the specified class
+deleteClass <class1>                       Deletes the specified class
 
-renameClass                       name of existing class, new name                                            Renames a class to a new specified class name                                                                                                                                 
+renameClass <class1, newName>              Renames a class to a new specified class name
                                                                                                                                                        
-addRelationship                   name of existing class (src), 
-                                  name of 2nd existing class (dest)                                           Adds a relationship between the two given classes                                                                      
+addRel <class1, class2>                    Adds a relationship between the two given classes
 
-deleteRelationship                name of existing class (src),
-                                  name of 2nd existing class (dest)                                           Deletes a relationship between the two given classes 
+deleteRel  <class1, class2>                Deletes a relationship between the two given classes 
 
-addAttribute                      name of existing class, attribute name                                      Adds an attribute to a given class 
+addAttr  <class1, attrName>                Adds an attribute to a given class 
 
-deleteAttribute                   name of existing class, attribute name                                      Deletes the given attribute from the specified class
+deleteAttr  <class1>                       Deletes the given attribute from the specified class
 
-renameAttribute                   name of existing class, name of existing attribute,                         Renames the given specified attribute in the given                                                                             new name for attribute                                                                                          class to a new name for the attribute
+renameAttr <class1, newAttrName>           Renames the given specified attribute in the given 
+                                           class to a new name for the attribute
 
-listClasses                       none                                                                        Prints the names of all existing classes
+printList                                  Prints the names of all existing classes
 
-listClass                         name of existing class                                                      Prints the contents of a given class
+printContents <class1>                     Prints the contents of a given class
 
-listRelationships                 name of existing class, name of 2nd existing class                          Prints the all the relationships between classes 
+printRel  <class1>                         Prints the all the relationships between classes 
 
-Help                              none                                                                        Prints a help document with all viable commands 
+help                                       Prints a help document with all viable commands 
 
-Exit                              none                                                                        Exits the the program 
+quit                                       Exits the the program 
 
-Save                              name of JSON file                                                           Saves the project into a JSON file
+save  <fileName>                           Saves the project into a JSON file
 
-Load                              name of JSON file                                                           Loads a project from a JSON file                                                                                                                                                                                                                                                                                                      
+load  <fileName>                           Loads a project from a JSON file

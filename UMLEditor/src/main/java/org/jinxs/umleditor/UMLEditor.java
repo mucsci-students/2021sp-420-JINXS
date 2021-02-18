@@ -2,6 +2,21 @@ package org.jinxs.umleditor;
 
 import java.util.ArrayList;
 
+// For writing out to a file when saving
+import java.io.FileWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+// For the JSON array of classes to be written to file
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+//import jdk.internal.joptsimple.internal.Classes;
+//import jdk.tools.jaotc.collect.ClassSearch;
+
 public class UMLEditor {
     
     private ArrayList<UMLClass> classes;
@@ -47,9 +62,20 @@ public class UMLEditor {
         System.out.println("The requested class to delete does not exist");
     }
 
+    /*
+    * 
+    */
     public void renameClass(String oldName, String newName) {
-
+        for(int i = 0; i < classes.size(); i++){
+            if(classes.get(i).name.equals(oldName)){
+                classes.get(i).name = newName;
+            }
+            else {
+                System.out.println("Class \"" + oldName + "\" was not found");
+            }
+        }
     }
+    
 
     // Adds a relationship between class1 and class2 where class1 is the source
     // and class2 is the destination
@@ -183,7 +209,7 @@ public class UMLEditor {
         }
     }
 
-  /*
+  /*****************************************************************************************
   * DelAttr will delete the given attribute form the specified class
   * Variables:
   * - className = name of class to be accessed
@@ -195,7 +221,7 @@ public class UMLEditor {
   * Array List "classes" to find the given name and then passes the class name to currClass.
   * currClass is then used to call the deleteAttr method and will attempt to delete the 
   * attribtue. Changing the boolean variable "attrExist" to ture if it does.
-  */
+  *****************************************************************************************/
     public void delAttr(String className, String attributes){
         boolean attrExist = false;
 
@@ -313,5 +339,87 @@ public class UMLEditor {
         for (int i = 0; i < classes.size(); ++i) {
             System.out.println(classes.get(i).name);
         }
+    }
+
+    public void save(String fileName) {
+        // Create a JSON array to hold all of the classes
+        JSONArray classJArray = new JSONArray();
+
+        // Loop through the list of classes to save each class and add its
+        // resulting JSON object to the JSON class array
+        for (int i = 0; i < classes.size(); ++i) {
+            classJArray.add(classes.get(i).saveClass());
+        }
+
+        // Write out the JSON class array to the desired filename and catch
+        // IOExceptions if they occur (which will result in a stack trace)
+        try (FileWriter file = new FileWriter(fileName + ".json")) {
+            file.write(classJArray.toJSONString());
+            file.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void load(String fileName){
+        // Initiate the JSON parser
+        JSONParser jPar = new JSONParser();
+        
+        // Attempt to read the filename specified by the user or catch resulting exceptions
+        // if/when that fails
+        try (FileReader reader = new FileReader(fileName + ".json")) {
+            // Save the JSON array from the parser
+            Object obj = jPar.parse(reader);
+            JSONArray classList = (JSONArray) obj;
+            
+            // Loop through each class object in the JSON array and add each class to the UMLEditor
+            // This ensures that each relationship can be added for each class during a second loop
+            // as addRel will fail if one or both classes do no already exist
+            for (int i = 0; i < classList.size(); ++i)  {
+                JSONObject singleClass = (JSONObject)classList.get(i);
+                String className = (String)singleClass.get("name");
+                this.addClass(className);
+            }
+
+            // Loop through each class object in the array again to add the relationships and
+            // attributes for each class
+            for (int classNum = 0; classNum < classList.size(); ++classNum)  {
+                JSONObject singleClass = (JSONObject) classList.get(classNum);
+
+                // Save the values of the name, relationships, and attributes from the class object
+                String className = (String) singleClass.get("name");
+                JSONArray Rel = (JSONArray) singleClass.get("relationships");
+                JSONArray att = (JSONArray) singleClass.get("attributes");
+
+                // Loop through each relationship in the relationship JSON array
+                // and add each relationship to the current class
+                for(int relNum = 0; relNum < Rel.size(); ++relNum) {
+                    JSONObject relation = (JSONObject) Rel.get(relNum);
+
+                    // Save the status of the relationship relative to the current class (src or dest)
+                    String relStatus = (String) relation.get("src/dest");
+
+                    // Add the relationship in the correct order based on whether the
+                    // current class is the source or destination
+                    if (relStatus.equals("src")){
+                        this.addRel(className, (String) relation.get("className"));
+                    } else { // status == dest
+                        this.addRel((String) relation.get("className"), className);
+                    }
+                }
+
+                // Loop through the attributes JSON array and add each attribute
+                for(int attrNum = 0; attrNum < att.size(); ++attrNum) {
+                    this.addAttr(className, (String) att.get(attrNum));
+                }
+            }
+        // Relevant exception catching: each results in a stack trace
+        } catch (Exception e){
+            e.printStackTrace();
+        } /* catch (IOException e){
+            e.printStackTrace();
+        } catch (ParseException e){
+            e.printStackTrace();
+        } */
     }
 }

@@ -1,19 +1,17 @@
 package org.jinxs.umleditor;
 
-// import java.io.FileReader;
-// import java.io.FileWriter;
-import java.io.File;
-// import java.io.IOException;
-import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-// import java.io.BufferedReader;
+import java.io.BufferedReader;
+import java.io.File;
 import java.util.Scanner;
 
 public class UMLInterface {
     
     // fields that we will use
-    // boolean helpfile = true; // asks if the helpfile is present
+    static BufferedReader brHelp; 
+    static boolean helpFile = true; // asks if the helpfile is present
 
     public static void commandInterface(UMLEditor project) {
         Scanner UserInput = new Scanner(System.in);
@@ -31,14 +29,11 @@ public class UMLInterface {
 
                 case "help":
                     try {
-                        File helpFile = new File("helpDocument.txt");
-                        Scanner helpReader = new Scanner(helpFile);
-                        while (helpReader.hasNextLine()) {
-                            System.out.println(helpReader.nextLine());
-                        }
-                        helpReader.close();
-                    } catch (FileNotFoundException e) {
-                        System.out.println("Helpfile was not found.");
+                        readHelpDoc(); 
+                    }
+                      
+                    catch (Exception e) {
+                     
                         e.printStackTrace();
                     }
                     break;
@@ -134,10 +129,10 @@ public class UMLInterface {
                 else if(commands.size() > 3){
                     System.out.println("Too many Arguments for renameAtribute command");
                 }
-                // else{
-                //     project.renameAttr(commands.get(1), commands.get(2), commands.get(3)); 
-                // }
-                //     break;
+                else{
+                    project.renameAttr(commands.get(1), commands.get(2), commands.get(3)); 
+                }
+                    break;
 
                 case "save":
                 if(commands.size() < 2){
@@ -146,10 +141,10 @@ public class UMLInterface {
                 else if(commands.size() > 2){
                     System.out.println("Too many Arguments for save command");
                 }
-                // else{
-                //     project.save(commands.get(1)); 
-                // }
-                //     break;
+                else{
+                    project.save(commands.get(1)); 
+                }
+                    break;
 
                 case "load":
                 if(commands.size() < 2){
@@ -158,9 +153,9 @@ public class UMLInterface {
                 else if(commands.size() > 2){
                     System.out.println("Too many Arguments for load command");
                 }
-                // else{
-                //     project.load(commands.get(1)); 
-                // }
+                else{
+                    project.load(commands.get(1)); 
+                }
                 break;
                 
                 case "printList":
@@ -200,6 +195,7 @@ public class UMLInterface {
         }
     }
 
+
     // Todo: Read input from user
     public static ArrayList<String> parseLine(String command) {
         ArrayList<String> commandList = new ArrayList<String>();
@@ -216,7 +212,27 @@ public class UMLInterface {
         return commandList;
     }
 
+    public static void readHelpDoc() throws Exception{
+        if(!helpFile){
+            System.out.println("helpDocument.txt was not found"); 
+            return; 
+        }
+        int i; 
+        while((i = brHelp.read()) != -1){
+            System.out.print((char) i);
+        }
+        brHelp.reset(); 
+        System.out.print("\n");
+    }
+
     public static void main(String[] args) {
+        try{
+            String filePath = new File("").getAbsolutePath();
+            brHelp = new BufferedReader (new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/helpDocument.txt"));
+            brHelp.mark(5000); 
+        }catch(Exception FileNotFoundExcpetion){
+            helpFile = false; 
+        }
         UMLEditor project = new UMLEditor();
         commandInterface(project);
         System.exit(0);
