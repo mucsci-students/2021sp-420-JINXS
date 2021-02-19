@@ -355,6 +355,8 @@ public class UMLEditor {
         // Write out the JSON class array to the desired filename and put it in the "saves" directory
         // and catch IOExceptions if they occur (which will result in a stack trace)
         String filePath = new File("").getAbsolutePath();
+        // Make a "saves" directory in the umleditor to hold JSON save files
+        new File(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves").mkdirs();
         try (FileWriter file = new FileWriter(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
             file.write(classJArray.toJSONString());
             file.flush();
