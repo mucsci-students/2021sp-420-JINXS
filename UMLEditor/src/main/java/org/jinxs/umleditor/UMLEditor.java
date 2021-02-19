@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 // For writing out to a file when saving
 import java.io.FileWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -351,9 +352,10 @@ public class UMLEditor {
             classJArray.add(classes.get(i).saveClass());
         }
 
-        // Write out the JSON class array to the desired filename and catch
-        // IOExceptions if they occur (which will result in a stack trace)
-        try (FileWriter file = new FileWriter(fileName + ".json")) {
+        // Write out the JSON class array to the desired filename and put it in the "saves" directory
+        // and catch IOExceptions if they occur (which will result in a stack trace)
+        String filePath = new File("").getAbsolutePath();
+        try (FileWriter file = new FileWriter(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
             file.write(classJArray.toJSONString());
             file.flush();
         } catch (IOException e) {
@@ -365,9 +367,10 @@ public class UMLEditor {
         // Initiate the JSON parser
         JSONParser jPar = new JSONParser();
         
-        // Attempt to read the filename specified by the user or catch resulting exceptions
-        // if/when that fails
-        try (FileReader reader = new FileReader(fileName + ".json")) {
+        // Attempt to read the filename in the "saves" directory specified by 
+        // the user or catch resulting exceptions if/when that fails
+        String filePath = new File("").getAbsolutePath();
+        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
             // Save the JSON array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
