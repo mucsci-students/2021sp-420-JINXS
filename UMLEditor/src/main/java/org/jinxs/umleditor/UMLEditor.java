@@ -176,23 +176,34 @@ public class UMLEditor {
         }
     }
 
-    // Adds an attribute (attrName) to a given class (className) if it exists,
-    // and the class does not currently have that attribute
-    public void addAttr(String className, String attrName) {
-        // Will store whether the given "className" exists
+    /*******************************************************************************
+    * addAttr will add the given attribtue to the current class as a field or method
+    * Variables:
+    * - className: The class the attribute will be added to
+    * - attrName = name of the attribute that will be added
+    * - type = determines if the attribute is a field or method
+    * - classExists = boolean to check and see if the class already exist
+    * - attrAdded = boolean that checks if the attribute was added succesfully
+    ********************************************************************************/
+    public void addAttr(String className, String attrName, String type) {
+        
         boolean classExists = false;
-        // Will store the result of attempting to add an attribute to the class
         boolean attrAdded = false;
 
-        // Search through the class list to find the desired class
+        // Search through classes array for className
         for (int i = 0; i < classes.size(); ++i) {
-            // If the class is found, attempt to add the desired attribute
+            // If className is found, add attrName
             if (classes.get(i).name.equals(className)) {
                 classExists = true;
-
+                
                 UMLClass currClass = classes.get(i);
                 // True if added succesfully, false if duplicate
-                attrAdded = currClass.addAttr(attrName);
+                if (type == "field"){
+                    attrAdded = currClass.addField(attrName);
+                }
+                else if (type == "method"){
+                    attrAdded = currClass.addMethod(attrName);
+                }
             }
         }
 
@@ -204,9 +215,19 @@ public class UMLEditor {
         }
 
         if (attrAdded) {
-            System.out.println("Attribute \"" + attrName + "\" added to class \"" + className + "\" succesfully");
+            if (type == "field"){
+                System.out.println("Field \"" + attrName + "\" added to class \"" + className + "\" succesfully");
+            }else{
+                System.out.println("method \"" + attrName + "\" added to class \"" + className + "\" succesfully");
+            }
+            
         } else {
-            System.out.println("Attribute \"" + attrName + "\" is already an attribute of class \"" + className);
+            if (type == "field"){
+                System.out.println("field \"" + attrName + "\" is already a field of class \"" + className);
+            }else{
+                System.out.println("method \"" + attrName + "\" is already an method of class \"" + className);
+            }
+            
         }
     }
 
@@ -223,14 +244,14 @@ public class UMLEditor {
   * currClass is then used to call the deleteAttr method and will attempt to delete the 
   * attribtue. Changing the boolean variable "attrExist" to ture if it does.
   *****************************************************************************************/
-    public void delAttr(String className, String attributes){
+    public void delAttr(String className, String attributes, String type){
         boolean attrExist = false;
 
     // Searches through arraylist classes, searching for className
         for (int i = 0; i < classes.size(); i++){
             if (className.equals(classes.get(i).name)){
                 UMLClass currClass = classes.get(i);
-                attrExist = currClass.deleteAttr(attributes);
+                attrExist = currClass.deleteAttr(attributes, type);
             }
             // if false, then delete attempt has failed. attribute does not exist
             if (!attrExist){
@@ -243,26 +264,26 @@ public class UMLEditor {
     }
     
     // Renames an attribute (oldAttr) of the given className to newAttr
-    public void renameAttr(String className, String oldAttr, String newAttr) {
+    public void renameAttr(String className, String oldAttr, String newAttr, String type) {
         // Ensure the new attribute name is different than the one being renamed
         if (oldAttr.equals(newAttr)) {
-          System.out.println("The new attribute name must be different than the one being changed");
-          return;
+            System.out.println("The new attribute name must be different than the one being changed");
+            return;
         }
         
         // Find the class that will have an attribute renamed
         for (int i = 0; i < classes.size(); ++i) {
           // If the class exists, attempt to rename the provided attribute name to the new name
-          if (classes.get(i).name.equals(className)) {
-            boolean success = classes.get(i).renameAttr(oldAttr, newAttr);
+            if (classes.get(i).name.equals(className)) {
+            boolean success = classes.get(i).renameAttr(oldAttr, newAttr, type);
             if (success) {
-              System.out.print("Attribute \"" + oldAttr + "\" for the class \"" + className + 
-                              "\" successfully renamed to \"" + newAttr + "\"");
+                System.out.print("Attribute \"" + oldAttr + "\" for the class \"" + className + 
+                                "\" successfully renamed to \"" + newAttr + "\"");
             }
             // else the class function renameAttr will notify the user if the new attribute was a duplicate
             // or if the old attribute was not found
             return;
-          }
+            }
         }
     
         // If the for loop cycles all the way through without returning, the class does not exist
