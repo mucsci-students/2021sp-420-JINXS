@@ -18,15 +18,17 @@ public class UMLClass {
     // {"className3", "src/dest"}
     // }
     private ArrayList<ArrayList<String>> relationships;
-    // List of attributes of this class
-    private ArrayList<String> attributes;
+    // List of fields of this class
+    private ArrayList<String> fields;
+    private ArrayList<ArrayList<String>> methods;
 
     // Constructs this new UMLClass given a class name
     public UMLClass(String className) {
         final int defaultSize = 100;
         name = className;
         relationships = new ArrayList<ArrayList<String>>(defaultSize);
-        attributes = new ArrayList<String>(defaultSize);
+        fields = new ArrayList<String>(defaultSize);
+        methods = new ArrayList<ArrayList<String>>(defaultSize);
     }
 
     // Returns the list of relationships
@@ -65,49 +67,90 @@ public class UMLClass {
         return false;
     }
 
-    // Return the list of attributes
+    // Return the list of fields
     public ArrayList<String> getAttrs() {
-        return attributes;
+        return fields;
     }
 
     // Add an attribute given a name
-    public boolean addAttr(String attrName) {
+    public boolean addField(String fieldName) {
         // Look through the attribute list for the name to make sure it doesn't exist
-        for (int i = 0; i < attributes.size(); ++i) {
+        for (int i = 0; i < fields.size(); ++i) {
             // If the attrName is found in the list, then the attribute already exists
-            if (attributes.get(i).equals(attrName)) {
+            if (fields.get(i).equals(fieldName)) {
                 return false;
             }
         }
 
         // Ensure there is space in the ArrayList for the attribute
-        attributes.ensureCapacity(attributes.size() + 1);
+        fields.ensureCapacity(fields.size() + 1);
 
-        return attributes.add(attrName);
+        return fields.add(fieldName);
+    }
+
+    public boolean addMethod(String methodName){
+        
+        // Ensure there is space for the new relationship
+        methods.ensureCapacity(methods.size() + 1);
+
+        // Create a new relationship ArrayList to hold the class name and src/dest
+        // status
+        ArrayList<String> meth = new ArrayList<String>(100);
+        meth.add(methodName);
+        
+        // Add the relationship to the list
+        return methods.add(meth);
     }
 
     // Delete an attribute given a name
-    public boolean deleteAttr(String attrName) {
-        return attributes.remove(attrName);
+    public boolean deleteAttr(String attrName, String type) {
+        if (type == "field"){
+            return fields.remove(attrName);
+        }
+        for(int i = 0; i < methods.size(); i++){
+            if(methods.get(i).get(0).equals(attrName)){
+                return methods.remove(methods.get(i));
+            }
+        }
+
+        return false;
+        
     }
 
     // Renames an attribute given the old name and a new name for the attribute
-    public boolean renameAttr(String oldName, String newName) {
+    public boolean renameAttr(String oldName, String newName, String type) {
         // Make sure the new name is not already an attribute for this class
-        for (int i = 0; i < attributes.size(); ++i) {
-          if (attributes.get(i).equals(newName)) {
-            System.out.println("Attribute \"" + newName + "\" is already an attribute of class \"" + name + "\"");
-            return false;
-          }
+        if (type == "field"){
+            for (int i = 0; i < fields.size(); ++i) {
+                if (fields.get(i).equals(newName)) {
+                System.out.println("field \"" + newName + "\" is already an field of class \"" + name + "\"");
+                return false;
+                }
+            }
+
+            for (int i = 0; i < fields.size(); ++i) {
+                if (fields.get(i).equals(oldName)) {
+                fields.set(i, newName);
+                return true;
+                }
+            }
+
+        }else if (type == "method"){
+            for (int i = 0; i < methods.size(); ++i) {
+                if (methods.get(i).get(0).equals(newName)) {
+                System.out.println("Method \"" + newName + "\" is already an method of class \"" + name + "\"");
+                return false;
+                }
+            }
+
+            for (int i = 0; i < methods.size(); ++i) {
+                if (methods.get(i).get(0).equals(oldName)) {
+                methods.get(i).set(0, newName);
+                return true;
+                }
+            }
         }
-    
-        // Look through the attributes ArrayList for the old attribute
-        for (int i = 0; i < attributes.size(); ++i) {
-          if (attributes.get(i).equals(oldName)) {
-            attributes.set(i, newName);
-            return true;
-          }
-        }
+
     
         // If control reaches this point, the old attribute does not exist for this class
         System.out.println("Attribute \"" + oldName + "\" is not an attribute of class \"" + name + "\"");
@@ -116,7 +159,7 @@ public class UMLClass {
 
     // Saves the contents of the class into a JSONObject
     // The name of the class is a single pair while the relationships
-    // and attributes are saved as arrays. Due to the structure of the relationships,
+    // and fields are saved as arrays. Due to the structure of the relationships,
     // each individual relationship is saved as an object of two pairs
     public JSONObject saveClass() {
         // Create the class object and add the name of the class
@@ -140,14 +183,14 @@ public class UMLClass {
         // Add the rel array to the class object
         classJObject.put("relationships", relsJArray);
 
-        // Add all attributes for the class into a JSON array
+        // Add all fields for the class into a JSON array
         JSONArray attrsJArray = new JSONArray();
-        for (int i = 0; i < attributes.size(); ++i) {
-            attrsJArray.add(attributes.get(i));
+        for (int i = 0; i < fields.size(); ++i) {
+            attrsJArray.add(fields.get(i));
         }
         
-        // Add the array of attributes to the class object
-        classJObject.put("attributes", attrsJArray);
+        // Add the array of fields to the class object
+        classJObject.put("fields", attrsJArray);
 
         // Everything is added, so the class object is finished
         return classJObject;
