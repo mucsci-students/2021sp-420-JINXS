@@ -290,6 +290,69 @@ public class UMLEditor {
         System.out.print("Class \"" + className + "\" does not currently exist");
     }
 
+    public void addParam(String className, String methName, String paramName){
+        UMLClass foundClass = classExists(className);
+        if (foundClass == null){
+            return;
+        }
+
+        foundClass.addParam(methName, paramName);
+    }
+
+    public void deleteParam(String className, String methName, String paramName){
+        UMLClass foundClass = classExists(className);
+        if (foundClass == null){
+            return;
+        }
+
+        foundClass.deleteParam(methName, paramName);
+    }
+
+    public void deleteAllParams(String className, String methName){
+        UMLClass foundClass = classExists(className);
+        if (foundClass == null){
+            return;
+        }
+
+        foundClass.deleteAllParams(methName);
+    }
+
+    public void changeParam(String className, String methName, String paramName){
+        UMLClass foundClass = classExists(className);
+        if (foundClass == null){
+            return;
+        }
+
+        foundClass.changeParam(methName, paramName);
+    }
+
+    public void changeAllParams(String className, String methName, ArrayList<String> params){
+        UMLClass foundClass = classExists(className);
+        if (foundClass == null){
+            return;
+        }
+        foundClass.changeAllParams(methName, params);
+    }
+
+    public UMLClass classExists(String className){
+        UMLClass foundClass = null;
+        for (int i = 0; i < classes.size(); ++i) {
+            if (classes.get(i).name.equals(className)) {
+                foundClass = classes.get(i);
+                break;
+            }
+        }
+
+        if (foundClass == null){
+            System.out.print("Class \"" + className + "\" does not currently exist");
+        }
+
+        return foundClass;
+    }
+
+
+
+
     // Prints the relationships of a given classname 
     public void printRel(String className){
         //intialize an empty arraylist which will hold our relationships
@@ -325,18 +388,8 @@ public class UMLEditor {
 
     public void printClassContents(String className) {
 
-        // finds the class of the specified names
-        UMLClass printClass = null;
-        for (int i = 0; i < classes.size(); ++i) {
-            if (classes.get(i).name.equals(className)) {
-                printClass = classes.get(i);
-                break;
-            }
-        }
-
-        // returns if the class does not exsist and prints an error
-        if (printClass == null) {
-            System.out.println("Class does not exist");
+        UMLClass printClass = classExists(className);
+        if (printClass == null){
             return;
         }
 

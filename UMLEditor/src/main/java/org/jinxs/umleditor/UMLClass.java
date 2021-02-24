@@ -90,15 +90,14 @@ public class UMLClass {
 
     public boolean addMethod(String methodName){
         
-        // Ensure there is space for the new relationship
+        // Ensure there is space for the new method
         methods.ensureCapacity(methods.size() + 1);
 
-        // Create a new relationship ArrayList to hold the class name and src/dest
-        // status
-        ArrayList<String> meth = new ArrayList<String>(100);
+
+        ArrayList<String> meth = new ArrayList<String>();
         meth.add(methodName);
         
-        // Add the relationship to the list
+
         return methods.add(meth);
     }
 
@@ -155,6 +154,119 @@ public class UMLClass {
         // If control reaches this point, the old attribute does not exist for this class
         System.out.println("Attribute \"" + oldName + "\" is not an attribute of class \"" + name + "\"");
         return false;
+    }
+
+    public boolean addParam(String methName, String paramName){
+
+        ArrayList<String> targetMethod = null;
+        for (int i = 0; i < methods.size(); ++i){
+            if (methods.get(i).get(0).equals(methName)){
+                targetMethod = methods.get(i);
+            }
+        }
+
+        if (targetMethod == null){
+            System.out.println("Method does not exist");
+            return false;
+        }
+
+        for (int i = 1; i < targetMethod.size(); ++i){
+            if (targetMethod.get(i).equals(paramName)){
+                System.out.println("Parameter already exists");
+                return false;
+            }
+        }
+
+        targetMethod.add(paramName);
+        return true;
+        
+    }
+
+    public boolean deleteParam(String methName, String paramName){
+        ArrayList<String> targetMethod = null;
+        for (int i = 0; i < methods.size(); ++i){
+            if (methods.get(i).get(0).equals(methName)){
+                targetMethod = methods.get(i);
+            }
+        }
+
+        if (targetMethod == null){
+            System.out.println("Method does not exist");
+            return false;
+        }
+
+        for (int i = 1; i < targetMethod.size(); ++i){
+            if (targetMethod.get(i).equals(paramName)){
+               targetMethod.remove(i);
+               return true;
+            }
+        }
+
+        System.out.println("Parameter does not exist");
+        return false;
+    }
+
+    public boolean deleteAllParams(String methName){
+        ArrayList<String> targetMethod = null;
+        for (int i = 0; i < methods.size(); ++i){
+            if (methods.get(i).get(0).equals(methName)){
+                targetMethod = methods.get(i);
+            }
+        }
+
+        if (targetMethod == null){
+            System.out.println("Method does not exist");
+            return false;
+        }
+
+        for (int i = 1; i < targetMethod.size(); ++i){
+            deleteParam(methName, targetMethod.get(i));
+        }
+
+        return true;
+    }
+
+    public boolean changeParam(String methName, String paramName){
+        ArrayList<String> targetMethod = null;
+        for (int i = 0; i < methods.size(); ++i){
+            if (methods.get(i).get(0).equals(methName)){
+                targetMethod = methods.get(i);
+            }
+        }
+
+        if (targetMethod == null){
+            System.out.println("Method does not exist");
+            return false;
+        }
+
+        for (int i = 1; i < targetMethod.size(); ++i){
+            if (targetMethod.get(i).equals(paramName)){
+               targetMethod.set(i, paramName);
+               return true;
+            }
+        }
+
+        System.out.println("Parameter does not exist");
+        return false;
+
+    }
+
+    public boolean changeAllParams(String methName, ArrayList<String> params){
+        ArrayList<String> targetMethod = null;
+        for (int i = 0; i < methods.size(); ++i){
+            if (methods.get(i).get(0).equals(methName)){
+                targetMethod = methods.get(i);
+            }
+        }
+
+        if (targetMethod == null){
+            System.out.println("Method does not exist");
+            return false;
+        }
+
+        deleteAllParams(methName);
+
+        return targetMethod.addAll(params);
     }
 
     // Saves the contents of the class into a JSONObject
