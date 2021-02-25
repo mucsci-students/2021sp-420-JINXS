@@ -13,9 +13,9 @@ public class UMLClass {
     // {
     // "src" or "dest" defines whether className is the source or destination to
     // this class
-    // {"className1", "src/dest"},
-    // {"className2", "src/dest"},
-    // {"className3", "src/dest"}
+    // {"className1", "src/dest", "type"},
+    // {"className2", "src/dest", "type"},
+    // {"className3", "src/dest", "type"}
     // }
     private ArrayList<ArrayList<String>> relationships;
     // List of fields of this class
@@ -62,6 +62,17 @@ public class UMLClass {
         for (int i = 0; i < relationships.size(); ++i) {
             if (relationships.get(i).get(0).equals(className)) {
                 relationships.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Change a relationship type
+    public boolean changeRelType(String otherClass, String newType) {
+        for (int i = 0; i < relationships.size(); ++i) {
+            if (relationships.get(i).get(0).equals(otherClass)) {
+                relationships.get(i).set(3, newType);
                 return true;
             }
         }

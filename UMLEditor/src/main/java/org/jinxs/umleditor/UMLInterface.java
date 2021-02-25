@@ -76,10 +76,10 @@ public class UMLInterface {
 
                 case "addRel":
                 if(commands.size() < 4){
-                    System.out.println("Too few Arguments for  addRelationship command");
+                    System.out.println("Too few Arguments for addRel command");
                 }
                 else if(commands.size() > 4){
-                    System.out.println("Too many Arguments for addRelationship command");
+                    System.out.println("Too many Arguments for addRel command");
                 }
                 else{
                     project.addRel(commands.get(1), commands.get(2), commands.get(3)); 
@@ -88,22 +88,32 @@ public class UMLInterface {
 
                 case "deleteRel":
                 if(commands.size() < 3){
-                    System.out.println("Too few Arguments for  deleteRelationship command");
+                    System.out.println("Too few Arguments for deleteRel command");
                 }
                 else if(commands.size() > 3){
-                    System.out.println("Too many Arguments for deleteRelationship command");
+                    System.out.println("Too many Arguments for deleteRel command");
                 }
                 else{
                     project.delRel(commands.get(1), commands.get(2)); 
                 }
                     break;
 
+                case "renameRel":
+                if (commands.size() < 4) {
+                    System.out.println("Too few Arguments for renameRel command");
+                } else if (commands.size() > 4) {
+                    System.out.println("Too many Arguments for renameRel command");
+                } else {
+                    project.changeRelType(commands.get(1), commands.get(2), commands.get(3));
+                }
+                    break;
+
                 case "addAttr":
                 if(commands.size() < 3){
-                    System.out.println("Too few Arguments for  addAtrribute command");
+                    System.out.println("Too few Arguments for addAttr command");
                 }
                 else if(commands.size() > 3){
-                    System.out.println("Too many Arguments for addAtribute command");
+                    System.out.println("Too many Arguments for addAttr command");
                 }
                 else{
                     project.addAttr(commands.get(1), commands.get(2)); 
@@ -112,10 +122,10 @@ public class UMLInterface {
 
                 case "deleteAttr":
                 if(commands.size() < 3){
-                    System.out.println("Too few Arguments for  deleteAtrribute command");
+                    System.out.println("Too few Arguments for deleteAttr command");
                 }
                 else if(commands.size() > 3){
-                    System.out.println("Too many Arguments for deleteAtribute command");
+                    System.out.println("Too many Arguments for deleteAttr command");
                 }
                 else{
                     project.delAttr(commands.get(1), commands.get(2)); 
@@ -124,10 +134,10 @@ public class UMLInterface {
 
                 case "renameAttr":
                 if(commands.size() < 4){
-                    System.out.println("Too few Arguments for  renameAtrribute command");
+                    System.out.println("Too few Arguments for renameAttr command");
                 }
                 else if(commands.size() > 3){
-                    System.out.println("Too many Arguments for renameAtribute command");
+                    System.out.println("Too many Arguments for renameAttr command");
                 }
                 else{
                     project.renameAttr(commands.get(1), commands.get(2), commands.get(3)); 
