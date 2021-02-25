@@ -18,6 +18,9 @@ import org.json.simple.parser.ParseException;
 //import jdk.internal.joptsimple.internal.Classes;
 //import jdk.tools.jaotc.collect.ClassSearch;
 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
 public class UMLEditor {
     
     private ArrayList<UMLClass> classes;
@@ -28,6 +31,23 @@ public class UMLEditor {
 
     // Adds a class to the list of classes given a new class name that is not already in use
     public void addClass(String className) {
+        // Ensure the class name does not start with a number
+        if (Character.isDigit(className.charAt(0))) {
+            System.out.println("Class name cannot start with a number");
+            return;
+        }
+
+        // Ensure the class name does not contain special characters (except for '_')
+        // By matching with a regex
+        Pattern p = Pattern.compile("[^a-z0-9_ ]", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(className);
+        boolean containsSpecChars = m.find();
+
+        if (containsSpecChars) {
+            System.out.println("The class name cannot contain special characters or spaces");
+            return;
+        }
+
         classes.ensureCapacity(classes.size() + 1);
         // Loop through the list of classes to ensure that a duplicate class name is not trying to be inserted
         for (int i = 0; i < classes.size(); ++i) {
