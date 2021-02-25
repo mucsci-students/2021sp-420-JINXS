@@ -73,6 +73,11 @@ public class UMLClass {
         return fields;
     }
 
+    // Return the list of methods
+    public ArrayList<ArrayList<String>> getMethods() {
+        return methods;
+    }
+
     // Add an attribute given a name
     public boolean addField(String fieldName) {
         // Look through the attribute list for the name to make sure it doesn't exist
