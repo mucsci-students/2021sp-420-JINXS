@@ -86,7 +86,7 @@ public class UMLEditor {
             System.out.println("Class names must be different");
             return;
         }
-/*******************Place holder type check*******************/
+        /*******************Place holder type check*******************/
         if (type.equals("association") || type.equals("aggregation") || type.equals("composition") ||
             type.equals("generalization")){
 
@@ -185,6 +185,32 @@ public class UMLEditor {
             c1.deleteRel(c2.name);
             c2.deleteRel(c1.name);
             System.out.println("Relationship deleted");
+        }
+    }
+
+    /********************************************************************************
+    * changeRelType
+    * Changes the relationship type of the given relationship
+    ********************************************************************************/
+    public void changeRelType(String class1, String class2, String newType) {
+        UMLClass c1 = classExists(class1);
+        UMLClass c2 = classExists(class2);
+
+        /******************* Place holder type check *******************/
+        if (newType.equals("association") || newType.equals("aggregation") || newType.equals("composition")
+                || newType.equals("generalization")) {
+
+        } else if (!(newType.equals(""))) {
+            System.out.println("Missing a Type, Please try again");
+            return;
+        } else {
+            System.out.println("Type is invalid");
+            return;
+        }
+
+        boolean res = c1.changeRelType(class2, newType) && c2.changeRelType(class1, newType);
+        if (!res) {
+            System.out.println("Changing the relationship type failed");
         }
     }
 
