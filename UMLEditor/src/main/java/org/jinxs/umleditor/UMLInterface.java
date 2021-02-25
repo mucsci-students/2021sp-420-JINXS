@@ -75,14 +75,14 @@ public class UMLInterface {
                     break;
 
                 case "addRel":
-                if(commands.size() < 3){
+                if(commands.size() < 4){
                     System.out.println("Too few Arguments for  addRelationship command");
                 }
-                else if(commands.size() > 3){
+                else if(commands.size() > 4){
                     System.out.println("Too many Arguments for addRelationship command");
                 }
                 else{
-                    project.addRel(commands.get(1), commands.get(2)); 
+                    project.addRel(commands.get(1), commands.get(2), commands.get(3)); 
                 }
                     break;
 

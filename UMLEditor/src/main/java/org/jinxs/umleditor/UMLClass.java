@@ -39,7 +39,7 @@ public class UMLClass {
     // Add a relationship given the name of the other class and a boolean
     // Boolean should be true if the other class is the source, else should be
     // false if this class is the source (the other class is the destination)
-    public boolean addRel(String className, boolean isSrc) {
+    public boolean addRel(String className, boolean isSrc, String type) {
         // Ensure there is space for the new relationship
         relationships.ensureCapacity(relationships.size() + 1);
 
@@ -51,6 +51,7 @@ public class UMLClass {
         ArrayList<String> rel = new ArrayList<String>(2);
         rel.add(className);
         rel.add(ext);
+        rel.add(type);
 
         // Add the relationship to the list
         return relationships.add(rel);

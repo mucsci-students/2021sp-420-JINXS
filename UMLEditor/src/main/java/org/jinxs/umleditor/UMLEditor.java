@@ -80,10 +80,21 @@ public class UMLEditor {
 
     // Adds a relationship between class1 and class2 where class1 is the source
     // and class2 is the destination
-    public void addRel(String class1, String class2) {
+    public void addRel(String class1, String class2, String type) {
         // Make sure each given class name is unique
         if (class1.equals(class2)) {
             System.out.println("Class names must be different");
+            return;
+        }
+/*******************Place holder type check*******************/
+        if (type.equals("association") || type.equals("aggregation") || type.equals("composition") ||
+            type.equals("generalization")){
+
+        }else if (!(type.equals(""))){
+            System.out.println("Missing a Type, Please try again");
+            return;
+        }else {
+            System.out.println("Type is invalid");
             return;
         }
 
@@ -119,13 +130,14 @@ public class UMLEditor {
         }
 
         // Add the relationship to both class's rel lists
+        // true = src, false = dest
         if (c1 != null && c2 != null) {
-            c1.addRel(class2, true);
-            c2.addRel(class1, false);
+            c1.addRel(class2, true, type);
+            c2.addRel(class1, false, type);
         }
         // Notify user of successful relationship addition
         System.out.println("Relationship between \"" + class1 + "\" and \"" + class2 + "\" added successfully");
-    }
+        }
 
     public void delRel(String class1, String class2){
         // Make sure each given class name is unique
