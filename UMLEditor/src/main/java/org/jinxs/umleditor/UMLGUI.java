@@ -11,10 +11,13 @@ import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 import java.util.*; 
 import java.awt.event.*;
+import java.io.IOException;
 import java.awt.*; 
 import java.util.HashMap;
 import java.util.Map;
-
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 
 
@@ -22,21 +25,33 @@ public class UMLGUI implements ActionListener{
  
     private static JFrame window; 
     private static JMenuBar menu; 
-    //private static Map<String,JPanel> classList; 
+    private static Map<String,JPanel> classList = new HashMap<String,JPanel>();
 
-    public static void umlWindow(UMLEditor project){
+    private static UMLEditor project = new UMLEditor(); 
+    private static JTextArea textArea; 
+    private static JPanel panel;
+    private static ArrayList<JPanel> panels = new ArrayList<JPanel>();
+    private static ArrayList<String> rels = new ArrayList<String>(); 
+     
+
+
+    
+
+    public static void umlWindow(){
  
         window = new JFrame("Graphical User Interface");
         window.setLayout(new GridLayout(5,5));
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setSize(800,700);
+        
 
         menu = new JMenuBar(); 
         createFileMenu(menu); 
         createClassMenu(menu); 
         createRelationshipMenu(menu); 
         createFieldMenu(menu);  
-        createMethodMenu(menu); 
+        createMethodMenu(menu);
+        createParamMenu(menu); 
 
         window.setJMenuBar(menu);
 
@@ -46,32 +61,109 @@ public class UMLGUI implements ActionListener{
 
     }
 
-    private static void createClass(String className){
 
-        classPanel(className); 
+    public static void getFromProject(UMLEditor project){
+        
+        panels.clear();
+        ArrayList<UMLClass> classes = project.getClasses(); 
+        for (int i = 0; i < classes.size(); ++i) {
+            createClassPanel(classes.get(i).name);
+        }
+
+        for (int i = 0; i < classes.size(); ++i) {
+            ArrayList<ArrayList<String>> rels = classes.get(i).getRels();
+
+            for(int j = 0; j < rels.size(); j++){
+                String relStatus = rels.get(j).get(1);
+
+                // Save the type of the relationship
+                String relType = rels.get(j).get(2);
+
+                // Add the relationship in the correct order based on whether the
+                // current class is the source or destination
+                if (relStatus.equals("src")){
+                    createRelPanel(classes.get(i).name, rels.get(j).get(0), relType);
+                } else { // status == dest
+                    createRelPanel(rels.get(j).get(0), classes.get(i).name, relType);
+                }
+            } 
+        }
+    }
+
+    private static void createClassPanel(String className){ 
+        //window.remove(panel);
+
+        panel = new JPanel();
+        panel.setSize(30, 250);
+        panel.setVisible(true);
+        window.add(panel); 
+        
+		JTextArea classTxt = new JTextArea("Classname: " + className);
+		classTxt.setEditable(false);
+
+
+		panel.add(classTxt);
+        repaintPanel();
+        panels.add(panel); 
+
+		Border bd = BorderFactory.createLineBorder(Color.GREEN);
+		classTxt.setBorder(bd);
+        
+    }
+
+ 
+
+    public static void createRelPanel(String src, String dest, String type){
+        JPanel relPanel = new JPanel();
+        relPanel.setSize(30, 250);
+        relPanel.setVisible(true);
+        window.add(relPanel); 
+        
+		JTextArea relSrc = new JTextArea("Class Source: " + src);
+        JTextArea relDest = new JTextArea("Class Destination: " + dest);
+        JTextArea relType = new JTextArea("Type: " + type);
+		relSrc.setEditable(false);
+        relDest.setEditable(false);
+        relType.setEditable(false);
+
+        String rel = src + dest + type;
+        for(int i = 0; i < rels.size(); i++){
+            if(rels.get(i).equals(rel)){
+                return; 
+            }
+        }
+        rels.add(rel);
+        
+
+		relPanel.add(relSrc);
+        relPanel.add(relDest);
+        relPanel.add(relType);
+
+    
+
+        
+
+        //classList.put(className, classPanel); 
+
+		Border bd = BorderFactory.createLineBorder(Color.RED);
+		relSrc.setBorder(bd);
+        relDest.setBorder(bd);
+        relType.setBorder(bd);
+       
         refresh(); 
     }
 
-    public static void classPanel(String className){
-        JPanel classPanel = new JPanel();
-        classPanel.setSize(30, 250);
-        classPanel.setVisible(true);
-        window.add(classPanel); 
-        
-		JTextArea classTxt = new JTextArea(className);
-		classTxt.setEditable(false);
-		classPanel.add(classTxt);
-       
 
-		Border bd = BorderFactory.createLineBorder(Color.RED);
-		classTxt.setBorder(bd);
-		window.add(classPanel);
 
-    }
 
     private static void refresh(){
         window.repaint(); 
     }
+    private static void repaintPanel(){
+        panel.revalidate(); 
+        panel.repaint(); 
+    }
+
 
     public static void createFileMenu(JMenuBar menu){
         JMenu file = new JMenu("File"); 
@@ -119,13 +211,13 @@ public class UMLGUI implements ActionListener{
         JMenuItem in = new JMenuItem("Inheritance");
         JMenuItem ag = new JMenuItem("Aggregation");
         JMenuItem comp = new JMenuItem("Composition");
-        JMenuItem gen = new JMenuItem("Generalization");
+        JMenuItem gen = new JMenuItem("Realization");
 
 
 		
 
         JMenuItem[] relArray = {in,ag,comp,gen}; 
-        String[] labelText = {"Inheritance", "Aggregation", "Composition", "Generalization"};      
+        String[] labelText = {"Inheritance", "Aggregation", "Composition", "Realization"};      
 
         for(int i = 0; i < 4; ++i)
 		{
@@ -180,15 +272,39 @@ public class UMLGUI implements ActionListener{
         menu.add(method); 
     }
 
+    public static void createParamMenu(JMenuBar menu){
+        JMenu param = new JMenu("Parameter"); 
+
+        JMenuItem addParam = new JMenuItem("Add Parameter");
+        JMenuItem deleteParam = new JMenuItem("Delete Parameter");
+        JMenuItem deleteAllParams = new JMenuItem("Delete All Parameters");
+        JMenuItem renameParam = new JMenuItem("Rename parameter");
+        JMenuItem renameAllParams = new JMenuItem("Rename All Parameters");
+	
+
+        JMenuItem[] paramArray = {addParam, deleteParam, deleteAllParams, renameParam, renameAllParams}; 
+        String[] labelText = {"Add Parameter","Delete Parameter","Delete All Parameters", "Rename Parameter", "renameAllParams"}; 
+             
+
+        for(int i = 0; i < 5; ++i)
+		{
+			param.add(paramArray[i]);
+			paramArray[i].setToolTipText(labelText[i]);
+			
+		}
+
+        menu.add(param); 
+    }
+
     private String getText(String string)
 	{
-		String str = "Classname: " + JOptionPane.showInputDialog(window, string, JOptionPane.PLAIN_MESSAGE);
+		String str = JOptionPane.showInputDialog(window, string, JOptionPane.PLAIN_MESSAGE);
 
 		return str;
 	}
 
-    public UMLGUI(UMLEditor project) {
-        umlWindow(project);
+    public UMLGUI() {
+        umlWindow();
 
         for (int i = 0; i < menu.getMenuCount(); ++i) {
             JMenu singleMenu = menu.getMenu(i);
@@ -201,29 +317,58 @@ public class UMLGUI implements ActionListener{
     }
 
     public void actionPerformed(ActionEvent e){
-        String command = e.getActionCommand(); 
-        UMLEditor project = new UMLEditor();
+        String command = e.getActionCommand();
+        if(panels.size() > 0){
+
+        for(int i = 0; i < panels.size(); i++){
+            window.remove(panels.get(i));
+        }
+        panels.clear();
+    }
+
+
         if(command.equals("Add")){
             String classToAdd = getText("Class to Add: ");
-            project.addClass(classToAdd);  
-            createClass(classToAdd); 
-            refresh(); 
+            project.addClass(classToAdd); 
+            getFromProject(project); 
+            repaintPanel(); 
                
         }
         if(command.equals("Delete")){
             String classToDelete = getText("Class to Delete: ");
             project.deleteClass(classToDelete);
+            getFromProject(project); 
             refresh(); 
         }
+        if(command.equals("Rename")){
+            String class1 = getText("Class to rename: ");
+            String class2 = getText("New name: ");
+            project.renameClass(class1, class2);
+            getFromProject(project);
+            refresh();
+        }
+        if (command.equals("Inheritance")){
+            String relToAdd = getText("Source Class: "); 
+            String relToAdd2 = getText("Destination Class: "); 
+            project.addRel(relToAdd, relToAdd2, "inheritance");
+            getFromProject(project);
+            refresh();
+        } 
     
     }
     
 
 
 
-   public static void main(String[] args) {
-       UMLEditor project = new UMLEditor(); 
-       new UMLGUI(project);
-    }   
+   public static void main(String[] args) throws IOException{
+
+       //if(args.length == 1 && args[0].equals("--cli")){
+           //UMLInterface console = new UMLInterface(); 
+       //}
+       //else{
+       UMLGUI gui = new UMLGUI(); 
+        //}   
+    //}
+    }
 }
 

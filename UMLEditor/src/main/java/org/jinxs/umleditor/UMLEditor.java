@@ -112,8 +112,8 @@ public class UMLEditor {
             return;
         }
         /*******************Place holder type check*******************/
-        if (type.equals("association") || type.equals("aggregation") || type.equals("composition") ||
-            type.equals("generalization")){
+        if (type.equals("inheritance") || type.equals("aggregation") || type.equals("composition") ||
+            type.equals("realization")){
 
         }else if (!(type.equals(""))){
             System.out.println("Missing a Type, Please try again");
@@ -222,8 +222,8 @@ public class UMLEditor {
         UMLClass c2 = classExists(class2);
 
         /******************* Place holder type check *******************/
-        if (newType.equals("association") || newType.equals("aggregation") || newType.equals("composition")
-                || newType.equals("generalization")) {
+        if (newType.equals("inheritance") || newType.equals("aggregation") || newType.equals("composition")
+                || newType.equals("realization")) {
 
         } else if (!(newType.equals(""))) {
             System.out.println("Missing a Type, Please try again");
@@ -468,6 +468,11 @@ public class UMLEditor {
         for (int i = 0; i < classes.size(); ++i) {
             System.out.println(classes.get(i).name);
         }
+    }
+
+    public ArrayList<UMLClass> getClasses(){
+
+        return classes; 
     }
 
     public void save(String fileName) {
