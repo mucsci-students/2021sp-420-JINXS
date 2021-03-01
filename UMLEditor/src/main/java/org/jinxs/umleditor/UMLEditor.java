@@ -350,7 +350,10 @@ public class UMLEditor {
             return;
         }
 
-        foundClass.addParam(methName, paramName);
+        boolean success = foundClass.addParam(methName, paramName);
+        if (success){
+            System.out.println ("Parameter \"" + paramName + "\" was added successfully");
+        }
     }
 
     public void deleteParam(String className, String methName, String paramName){
@@ -359,7 +362,10 @@ public class UMLEditor {
             return;
         }
 
-        foundClass.deleteParam(methName, paramName);
+       boolean success = foundClass.deleteParam(methName, paramName);
+        if (success){
+            System.out.println ("Parameter \"" + paramName + "\" was deleted successfully");
+        }
     }
 
     public void deleteAllParams(String className, String methName){
@@ -368,24 +374,35 @@ public class UMLEditor {
             return;
         }
 
-        foundClass.deleteAllParams(methName);
+        boolean success = foundClass.deleteAllParams(methName);
+        if (success) {
+            System.out.println ("Parameters deleted successfully");
+        }
     }
 
-    public void changeParam(String className, String methName, String paramName){
+    public void changeParam(String className, String methName, String paramName, String newParamName){
         UMLClass foundClass = classExists(className);
         if (foundClass == null){
             return;
         }
 
-        foundClass.changeParam(methName, paramName);
-    }
+        boolean success = foundClass.changeParam(methName, paramName, newParamName);
+        if (success){
+            System.out.print("Parameter \"" + paramName + "\" for the class \"" + className + 
+                "\" successfully renamed to \"" + newParamName + "\"");
+        }
+        
+    } 
 
     public void changeAllParams(String className, String methName, ArrayList<String> params){
         UMLClass foundClass = classExists(className);
         if (foundClass == null){
             return;
         }
-        foundClass.changeAllParams(methName, params);
+        boolean success = foundClass.changeAllParams(methName, params);
+        if (success){
+            System.out.println ("Parameters changed successfully");
+        }
     }
 
     public UMLClass classExists(String className){
@@ -450,16 +467,29 @@ public class UMLEditor {
         // prints out the class's name
         System.out.println("Class: " + className);
 
-        // prints out the class's attributes
-        System.out.println("Attributes: ");
-        ArrayList<String> attrs = printClass.getAttrs();
-        for (int i = 0; i < attrs.size(); ++i) {
-            System.out.println(attrs.get(i));
+        // prints out the class's fields
+        System.out.println("Fields: ");
+        ArrayList<String> fields = printClass.getFields();
+        for (int i = 0; i < fields.size(); ++i) {
+            System.out.println("    " + fields.get(i));
         }
+
+        // prints out the class's methods
+        System.out.println("Methods: ");
+        ArrayList<ArrayList<String>> meths = printClass.getMethods();
+        for (int i = 0; i < meths.size(); ++i) {
+            ArrayList<String> targetMeth = meths.get(i);
+            System.out.println("    " + targetMeth.get(0));
+            System.out.println("        Params: " );
+            for (int x = 1; x < targetMeth.size(); ++x){
+                System.out.println("            " + targetMeth.get(x) );
+            }
+        }
+
+
 
         // prints out the class's relationships
         printRel(className);
-
         return;
     }
 

@@ -88,7 +88,7 @@ public class UMLClass {
     }
 
     // Return the list of fields
-    public ArrayList<String> getAttrs() {
+    public ArrayList<String> getFields() {
         return fields;
     }
 
@@ -245,13 +245,15 @@ public class UMLClass {
         }
 
         for (int i = 1; i < targetMethod.size(); ++i){
-            deleteParam(methName, targetMethod.get(i));
+            targetMethod.remove(i);
         }
+
+        targetMethod.remove(targetMethod.size() -1);
 
         return true;
     }
 
-    public boolean changeParam(String methName, String paramName){
+    public boolean changeParam(String methName, String oldName, String newName){
         ArrayList<String> targetMethod = null;
         for (int i = 0; i < methods.size(); ++i){
             if (methods.get(i).get(0).equals(methName)){
@@ -265,8 +267,8 @@ public class UMLClass {
         }
 
         for (int i = 1; i < targetMethod.size(); ++i){
-            if (targetMethod.get(i).equals(paramName)){
-               targetMethod.set(i, paramName);
+            if (targetMethod.get(i).equals(oldName)){
+               targetMethod.set(i, newName);
                return true;
             }
         }
