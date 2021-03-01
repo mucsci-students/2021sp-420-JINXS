@@ -5,7 +5,6 @@ import java.util.ArrayList;
 // For writing out to a file when saving
 import java.io.FileWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -13,7 +12,6 @@ import java.io.IOException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 //import jdk.internal.joptsimple.internal.Classes;
 //import jdk.tools.jaotc.collect.ClassSearch;
@@ -245,45 +243,36 @@ public class UMLEditor {
     ********************************************************************************/
     public void addAttr(String className, String attrName, String type) {
         
-        boolean classExists = false;
         boolean attrAdded = false;
 
-        // Search through classes array for className
-        for (int i = 0; i < classes.size(); ++i) {
-            // If className is found, add attrName
-            if (classes.get(i).name.equals(className)) {
-                classExists = true;
-                
-                UMLClass currClass = classes.get(i);
-                // True if added succesfully, false if duplicate
-                if (type == "field"){
-                    attrAdded = currClass.addField(attrName);
-                }
-                else if (type == "method"){
-                    attrAdded = currClass.addMethod(attrName);
-                }
-            }
+        UMLClass currClass = classExists(className);
+
+        if (currClass == null) {
+            return;
+        }
+
+        // True if added succesfully, false if duplicate
+        if (type.equals("field")){
+            attrAdded = currClass.addField(attrName);
+        }
+        else if (type.equals("method")){
+            attrAdded = currClass.addMethod(attrName);
         }
 
         // Notify the user of the resuls of the attribute addition
 
-        if (!classExists) {
-            System.out.println("Class \"" + className + "\" does not exist");
-            return;
-        }
-
         if (attrAdded) {
-            if (type == "field"){
+            if (type.equals("field")){
                 System.out.println("Field \"" + attrName + "\" added to class \"" + className + "\" succesfully");
             }else{
                 System.out.println("method \"" + attrName + "\" added to class \"" + className + "\" succesfully");
             }
             
         } else {
-            if (type == "field"){
+            if (type.equals("field")){
                 System.out.println("field \"" + attrName + "\" is already a field of class \"" + className);
             }else{
-                System.out.println("method \"" + attrName + "\" is already an method of class \"" + className);
+                System.out.println("method \"" + attrName + "\" is already a method of class \"" + className);
             }
             
         }
@@ -518,45 +507,58 @@ public class UMLEditor {
                 this.addClass(className);
             }
 
-            // Loop through each class object in the array again to add the relationships and
-            // attributes for each class
+            // Loop through each class object in the array again to add the relationships,
+            // methods, and fields for each class
             for (int classNum = 0; classNum < classList.size(); ++classNum)  {
                 JSONObject singleClass = (JSONObject) classList.get(classNum);
 
                 // Save the values of the name, relationships, and attributes from the class object
                 String className = (String) singleClass.get("name");
-                JSONArray Rel = (JSONArray) singleClass.get("relationships");
-                JSONArray att = (JSONArray) singleClass.get("attributes");
+                JSONArray rels = (JSONArray) singleClass.get("relationships");
+                JSONArray methods = (JSONArray) singleClass.get("methods");
+                JSONArray fields = (JSONArray) singleClass.get("fields");
 
                 // Loop through each relationship in the relationship JSON array
                 // and add each relationship to the current class
-                for(int relNum = 0; relNum < Rel.size(); ++relNum) {
-                    JSONObject relation = (JSONObject) Rel.get(relNum);
+                for(int relNum = 0; relNum < rels.size(); ++relNum) {
+                    JSONObject relation = (JSONObject) rels.get(relNum);
 
                     // Save the status of the relationship relative to the current class (src or dest)
                     String relStatus = (String) relation.get("src/dest");
 
+                    // Save the type of the relationship
+                    String relType = (String) relation.get("type");
+
                     // Add the relationship in the correct order based on whether the
                     // current class is the source or destination
                     if (relStatus.equals("src")){
-                        this.addRel(className, (String) relation.get("className"));
+                        this.addRel(className, (String) relation.get("className"), relType);
                     } else { // status == dest
-                        this.addRel((String) relation.get("className"), className);
+                        this.addRel((String) relation.get("className"), className, relType);
                     }
                 }
 
-                // Loop through the attributes JSON array and add each attribute
-                for(int attrNum = 0; attrNum < att.size(); ++attrNum) {
-                    this.addAttr(className, (String) att.get(attrNum));
+                // Loop through the fields JSON array and add each field
+                for(int fieldNum = 0; fieldNum < fields.size(); ++fieldNum) {
+                    this.addAttr(className, (String) fields.get(fieldNum), "field");
+                }
+
+                // Loop through the methods JSON array and add each method
+                for(int methodNum = 0; methodNum < methods.size(); ++methodNum) {
+                    JSONArray method = (JSONArray) methods.get(methodNum);
+                    
+                    // Add the method to the class
+                    this.addAttr(className, (String) method.get(0), "method");
+
+                    // Add all params for the method to the class
+                    for(int paramNum = 1; paramNum < method.size(); ++paramNum) {
+                        this.addParam(className, (String) method.get(0), (String) method.get(paramNum));
+                    }
                 }
             }
         // Relevant exception catching: each results in a stack trace
         } catch (Exception e){
             e.printStackTrace();
-        } /* catch (IOException e){
-            e.printStackTrace();
-        } catch (ParseException e){
-            e.printStackTrace();
-        } */
+        }
     }
 }
