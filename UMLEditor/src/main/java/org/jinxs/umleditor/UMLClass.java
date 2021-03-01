@@ -326,9 +326,8 @@ public class UMLClass {
         // Add all methods for the class into a JSON array
         JSONArray methodsJArray = new JSONArray();
         for (int method = 0; method < methods.size(); ++method) {
-            // Put each relationship into its own object containing two pairs:
-            // 1: the name of the other class in the relationship named "className"
-            // 2: the status of the relationship, either "src" or "dest" name "src/dest"
+            // Add each method's name, then loop through and all params associated
+            // with the method
             JSONArray methodJArray = new JSONArray();
             for (int param = 0; param < methods.get(method).size(); ++param) {
                 methodJArray.add(methods.get(method).get(param));
