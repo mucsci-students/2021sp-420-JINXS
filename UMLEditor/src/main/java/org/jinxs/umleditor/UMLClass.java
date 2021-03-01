@@ -326,7 +326,7 @@ public class UMLClass {
         // Add all methods for the class into a JSON array
         JSONArray methodsJArray = new JSONArray();
         for (int method = 0; method < methods.size(); ++method) {
-            // Add each method's name, then loop through and all params associated
+            // Add each method's name, then loop through and add all params associated
             // with the method
             JSONArray methodJArray = new JSONArray();
             for (int param = 0; param < methods.get(method).size(); ++param) {
