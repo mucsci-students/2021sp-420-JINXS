@@ -13,8 +13,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-//import jdk.internal.joptsimple.internal.Classes;
-//import jdk.tools.jaotc.collect.ClassSearch;
+// import jdk.internal.joptsimple.internal.Classes;
+// import jdk.tools.jaotc.collect.ClassSearch;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -85,13 +85,20 @@ public class UMLEditor {
     * 
     */
     public void renameClass(String oldName, String newName) {
-        for(int i = 0; i < classes.size(); i++){
-            if(classes.get(i).name.equals(oldName)){
-                classes.get(i).name = newName;
-            }
-            else {
-                System.out.println("Class \"" + oldName + "\" was not found");
-            }
+        // Ensure the class name does not contain special characters (except for '_')
+        // By matching with a regex
+        Pattern p = Pattern.compile("[^a-z0-9_ ]", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(newName);
+        boolean containsSpecChars = m.find();
+
+        if (containsSpecChars) {
+            System.out.println("The class name cannot contain special characters or spaces");
+            return;
+        }
+
+        UMLClass newNameClass = classExists(oldName);
+        if (newNameClass != null) {
+            newNameClass.name = newName;
         }
     }
     
@@ -560,5 +567,15 @@ public class UMLEditor {
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    // No-op function to ensure that the UMLEditor did not encounter issues while being constructed
+    public boolean noop() {
+        return true;
+    }
+
+    // Getter function for testing editor functionality
+    public ArrayList<UMLClass> getClasses() {
+        return classes;
     }
 }
