@@ -105,7 +105,7 @@ public class UMLInterface {
                                 break; 
 
                                 default:
-                                System.out.println("Add + " + commands.get(1) + "is not a valid command"); 
+                                System.out.println("Add + " + commands.get(1) + " is not a valid command"); 
                                 break;
 
                             }     
@@ -160,7 +160,7 @@ public class UMLInterface {
                         
                         case "param":
                         if (commands.size() < 5) {
-                            System.out.println("Too few Arguments for addMethod command");
+                            System.out.println("Too few Arguments for addParam command");
                         }
                             project.deleteParam(commands.get(2), commands.get(3), commands.get(4)); 
                         break; 
@@ -229,10 +229,10 @@ public class UMLInterface {
                         break; 
                         
                         case "param":
-                        if (commands.size() < 5) {
+                        if (commands.size() < 6) {
                             System.out.println("Too few Arguments for renameParam command");
                         }
-                            project.changeParam(commands.get(2), commands.get(3), commands.get(4)); 
+                            project.changeParam(commands.get(2), commands.get(3), commands.get(4), commands.get(5)); 
                         break; 
 
                         case "allParams":
