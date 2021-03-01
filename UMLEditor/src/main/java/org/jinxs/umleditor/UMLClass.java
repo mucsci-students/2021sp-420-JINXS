@@ -301,9 +301,11 @@ public class UMLClass {
             // Put each relationship into its own object containing two pairs:
             // 1: the name of the other class in the relationship named "className"
             // 2: the status of the relationship, either "src" or "dest" name "src/dest"
+            // 3: the type of the relationship: "aggregation", "association", "composition", "generalization"
             JSONObject relJObject = new JSONObject();
             relJObject.put("className", relationships.get(i).get(0));
             relJObject.put("src/dest", relationships.get(i).get(1));
+            relJObject.put("type", relationships.get(i).get(2));
             
             // Add each relationship object to the relationship array
             relsJArray.add(relJObject);
@@ -313,13 +315,31 @@ public class UMLClass {
         classJObject.put("relationships", relsJArray);
 
         // Add all fields for the class into a JSON array
-        JSONArray attrsJArray = new JSONArray();
+        JSONArray fieldsJArray = new JSONArray();
         for (int i = 0; i < fields.size(); ++i) {
-            attrsJArray.add(fields.get(i));
+            fieldsJArray.add(fields.get(i));
         }
         
         // Add the array of fields to the class object
-        classJObject.put("fields", attrsJArray);
+        classJObject.put("fields", fieldsJArray);
+
+        // Add all methods for the class into a JSON array
+        JSONArray methodsJArray = new JSONArray();
+        for (int method = 0; method < methods.size(); ++method) {
+            // Put each relationship into its own object containing two pairs:
+            // 1: the name of the other class in the relationship named "className"
+            // 2: the status of the relationship, either "src" or "dest" name "src/dest"
+            JSONArray methodJArray = new JSONArray();
+            for (int param = 0; param < methods.get(method).size(); ++param) {
+                methodJArray.add(methods.get(method).get(param));
+            }
+            
+            // Add each relationship object to the relationship array
+            methodsJArray.add(methodJArray);
+        }
+
+        // Add the methods array to the class object
+        classJObject.put("methods", methodsJArray);
 
         // Everything is added, so the class object is finished
         return classJObject;

@@ -96,10 +96,10 @@ public class UMLInterface {
                                 break; 
                                 
                                 case "param":
-                                if (commands.size() < 4) {
+                                if (commands.size() < 5) {
                                     System.out.println("Too few Arguments for addParam command");
                                 }
-                                for(int i = 2 ; i < commands.size(); i++){
+                                for(int i = 4 ; i < commands.size(); i++){
                                     project.addParam(commands.get(2), commands.get(3), commands.get(i)); 
                                 }
                                 break; 
@@ -263,9 +263,9 @@ public class UMLInterface {
                         else if(commands.size() > 2){
                             System.out.println("Too many Arguments for save command");
                         }
-                        // else{
-                        //     project.save(commands.get(1)); 
-                        // }
+                        else{
+                            project.save(commands.get(1)); 
+                        }
                     break;
 
                     //Loads a project from a named JSON file
@@ -276,9 +276,9 @@ public class UMLInterface {
                         else if(commands.size() > 2){
                             System.out.println("Too many Arguments for load command");
                         }
-                        // else{
-                        //     project.load(commands.get(1)); 
-                        // }
+                        else{
+                            project.load(commands.get(1)); 
+                        }
                     break;
 
                     //Prints all the classes in the project
