@@ -164,15 +164,6 @@ public class UMLGUI implements ActionListener{
         panel.repaint(); 
     }
 
-    
-
-    public static void ErrorWindow(){
-        textArea = new JTextArea(50, 10);
-        textArea.setEditable(false);
-        PrintStream printStream = new PrintStream(new CustomOutputStream(textArea));
-        System.setOut(printStream);
-        System.setErr(printStream);
-    }
 
     public static void createFileMenu(JMenuBar menu){
         JMenu file = new JMenu("File"); 
