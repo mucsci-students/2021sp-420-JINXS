@@ -25,10 +25,10 @@ public class UMLGUI implements ActionListener{
  
     private static JFrame window; 
     private static JMenuBar menu; 
-    private static Map<String,JPanel> classList = new HashMap<String,JPanel>();
+    //private static Map<String,JPanel> classList = new HashMap<String,JPanel>();
 
     private static UMLEditor project = new UMLEditor(); 
-    private static JTextArea textArea; 
+    //private static JTextArea textArea; 
     private static JPanel panel;
     private static ArrayList<JPanel> panels = new ArrayList<JPanel>();
     private static ArrayList<String> rels = new ArrayList<String>(); 
@@ -63,13 +63,17 @@ public class UMLGUI implements ActionListener{
 
 
     public static void getFromProject(UMLEditor project){
-        
+        // Delete all panels on the GUI to redraw the current state of the project
+        // to the GUI
         panels.clear();
+
+        // Create a panel for each class in the project
         ArrayList<UMLClass> classes = project.getClasses(); 
         for (int i = 0; i < classes.size(); ++i) {
             createClassPanel(classes.get(i).name);
         }
 
+        // Create a panel for each relationship in the project
         for (int i = 0; i < classes.size(); ++i) {
             ArrayList<ArrayList<String>> rels = classes.get(i).getRels();
 
@@ -88,6 +92,25 @@ public class UMLGUI implements ActionListener{
                 }
             } 
         }
+
+        // Create a panel for each field in the project for each class
+        for (int i = 0; i < classes.size(); ++i) {
+            ArrayList<String> fields = classes.get(i).getFields();
+
+            for(int j = 0; j < fields.size(); j++){
+                //createFieldPanel(fields.get(j));
+            } 
+        }
+
+        // Create a panel for each method in the project for each class
+        for (int i = 0; i < classes.size(); ++i) {
+            ArrayList<ArrayList<String>> methods = classes.get(i).getMethods();
+
+            //createMethodPanel(methods.get(i).get(0));
+            for(int j = 1; j < methods.size(); j++){
+                //createParamPanel(methods.get(i).get(j));
+            }
+        } 
     }
 
     private static void createClassPanel(String className){ 
@@ -126,6 +149,8 @@ public class UMLGUI implements ActionListener{
         relDest.setEditable(false);
         relType.setEditable(false);
 
+        // Check to see if the relationship was already added
+        // from another class. If it was, don't add it to the GUI again
         String rel = src + dest + type;
         for(int i = 0; i < rels.size(); i++){
             if(rels.get(i).equals(rel)){
@@ -193,7 +218,7 @@ public class UMLGUI implements ActionListener{
 
         JMenuItem[] classArray = {addClass,deleteClass, renameClass}; 
         String[] labelText = {"addClass", "deleteClass" , "renameClass"}; 
-        String[] commands = {"Add", "Delete", "Rename"}; 
+        String[] commands = {"addClass", "deleteClass", "renameClass"}; 
              
 
         for(int i = 0; i < 3; ++i)
@@ -326,28 +351,50 @@ public class UMLGUI implements ActionListener{
         panels.clear();
     }
 
-
-        if(command.equals("Add")){
+        // CLASS COMMANDS
+        if(command.equals("addClass")){
             String classToAdd = getText("Class to Add: ");
             project.addClass(classToAdd); 
             getFromProject(project); 
             repaintPanel(); 
                
         }
-        if(command.equals("Delete")){
+        if(command.equals("deleteClass")){
             String classToDelete = getText("Class to Delete: ");
             project.deleteClass(classToDelete);
             getFromProject(project); 
             refresh(); 
         }
-        if(command.equals("Rename")){
+        if(command.equals("renameClass")){
             String class1 = getText("Class to rename: ");
             String class2 = getText("New name: ");
             project.renameClass(class1, class2);
             getFromProject(project);
             refresh();
         }
+        // RELATIONSHIP COMMANDS
         if (command.equals("Inheritance")){
+            String relToAdd = getText("Source Class: "); 
+            String relToAdd2 = getText("Destination Class: "); 
+            project.addRel(relToAdd, relToAdd2, "inheritance");
+            getFromProject(project);
+            refresh();
+        } 
+        if (command.equals("Aggregation")){
+            String relToAdd = getText("Source Class: "); 
+            String relToAdd2 = getText("Destination Class: "); 
+            project.addRel(relToAdd, relToAdd2, "aggregation");
+            getFromProject(project);
+            refresh();
+        } 
+        if (command.equals("Composition")){
+            String relToAdd = getText("Source Class: "); 
+            String relToAdd2 = getText("Destination Class: "); 
+            project.addRel(relToAdd, relToAdd2, "composition");
+            getFromProject(project);
+            refresh();
+        } 
+        if (command.equals("Realization")){
             String relToAdd = getText("Source Class: "); 
             String relToAdd2 = getText("Destination Class: "); 
             project.addRel(relToAdd, relToAdd2, "inheritance");
@@ -366,7 +413,7 @@ public class UMLGUI implements ActionListener{
            //UMLInterface console = new UMLInterface(); 
        //}
        //else{
-       UMLGUI gui = new UMLGUI(); 
+       new UMLGUI(); 
         //}   
     //}
     }
