@@ -114,7 +114,14 @@ public class UMLClass {
     }
 
     public boolean addMethod(String methodName){
-        
+        // Look through the method list for the name to make sure it doesn't exist
+        for (int i = 0; i < methods.size(); ++i) {
+            // If the attrName is found in the list, then the attribute already exists
+            if (methods.get(i).get(0).equals(methodName)) {
+                return false;
+            }
+        }
+
         // Ensure there is space for the new method
         methods.ensureCapacity(methods.size() + 1);
 
