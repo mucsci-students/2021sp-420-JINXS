@@ -61,6 +61,7 @@ public class UMLGUI implements ActionListener{
 
     }
 
+    
 
     public static void getFromProject(UMLEditor project){
         // Delete all panels on the GUI to redraw the current state of the project
@@ -70,120 +71,84 @@ public class UMLGUI implements ActionListener{
         // Create a panel for each class in the project
         ArrayList<UMLClass> classes = project.getClasses(); 
         for (int i = 0; i < classes.size(); ++i) {
-            createClassPanel(classes.get(i).name);
-        }
+            panel = new JPanel();
+            panel.setSize(800, 250);
+            panel.setVisible(true);
+            window.add(panel); 
+        
+		    JTextArea classTxt = new JTextArea("Classname: " + classes.get(i).name);
+		    classTxt.setEditable(false); 
 
-        // Create a panel for each relationship in the project
-        for (int i = 0; i < classes.size(); ++i) {
+		    Border bdClass = BorderFactory.createLineBorder(Color.GREEN);
+		    classTxt.setBorder(bdClass);
+
+            panel.add(classTxt);
+
+            // Create a panel for each relationship in the project
             ArrayList<ArrayList<String>> rels = classes.get(i).getRels();
 
-            for(int j = 0; j < rels.size(); j++){
-                String relStatus = rels.get(j).get(1);
+            for(int j = 0; j < rels.size(); ++j){
+                String dest = rels.get(j).get(0);
 
                 // Save the type of the relationship
-                String relType = rels.get(j).get(2);
+                String type = rels.get(j).get(2);
 
-                // Add the relationship in the correct order based on whether the
-                // current class is the source or destination
-                if (relStatus.equals("src")){
-                    createRelPanel(classes.get(i).name, rels.get(j).get(0), relType);
-                } else { // status == dest
-                    createRelPanel(rels.get(j).get(0), classes.get(i).name, relType);
-                }
+                JTextArea relDest = new JTextArea("Class Destination: " + dest);
+                JTextArea relType = new JTextArea("Type: " + type);
+                relDest.setEditable(false);
+                relType.setEditable(false);
+
+                panel.add(relDest);
+                panel.add(relType); 
+
+		        Border bdRel = BorderFactory.createLineBorder(Color.RED);
+                relDest.setBorder(bdRel);
+                relType.setBorder(bdRel);
             } 
-        }
 
-        // Create a panel for each field in the project for each class
-        for (int i = 0; i < classes.size(); ++i) {
             ArrayList<String> fields = classes.get(i).getFields();
 
             for(int j = 0; j < fields.size(); j++){
-                //createFieldPanel(fields.get(j));
-            } 
-        }
+                String field = fields.get(j);
 
-        // Create a panel for each method in the project for each class
-        for (int i = 0; i < classes.size(); ++i) {
+                JTextArea fieldText = new JTextArea("Field" + (j+1) +": " + field);
+                fieldText.setEditable(false);
+
+                panel.add(fieldText);
+
+                Border bdField = BorderFactory.createLineBorder(Color.BLUE);
+                fieldText.setBorder(bdField);
+            } 
+
             ArrayList<ArrayList<String>> methods = classes.get(i).getMethods();
 
-            //createMethodPanel(methods.get(i).get(0));
-            for(int j = 1; j < methods.size(); j++){
-                //createParamPanel(methods.get(i).get(j));
+            for(int j = 0; j < methods.size(); j++){
+                String methodName = methods.get(j).get(0);
+
+                JTextArea methodText = new JTextArea("Method: " + methodName + ": Params: ");
+                methodText.setEditable(false);
+
+                for(int k = 1; k < methods.get(j).size(); ++k){
+                    String param = methods.get(j).get(k);
+                    methodText.append(param + ", ");
+                }
+
+                panel.add(methodText);
+
+                Border bdField = BorderFactory.createLineBorder(Color.ORANGE);
+                methodText.setBorder(bdField);
             }
-        } 
-    }
 
-    private static void createClassPanel(String className){ 
-        //window.remove(panel);
-
-        panel = new JPanel();
-        panel.setSize(30, 250);
-        panel.setVisible(true);
-        window.add(panel); 
-        
-		JTextArea classTxt = new JTextArea("Classname: " + className);
-		classTxt.setEditable(false);
-
-
-		panel.add(classTxt);
-        repaintPanel();
-        panels.add(panel); 
-
-		Border bd = BorderFactory.createLineBorder(Color.GREEN);
-		classTxt.setBorder(bd);
-        
-    }
-
- 
-
-    public static void createRelPanel(String src, String dest, String type){
-        JPanel relPanel = new JPanel();
-        relPanel.setSize(30, 250);
-        relPanel.setVisible(true);
-        window.add(relPanel); 
-        
-		JTextArea relSrc = new JTextArea("Class Source: " + src);
-        JTextArea relDest = new JTextArea("Class Destination: " + dest);
-        JTextArea relType = new JTextArea("Type: " + type);
-		relSrc.setEditable(false);
-        relDest.setEditable(false);
-        relType.setEditable(false);
-
-        // Check to see if the relationship was already added
-        // from another class. If it was, don't add it to the GUI again
-        String rel = src + dest + type;
-        for(int i = 0; i < rels.size(); i++){
-            if(rels.get(i).equals(rel)){
-                return; 
-            }
+            repaintPanel();
+            panels.add(panel);
         }
-        rels.add(rel);
-        
-
-		relPanel.add(relSrc);
-        relPanel.add(relDest);
-        relPanel.add(relType);
+    }
 
     
-
-        
-
-        //classList.put(className, classPanel); 
-
-		Border bd = BorderFactory.createLineBorder(Color.RED);
-		relSrc.setBorder(bd);
-        relDest.setBorder(bd);
-        relType.setBorder(bd);
-       
-        refresh(); 
-    }
-
-
-
-
     private static void refresh(){
         window.repaint(); 
     }
+
     private static void repaintPanel(){
         panel.revalidate(); 
         panel.repaint(); 
@@ -401,21 +366,48 @@ public class UMLGUI implements ActionListener{
             getFromProject(project);
             refresh();
         } 
-    
+        // FIELD COMMANDS
+        if (command.equals("Add Field")){
+            String classToAdd = getText("Class: "); 
+            String fieldToAdd = getText("Field Name: "); 
+            project.addAttr(classToAdd, fieldToAdd, "field");
+            getFromProject(project);
+            refresh();
+        } 
+        // METHOD COMMANDS
+        if (command.equals("Add Method")){
+            String classToAdd = getText("Class: "); 
+            String methodToAdd = getText("Method Name: "); 
+            project.addAttr(classToAdd, methodToAdd, "method");
+            getFromProject(project);
+            refresh();
+        } 
+        if (command.equals("Add Parameter")){
+            String classToAdd = getText("Class: "); 
+            String methodToAdd = getText("Method Name: "); 
+            String paramToAdd = getText("Parameter Name: "); 
+            project.addParam(classToAdd, methodToAdd, paramToAdd);
+            getFromProject(project);
+            refresh();
+        } 
+        // SAVE/LOAD COMMANDS
+        if (command.equals("Save")){
+            String saveName = getText("Save Name: "); 
+            project.save(saveName);
+        } 
+        if (command.equals("Load")){
+            String loadName = getText("Name of save to load: "); 
+            project.load(loadName);
+            getFromProject(project);
+            refresh();
+        } 
     }
     
 
 
 
    public static void main(String[] args) throws IOException{
-
-       //if(args.length == 1 && args[0].equals("--cli")){
-           //UMLInterface console = new UMLInterface(); 
-       //}
-       //else{
-       new UMLGUI(); 
-        //}   
-    //}
+       new UMLGUI();
     }
 }
 
