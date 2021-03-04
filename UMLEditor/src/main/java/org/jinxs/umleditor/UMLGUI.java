@@ -292,6 +292,19 @@ public class UMLGUI implements ActionListener{
 
 		return str;
 	}
+    
+    public void exitPrompt(ActionEvent e)
+    { 
+      String ObjButtons[] = {"Yes","No"};
+      int PromptResult = JOptionPane.showOptionDialog(null, 
+          "Are you sure you want to exit?", "Exit GUI", 
+          JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, 
+          ObjButtons,ObjButtons[1]);
+      if(PromptResult==0)
+      {
+        System.exit(0);          
+      }
+    }
 
     public UMLGUI() {
         umlWindow();
@@ -401,6 +414,10 @@ public class UMLGUI implements ActionListener{
             getFromProject(project);
             refresh();
         } 
+        if (command.equals("Exit")){
+           exitPrompt(e); 
+        }
+        
     }
     
 
