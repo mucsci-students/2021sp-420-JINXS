@@ -362,7 +362,7 @@ public class UMLEditor {
             return;
         }
 
-       boolean success = foundClass.deleteParam(methName, paramName);
+        boolean success = foundClass.deleteParam(methName, paramName);
         if (success){
             System.out.println ("Parameter \"" + paramName + "\" was deleted successfully");
         }
@@ -454,6 +454,12 @@ public class UMLEditor {
             if(rels.get(i).get(1).equals("dest")){
                 System.out.println(rels.get(i).get(0));
             }
+        }
+
+        System.out.print("Relationship Type: ");
+        // Print relations
+        for(int i = 0; i < rels.size(); ++i){
+            System.out.println(rels.get(i).get(2));
         }
     }
 

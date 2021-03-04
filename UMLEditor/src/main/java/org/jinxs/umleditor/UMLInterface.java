@@ -155,7 +155,7 @@ public class UMLInterface {
                             System.out.println("Too few Arguments for deleteMethod command");
                         }
                         project.delAttr(commands.get(2), commands.get(3),commands.get(1));
-                      
+                    
                         break; 
                         
                         case "param":
@@ -251,7 +251,7 @@ public class UMLInterface {
                         break;
 
                     }  
-                   
+                
                     break;
 
 

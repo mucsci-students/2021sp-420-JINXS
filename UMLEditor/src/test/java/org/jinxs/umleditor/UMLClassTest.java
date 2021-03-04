@@ -33,22 +33,22 @@ public class UMLClassTest  {
         assertTrue("Relationships ArrayList is empty", c.getRels().isEmpty());
 
         // Add a single relationship where c is the src
-        c.addRel("otherClass1", true);
+        c.addRel("otherClass1", true, "aggregation");
         assertEquals("Relationships ArrayList has size 1", c.getRels().size(), 1);
         assertEquals("Relationship's inner ArrayList has size 2", c.getRels().get(0).size(), 2);
         assertEquals("First part of rel is the other class name", c.getRels().get(0).get(0), "otherClass1");
         assertEquals("Second part of rel is \"src\"", c.getRels().get(0).get(1), "src");
 
         // Add a second relationship where c is the dest
-        c.addRel("otherClass2", false);
+        c.addRel("otherClass2", false, "composition");
         assertEquals("Relationships ArrayList has size 2", c.getRels().size(), 2);
         assertEquals("Relationship's inner ArrayList has size 2", c.getRels().get(1).size(), 2);
         assertEquals("First part of rel is the other class name", c.getRels().get(1).get(0), "otherClass2");
         assertEquals("Second part of rel is \"dest\"", c.getRels().get(1).get(1), "dest");
 
         // Add two more rels
-        c.addRel("otherClass3", false);
-        c.addRel("otherClass4", true);
+        c.addRel("otherClass3", false, "inheritance");
+        c.addRel("otherClass4", true, "realization");
         assertEquals("Relationships ArrayList has size 4", c.getRels().size(), 4);
         assertEquals("Relationship's inner ArrayList has size 2", c.getRels().get(2).size(), 2);
         assertEquals("Relationship's inner ArrayList has size 2", c.getRels().get(3).size(), 2);
@@ -59,7 +59,7 @@ public class UMLClassTest  {
 
         // Make sure that the capacity is ensured when exceeding 100 rels
         for (int i = 5; i < 105; ++i) {
-            c.addRel("otherClass" + i, true);
+            c.addRel("otherClass" + i, true, "composition");
         }
         assertEquals("Relationships ArrayList has size 104", c.getRels().size(), 104);
         assertEquals("Relationship's inner ArrayList has size 2", c.getRels().get(103).size(), 2);
@@ -74,7 +74,7 @@ public class UMLClassTest  {
         UMLClass c = new UMLClass("className");
 
         // Add and remove 1 relationship
-        c.addRel("otherClass1", true);
+        c.addRel("otherClass1", true, "aggregation");
         assertEquals("Relationships ArrayList has size 1", c.getRels().size(), 1);
         c.deleteRel("otherClass1");
         assertTrue("Relationships ArrayList is empty", c.getRels().isEmpty());
@@ -84,8 +84,8 @@ public class UMLClassTest  {
         assertTrue("Relationships ArrayList is empty", c.getRels().isEmpty());
 
         // Add 2 rels and remove the 2nd
-        c.addRel("otherClass1", true);
-        c.addRel("otherClass2", false);
+        c.addRel("otherClass1", true, "composition");
+        c.addRel("otherClass2", false, "inheritance");
         assertEquals("Relationships ArrayList has size 2", c.getRels().size(), 2);
         c.deleteRel("otherClass2");
         assertEquals("Relationships ArrayList has size 1", c.getRels().size(), 1);
@@ -94,8 +94,8 @@ public class UMLClassTest  {
         assertEquals("Second part of rel is \"src\"", c.getRels().get(0).get(1), "src");
 
         // Add 2 more rels and remove the 1st from the previous test
-        c.addRel("otherClass3", false);
-        c.addRel("otherClass4", true);
+        c.addRel("otherClass3", false, "aggregation");
+        c.addRel("otherClass4", true, "inheritance");
         assertEquals("Relationships ArrayList has size 3", c.getRels().size(), 3);
         c.deleteRel("otherClass1");
         assertEquals("Relationships ArrayList has size 2", c.getRels().size(), 2);
@@ -106,7 +106,7 @@ public class UMLClassTest  {
 
         // Add 100 more rels and delete all but one
         for (int i = 5; i < 105; ++i) {
-            c.addRel("otherClass" + i, false);
+            c.addRel("otherClass" + i, false, "inheritance");
         }
         assertEquals("Relationships ArrayList has size 102", c.getRels().size(), 102);
         assertEquals("Relationship's inner ArrayList has size 2", c.getRels().get(101).size(), 2);
