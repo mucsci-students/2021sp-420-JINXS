@@ -80,7 +80,7 @@ public class UMLClass {
     public boolean changeRelType(String otherClass, String newType) {
         for (int i = 0; i < relationships.size(); ++i) {
             if (relationships.get(i).get(0).equals(otherClass)) {
-                relationships.get(i).set(3, newType);
+                relationships.get(i).set(2, newType);
                 return true;
             }
         }
