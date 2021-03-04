@@ -351,15 +351,29 @@ public class UMLInterface {
     }
 
     public static void main(String[] args) {
-        try{
-            brHelpDoc = new BufferedReader(new FileReader("helpDocument.txt")); 
+        if (args.length == 0) {
+            UMLGUI gui = new UMLGUI();
         }
-        catch(Exception FileNotFoundException){
-            helpfile = false;  
+        else if (args.length > 0) {
+            if (args.length == 1 && args[0].equals("--cli")) {
+                try {
+                    brHelpDoc = new BufferedReader(new FileReader("helpDocument.txt"));
+                } catch (Exception FileNotFoundException) {
+                    helpfile = false;
+                }
+                UMLEditor project = new UMLEditor();
+                commandInterface(project);
+            }
+            else {
+                System.out.print("Unrecognized argument(s): \"");
+                for (int i = 0; i < args.length; ++i) {
+                    System.out.print(args[i]);
+                    if (i + 1 < args.length) {
+                        System.out.print(" ");
+                    }
+                }
+                System.out.println("\"");
+            }
         }
-
-        UMLEditor project = new UMLEditor();
-        commandInterface(project);
-        System.exit(0);
     }
 }
