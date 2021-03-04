@@ -500,11 +500,6 @@ public class UMLEditor {
         }
     }
 
-    public ArrayList<UMLClass> getClasses(){
-
-        return classes; 
-    }
-
     public void save(String fileName) {
         // Create a JSON array to hold all of the classes
         JSONArray classJArray = new JSONArray();
