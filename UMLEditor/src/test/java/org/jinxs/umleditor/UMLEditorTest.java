@@ -330,20 +330,6 @@ public class UMLEditorTest {
         assertTrue("newMethod should have zero parameters",  deleteParamCheck(editor.getClasses().get(0).getMethods().get(0)));
     }
 
-    // Depends on addAttr working
-    @Test
-    public void delAllParamsTest() {
-        UMLEditor editor = new UMLEditor();
-        editor.addClass("class1");
-        editor.addAttr("class1", "newMethod", "method");
-        editor.addParam("class1", "newMethod", "param1");
-        editor.addParam("class1", "newMethod", "param2");
-        editor.addParam("class1", "newMethod", "param3");
-        editor.deleteAllParams("class1", "newMethod");
-
-        assertTrue("newMethod should have zero parameters",  deleteParamCheck(editor.getClasses().get(0).getMethods().get(0)));
-    }
-
       // Depends on addAttr working
       @Test
       public void delAllParamsTest() {
