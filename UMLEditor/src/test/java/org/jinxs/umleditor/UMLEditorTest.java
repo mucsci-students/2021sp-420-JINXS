@@ -265,35 +265,35 @@ public class UMLEditorTest {
         assertTrue("class1 should have zero methods", editor.getClasses().get(0).getMethods().isEmpty());
     }
 
-     // Depends on addAttr working
-     @Test
-     public void addAndDeleteManyMethodAttrsTest() {
-         UMLEditor editor = new UMLEditor();
-         editor.addClass("class1");
-         editor.addAttr("class1", "method1", "method");
-         editor.addAttr("class1", "method2", "method");
- 
-         assertEquals("class1 should have two methods", editor.getClasses().get(0).getMethods().size(), 2);
- 
-         editor.delAttr("class1", "method1", "method");
- 
-         assertEquals("class1 should have one method", editor.getClasses().get(0).getMethods().size(), 1);
- 
-         editor.delAttr("class1", "method2", "method");
- 
-         assertTrue("class1 should have zero methods", editor.getClasses().get(0).getMethods().isEmpty());
-     }
+    // Depends on addAttr working
+    @Test
+    public void addAndDeleteManyMethodAttrsTest() {
+        UMLEditor editor = new UMLEditor();
+        editor.addClass("class1");
+        editor.addAttr("class1", "method1", "method");
+        editor.addAttr("class1", "method2", "method");
 
-     // Depends on addAttr working
-     @Test
-     public void renameMethodAttrTest() {
-         UMLEditor editor = new UMLEditor();
-         editor.addClass("class1");
-         editor.addAttr("class1", "newMethod", "method");
-         editor.renameAttr("class1", "newMethod", "newName", "method");
- 
-         assertEquals("class1 should have one method named newName", editor.getClasses().get(0).getMethods().get(0).get(0), "newName");
-     }
+        assertEquals("class1 should have two methods", editor.getClasses().get(0).getMethods().size(), 2);
+
+        editor.delAttr("class1", "method1", "method");
+
+        assertEquals("class1 should have one method", editor.getClasses().get(0).getMethods().size(), 1);
+
+        editor.delAttr("class1", "method2", "method");
+
+        assertTrue("class1 should have zero methods", editor.getClasses().get(0).getMethods().isEmpty());
+    }
+
+    // Depends on addAttr working
+    @Test
+    public void renameMethodAttrTest() {
+        UMLEditor editor = new UMLEditor();
+        editor.addClass("class1");
+        editor.addAttr("class1", "newMethod", "method");
+        editor.renameAttr("class1", "newMethod", "newName", "method");
+
+        assertEquals("class1 should have one method named newName", editor.getClasses().get(0).getMethods().get(0).get(0), "newName");
+    }
 
      // PARAMETER TESTS: ADD, DELETE, RENAME
     // --------------------------------------------
@@ -330,19 +330,19 @@ public class UMLEditorTest {
         assertTrue("newMethod should have zero parameters",  deleteParamCheck(editor.getClasses().get(0).getMethods().get(0)));
     }
 
-      // Depends on addAttr working
-      @Test
-      public void delAllParamsTest() {
-          UMLEditor editor = new UMLEditor();
-          editor.addClass("class1");
-          editor.addAttr("class1", "newMethod", "method");
-          editor.addParam("class1", "newMethod", "param1");
-          editor.addParam("class1", "newMethod", "param2");
-          editor.addParam("class1", "newMethod", "param3");
-          editor.deleteAllParams("class1", "newMethod");
-  
-          assertTrue("newMethod should have zero parameters",  deleteParamCheck(editor.getClasses().get(0).getMethods().get(0)));
-      }
+    // Depends on addAttr working
+    @Test
+    public void delAllParamsTest() {
+        UMLEditor editor = new UMLEditor();
+        editor.addClass("class1");
+        editor.addAttr("class1", "newMethod", "method");
+        editor.addParam("class1", "newMethod", "param1");
+        editor.addParam("class1", "newMethod", "param2");
+        editor.addParam("class1", "newMethod", "param3");
+        editor.deleteAllParams("class1", "newMethod");
+
+        assertTrue("newMethod should have zero parameters",  deleteParamCheck(editor.getClasses().get(0).getMethods().get(0)));
+    }
 
     // Depends on addAttr working
     @Test
