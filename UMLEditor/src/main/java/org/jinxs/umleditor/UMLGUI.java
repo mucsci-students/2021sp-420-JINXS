@@ -202,14 +202,17 @@ public class UMLGUI implements ActionListener{
         JMenuItem ag = new JMenuItem("Aggregation");
         JMenuItem comp = new JMenuItem("Composition");
         JMenuItem gen = new JMenuItem("Realization");
+        JMenuItem change = new JMenuItem("Change Relation Type");
+        JMenuItem del = new JMenuItem("Delete Relationship");
 
 
 		
 
-        JMenuItem[] relArray = {in,ag,comp,gen}; 
-        String[] labelText = {"Inheritance", "Aggregation", "Composition", "Realization"};      
+        JMenuItem[] relArray = {in,ag,comp,gen,change,del}; 
+        String[] labelText = {"Inheritance", "Aggregation", "Composition", "Realization", 
+                                    "Change Relation Type", "Delete Relationship"};      
 
-        for(int i = 0; i < 4; ++i)
+        for(int i = 0; i < 6; ++i)
 		{
 			relationship.add(relArray[i]);
 			relArray[i].setToolTipText(labelText[i]);
@@ -268,12 +271,12 @@ public class UMLGUI implements ActionListener{
         JMenuItem addParam = new JMenuItem("Add Parameter");
         JMenuItem deleteParam = new JMenuItem("Delete Parameter");
         JMenuItem deleteAllParams = new JMenuItem("Delete All Parameters");
-        JMenuItem renameParam = new JMenuItem("Rename parameter");
+        JMenuItem renameParam = new JMenuItem("Rename Parameter");
         JMenuItem renameAllParams = new JMenuItem("Rename All Parameters");
 	
 
         JMenuItem[] paramArray = {addParam, deleteParam, deleteAllParams, renameParam, renameAllParams}; 
-        String[] labelText = {"Add Parameter","Delete Parameter","Delete All Parameters", "Rename Parameter", "renameAllParams"}; 
+        String[] labelText = {"Add Parameter","Delete Parameter","Delete All Parameters", "Rename Parameter", "Rename All Parameters"}; 
              
 
         for(int i = 0; i < 5; ++i)
@@ -375,7 +378,22 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Realization")){
             String relToAdd = getText("Source Class: "); 
             String relToAdd2 = getText("Destination Class: "); 
-            project.addRel(relToAdd, relToAdd2, "inheritance");
+            project.addRel(relToAdd, relToAdd2, "realization");
+            getFromProject(project);
+            refresh();
+        } 
+        if (command.equals("Change Relation Type")){
+            String class1 = getText("Class 1: "); 
+            String class2 = getText("Class 2: ");
+            String type = getText("New type: ");
+            project.changeRelType(class1, class2, type);
+            getFromProject(project);
+            refresh();
+        } 
+        if (command.equals("Delete Relationship")){
+            String class1 = getText("Class 1: "); 
+            String class2 = getText("Class 2: "); 
+            project.delRel(class1, class2);
             getFromProject(project);
             refresh();
         } 
@@ -384,6 +402,21 @@ public class UMLGUI implements ActionListener{
             String classToAdd = getText("Class: "); 
             String fieldToAdd = getText("Field Name: "); 
             project.addAttr(classToAdd, fieldToAdd, "field");
+            getFromProject(project);
+            refresh();
+        } 
+        if (command.equals("Delete Field")){
+            String className = getText("Class: "); 
+            String fieldToDel = getText("Field to Delete: "); 
+            project.delAttr(className, fieldToDel, "field");
+            getFromProject(project);
+            refresh();
+        } 
+        if (command.equals("Rename Field")){
+            String className = getText("Class: "); 
+            String oldField = getText("Field to Rename: ");
+            String newField = getText("New Field Name: ");
+            project.renameAttr(className, oldField, newField, "field");
             getFromProject(project);
             refresh();
         } 
@@ -400,6 +433,45 @@ public class UMLGUI implements ActionListener{
             String methodToAdd = getText("Method Name: "); 
             String paramToAdd = getText("Parameter Name: "); 
             project.addParam(classToAdd, methodToAdd, paramToAdd);
+            getFromProject(project);
+            refresh();
+        } 
+        if (command.equals("Delete Parameter")){
+            String className = getText("Class: "); 
+            String methodName = getText("Method Name: "); 
+            String paramName = getText("Parameter to Delete: "); 
+            project.deleteParam(className, methodName, paramName);
+            getFromProject(project);
+            refresh();
+        } 
+        if (command.equals("Delete All Parameters")){
+            String className = getText("Class: "); 
+            String methodName = getText("Method to delete all params from: ");  
+            project.deleteAllParams(className, methodName);
+            getFromProject(project);
+            refresh();
+        } 
+        if (command.equals("Rename Parameter")){
+            String className = getText("Class: "); 
+            String methodName = getText("Method Name: "); 
+            String oldParam = getText("Parameter to Change: "); 
+            String newParam = getText("New Parameter Name: ");
+            project.changeParam(className, methodName, oldParam, newParam);
+            getFromProject(project);
+            refresh();
+        } 
+        if (command.equals("Rename All Parameters")){
+            String className = getText("Class: "); 
+            String methodName = getText("Name of method to change all params: "); 
+            String numOfParams = getText("How many params to add: ");
+            int paramNum = Integer.parseInt(numOfParams);
+            ArrayList<String> params = new ArrayList<String>(paramNum);
+            while (paramNum > 0){
+                String paramName = getText("New param name: ");
+                params.add(paramName);
+                --paramNum;
+            }
+            project.changeAllParams(className, methodName, params);
             getFromProject(project);
             refresh();
         } 
