@@ -135,7 +135,7 @@ public class UMLClass {
 
     // Delete an attribute given a name
     public boolean deleteAttr(String attrName, String type) {
-        if (type == "field"){
+        if (type.equals("field")){
             return fields.remove(attrName);
         }
         for(int i = 0; i < methods.size(); i++){
@@ -151,7 +151,7 @@ public class UMLClass {
     // Renames an attribute given the old name and a new name for the attribute
     public boolean renameAttr(String oldName, String newName, String type) {
         // Make sure the new name is not already an attribute for this class
-        if (type == "field"){
+        if (type.equals("field")){
             for (int i = 0; i < fields.size(); ++i) {
                 if (fields.get(i).equals(newName)) {
                 System.out.println("field \"" + newName + "\" is already an field of class \"" + name + "\"");
@@ -166,7 +166,7 @@ public class UMLClass {
                 }
             }
 
-        }else if (type == "method"){
+        }else if (type.equals("method")){
             for (int i = 0; i < methods.size(); ++i) {
                 if (methods.get(i).get(0).equals(newName)) {
                 System.out.println("Method \"" + newName + "\" is already an method of class \"" + name + "\"");
