@@ -4,7 +4,7 @@ function setup() {
 
     cd UMLEditor
     ./mvnw -N io.takari:maven:wrapper
-    ./mvnw clean install -Dmaven.test.skip=true
+    ./mvnw -U clean install -Dmaven.test.skip=true
     cd ..
 
 }
