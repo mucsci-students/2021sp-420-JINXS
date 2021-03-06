@@ -1,0 +1,1 @@
+java -jar UMLEditor/target/UMLEditor-1.0.jar %*
