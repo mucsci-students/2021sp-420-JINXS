@@ -1,22 +1,22 @@
 Command/shortcut	          	                 Description
 -------------------------	                     --------------
 add
-    Class <class1>                               Creates a new UML class 
+    class <class1>                               Creates a new UML class 
     rel <class1, class2, type>                   Adds a relationship between the two given classes
     field <class1, field1>                       Adds a field to a given class
     method  <class1, method1>                    Adds a method to a given class  
     param <class1, method1, param1>              Adds a parameter to a given method
 delete
-    Class <class1>                               Deletes the specified class
-    Rel  <class1, class2>                        Deletes a relationship between the two given classes
+    class <class1>                               Deletes the specified class
+    rel  <class1, class2>                        Deletes a relationship between the two given classes
     field  <class1>                              Deletes the given field from the specified class
     method  <class1>                             Deletes the given method from the specified class
-    Param <class1,method1, param1>               Deletes the given parameter from the specified class
-    AllParams <class1,method1>                   Deletes all parameters from the specified class
+    param <class1,method1, param1>               Deletes the given parameter from the specified class
+    allParams <class1,method1>                   Deletes all parameters from the specified class
 
 rename
-    Class <class1, newName>                      Renames a class to a new specified class name
-    RelType <class1, class2, newType>            Changes the type of relationship
+    class <class1, newName>                      Renames a class to a new specified class name
+    relType <class1, class2, newType>            Changes the type of relationship
     field <class1, field1, newfieldName>         Renames the given field name from the specified class
     method <class1, method1, newMethodName>      Renames the given field name from the specified class
     param <class1,method1, param1, newParamName> Renames the given parameter from the specified class

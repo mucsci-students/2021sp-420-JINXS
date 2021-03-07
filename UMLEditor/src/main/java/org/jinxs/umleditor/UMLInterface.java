@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.io.BufferedReader;
+import java.io.File;
 import java.util.Scanner;
 
 public class UMLInterface {
@@ -322,6 +323,12 @@ public class UMLInterface {
 
     //Reads in the helpfile if present
     public static void readHelpDoc() throws Exception{
+        try {
+            String filePath = new File("").getAbsolutePath();
+            brHelpDoc = new BufferedReader (new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/helpDocument.txt"));
+        } catch (Exception FileNotFoundException) {
+            helpfile = false;
+        }
         if(!helpfile){
             System.out.println("helpDocument.txt was not found");
             return;
@@ -329,8 +336,6 @@ public class UMLInterface {
         int i;
         while((i = brHelpDoc.read()) != -1){
             System.out.print ((char) i);
-            brHelpDoc.reset();
-            System.out.print("\n"); 
         }
     }
 
@@ -356,11 +361,6 @@ public class UMLInterface {
         }
         else if (args.length > 0) {
             if (args.length == 1 && args[0].equals("--cli")) {
-                try {
-                    brHelpDoc = new BufferedReader(new FileReader("helpDocument.txt"));
-                } catch (Exception FileNotFoundException) {
-                    helpfile = false;
-                }
                 UMLEditor project = new UMLEditor();
                 commandInterface(project);
             }
