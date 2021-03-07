@@ -463,8 +463,22 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Rename All Parameters")){
             String className = getText("Class: "); 
             String methodName = getText("Name of method to change all params: "); 
-            String numOfParams = getText("How many params to add: ");
-            int paramNum = Integer.parseInt(numOfParams);
+
+            // parseInt will fail if given a non-number, so the user
+            // will be continuously asked for a number of parameters
+            // until they provide a number
+            boolean inputIsInt = false;
+            int paramNum = 0;
+            while (!inputIsInt) {
+                String numOfParams = getText("How many params to add: ");
+                try {
+                    inputIsInt = true;
+                    paramNum = Integer.parseInt(numOfParams);
+                } catch (Exception numberFormatException) {
+                    inputIsInt = false;
+                }
+            }
+
             ArrayList<String> params = new ArrayList<String>(paramNum);
             while (paramNum > 0){
                 String paramName = getText("New param name: ");
