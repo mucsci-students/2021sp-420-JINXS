@@ -251,11 +251,9 @@ public class UMLClass {
             return false;
         }
 
-        for (int i = 1; i < targetMethod.size(); ++i){
-            targetMethod.remove(i);
+        while (targetMethod.size() > 1) {
+            targetMethod.remove(1);
         }
-
-        targetMethod.remove(targetMethod.size() -1);
 
         return true;
     }
