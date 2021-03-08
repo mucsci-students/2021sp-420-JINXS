@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 // For writing out to a file when saving
 import java.io.FileWriter;
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -12,10 +12,12 @@ import java.io.IOException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
-//import jdk.internal.joptsimple.internal.Classes;
-//import jdk.tools.jaotc.collect.ClassSearch;
+// import jdk.internal.joptsimple.internal.Classes;
+// import jdk.tools.jaotc.collect.ClassSearch;
+
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class UMLEditor {
     
@@ -27,6 +29,23 @@ public class UMLEditor {
 
     // Adds a class to the list of classes given a new class name that is not already in use
     public void addClass(String className) {
+        // Ensure the class name does not start with a number
+        if (Character.isDigit(className.charAt(0))) {
+            System.out.println("Class name cannot start with a number");
+            return;
+        }
+
+        // Ensure the class name does not contain special characters (except for '_')
+        // By matching with a regex
+        Pattern p = Pattern.compile("[^a-z0-9_ ]", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(className);
+        boolean containsSpecChars = m.find();
+
+        if (containsSpecChars) {
+            System.out.println("The class name cannot contain special characters or spaces");
+            return;
+        }
+
         classes.ensureCapacity(classes.size() + 1);
         // Loop through the list of classes to ensure that a duplicate class name is not trying to be inserted
         for (int i = 0; i < classes.size(); ++i) {
@@ -66,23 +85,41 @@ public class UMLEditor {
     * 
     */
     public void renameClass(String oldName, String newName) {
-        for(int i = 0; i < classes.size(); i++){
-            if(classes.get(i).name.equals(oldName)){
-                classes.get(i).name = newName;
-            }
-            else {
-                System.out.println("Class \"" + oldName + "\" was not found");
-            }
+        // Ensure the class name does not contain special characters (except for '_')
+        // By matching with a regex
+        Pattern p = Pattern.compile("[^a-z0-9_ ]", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(newName);
+        boolean containsSpecChars = m.find();
+
+        if (containsSpecChars) {
+            System.out.println("The class name cannot contain special characters or spaces");
+            return;
+        }
+
+        UMLClass newNameClass = classExists(oldName);
+        if (newNameClass != null) {
+            newNameClass.name = newName;
         }
     }
     
 
     // Adds a relationship between class1 and class2 where class1 is the source
     // and class2 is the destination
-    public void addRel(String class1, String class2) {
+    public void addRel(String class1, String class2, String type) {
         // Make sure each given class name is unique
         if (class1.equals(class2)) {
             System.out.println("Class names must be different");
+            return;
+        }
+        /*******************Place holder type check*******************/
+        if (type.equals("inheritance") || type.equals("aggregation") || type.equals("composition") ||
+            type.equals("realization")){
+
+        }else if (!(type.equals(""))){
+            System.out.println("Missing a Type, Please try again");
+            return;
+        }else {
+            System.out.println("Type is invalid");
             return;
         }
 
@@ -118,13 +155,14 @@ public class UMLEditor {
         }
 
         // Add the relationship to both class's rel lists
+        // true = src, false = dest
         if (c1 != null && c2 != null) {
-            c1.addRel(class2, true);
-            c2.addRel(class1, false);
+            c1.addRel(class2, true, type);
+            c2.addRel(class1, false, type);
         }
         // Notify user of successful relationship addition
         System.out.println("Relationship between \"" + class1 + "\" and \"" + class2 + "\" added successfully");
-    }
+        }
 
     public void delRel(String class1, String class2){
         // Make sure each given class name is unique
@@ -175,37 +213,75 @@ public class UMLEditor {
         }
     }
 
-    // Adds an attribute (attrName) to a given class (className) if it exists,
-    // and the class does not currently have that attribute
-    public void addAttr(String className, String attrName) {
-        // Will store whether the given "className" exists
-        boolean classExists = false;
-        // Will store the result of attempting to add an attribute to the class
+    /********************************************************************************
+    * changeRelType
+    * Changes the relationship type of the given relationship
+    ********************************************************************************/
+    public void changeRelType(String class1, String class2, String newType) {
+        UMLClass c1 = classExists(class1);
+        UMLClass c2 = classExists(class2);
+
+        /******************* Place holder type check *******************/
+        if (newType.equals("inheritance") || newType.equals("aggregation") || newType.equals("composition")
+                || newType.equals("realization")) {
+
+        } else if (!(newType.equals(""))) {
+            System.out.println("Missing a Type, Please try again");
+            return;
+        } else {
+            System.out.println("Type is invalid");
+            return;
+        }
+
+        boolean res = c1.changeRelType(class2, newType) && c2.changeRelType(class1, newType);
+        if (!res) {
+            System.out.println("Changing the relationship type failed");
+        }
+    }
+
+    /*******************************************************************************
+    * addAttr will add the given attribtue to the current class as a field or method
+    * Variables:
+    * - className: The class the attribute will be added to
+    * - attrName = name of the attribute that will be added
+    * - type = determines if the attribute is a field or method
+    * - classExists = boolean to check and see if the class already exist
+    * - attrAdded = boolean that checks if the attribute was added succesfully
+    ********************************************************************************/
+    public void addAttr(String className, String attrName, String type) {
+        
         boolean attrAdded = false;
 
-        // Search through the class list to find the desired class
-        for (int i = 0; i < classes.size(); ++i) {
-            // If the class is found, attempt to add the desired attribute
-            if (classes.get(i).name.equals(className)) {
-                classExists = true;
+        UMLClass currClass = classExists(className);
 
-                UMLClass currClass = classes.get(i);
-                // True if added succesfully, false if duplicate
-                attrAdded = currClass.addAttr(attrName);
-            }
+        if (currClass == null) {
+            return;
+        }
+
+        // True if added succesfully, false if duplicate
+        if (type.equals("field")){
+            attrAdded = currClass.addField(attrName);
+        }
+        else if (type.equals("method")){
+            attrAdded = currClass.addMethod(attrName);
         }
 
         // Notify the user of the resuls of the attribute addition
 
-        if (!classExists) {
-            System.out.println("Class \"" + className + "\" does not exist");
-            return;
-        }
-
         if (attrAdded) {
-            System.out.println("Attribute \"" + attrName + "\" added to class \"" + className + "\" succesfully");
+            if (type.equals("field")){
+                System.out.println("Field \"" + attrName + "\" added to class \"" + className + "\" succesfully");
+            }else{
+                System.out.println("method \"" + attrName + "\" added to class \"" + className + "\" succesfully");
+            }
+            
         } else {
-            System.out.println("Attribute \"" + attrName + "\" is already an attribute of class \"" + className);
+            if (type.equals("field")){
+                System.out.println("field \"" + attrName + "\" is already a field of class \"" + className);
+            }else{
+                System.out.println("method \"" + attrName + "\" is already a method of class \"" + className);
+            }
+            
         }
     }
 
@@ -222,14 +298,14 @@ public class UMLEditor {
   * currClass is then used to call the deleteAttr method and will attempt to delete the 
   * attribtue. Changing the boolean variable "attrExist" to ture if it does.
   *****************************************************************************************/
-    public void delAttr(String className, String attributes){
+    public void delAttr(String className, String attributes, String type){
         boolean attrExist = false;
 
     // Searches through arraylist classes, searching for className
         for (int i = 0; i < classes.size(); i++){
             if (className.equals(classes.get(i).name)){
                 UMLClass currClass = classes.get(i);
-                attrExist = currClass.deleteAttr(attributes);
+                attrExist = currClass.deleteAttr(attributes, type);
             }
             // if false, then delete attempt has failed. attribute does not exist
             if (!attrExist){
@@ -242,31 +318,111 @@ public class UMLEditor {
     }
     
     // Renames an attribute (oldAttr) of the given className to newAttr
-    public void renameAttr(String className, String oldAttr, String newAttr) {
+    public void renameAttr(String className, String oldAttr, String newAttr, String type) {
         // Ensure the new attribute name is different than the one being renamed
         if (oldAttr.equals(newAttr)) {
-          System.out.println("The new attribute name must be different than the one being changed");
-          return;
+            System.out.println("The new attribute name must be different than the one being changed");
+            return;
         }
         
         // Find the class that will have an attribute renamed
         for (int i = 0; i < classes.size(); ++i) {
           // If the class exists, attempt to rename the provided attribute name to the new name
-          if (classes.get(i).name.equals(className)) {
-            boolean success = classes.get(i).renameAttr(oldAttr, newAttr);
+            if (classes.get(i).name.equals(className)) {
+            boolean success = classes.get(i).renameAttr(oldAttr, newAttr, type);
             if (success) {
-              System.out.print("Attribute \"" + oldAttr + "\" for the class \"" + className + 
-                              "\" successfully renamed to \"" + newAttr + "\"");
+                System.out.print("Attribute \"" + oldAttr + "\" for the class \"" + className + 
+                                "\" successfully renamed to \"" + newAttr + "\"");
             }
             // else the class function renameAttr will notify the user if the new attribute was a duplicate
             // or if the old attribute was not found
             return;
-          }
+            }
         }
     
         // If the for loop cycles all the way through without returning, the class does not exist
         System.out.print("Class \"" + className + "\" does not currently exist");
     }
+
+    public void addParam(String className, String methName, String paramName){
+        UMLClass foundClass = classExists(className);
+        if (foundClass == null){
+            return;
+        }
+
+        boolean success = foundClass.addParam(methName, paramName);
+        if (success){
+            System.out.println ("Parameter \"" + paramName + "\" was added successfully");
+        }
+    }
+
+    public void deleteParam(String className, String methName, String paramName){
+        UMLClass foundClass = classExists(className);
+        if (foundClass == null){
+            return;
+        }
+
+        boolean success = foundClass.deleteParam(methName, paramName);
+        if (success){
+            System.out.println ("Parameter \"" + paramName + "\" was deleted successfully");
+        }
+    }
+
+    public void deleteAllParams(String className, String methName){
+        UMLClass foundClass = classExists(className);
+        if (foundClass == null){
+            return;
+        }
+
+        boolean success = foundClass.deleteAllParams(methName);
+        if (success) {
+            System.out.println ("Parameters deleted successfully");
+        }
+    }
+
+    public void changeParam(String className, String methName, String paramName, String newParamName){
+        UMLClass foundClass = classExists(className);
+        if (foundClass == null){
+            return;
+        }
+
+        boolean success = foundClass.changeParam(methName, paramName, newParamName);
+        if (success){
+            System.out.print("Parameter \"" + paramName + "\" for the class \"" + className + 
+                "\" successfully renamed to \"" + newParamName + "\"");
+        }
+        
+    } 
+
+    public void changeAllParams(String className, String methName, ArrayList<String> params){
+        UMLClass foundClass = classExists(className);
+        if (foundClass == null){
+            return;
+        }
+        boolean success = foundClass.changeAllParams(methName, params);
+        if (success){
+            System.out.println ("Parameters changed successfully");
+        }
+    }
+
+    public UMLClass classExists(String className){
+        UMLClass foundClass = null;
+        for (int i = 0; i < classes.size(); ++i) {
+            if (classes.get(i).name.equals(className)) {
+                foundClass = classes.get(i);
+                break;
+            }
+        }
+
+        if (foundClass == null){
+            System.out.print("Class \"" + className + "\" does not currently exist");
+        }
+
+        return foundClass;
+    }
+
+
+
 
     // Prints the relationships of a given classname 
     public void printRel(String className){
@@ -299,38 +455,47 @@ public class UMLEditor {
                 System.out.println(rels.get(i).get(0));
             }
         }
+
+        System.out.print("Relationship Type: ");
+        // Print relations
+        for(int i = 0; i < rels.size(); ++i){
+            System.out.println(rels.get(i).get(2));
+        }
     }
 
     public void printClassContents(String className) {
 
-        // finds the class of the specified names
-        UMLClass printClass = null;
-        for (int i = 0; i < classes.size(); ++i) {
-            if (classes.get(i).name.equals(className)) {
-                printClass = classes.get(i);
-                break;
-            }
-        }
-
-        // returns if the class does not exsist and prints an error
-        if (printClass == null) {
-            System.out.println("Class does not exist");
+        UMLClass printClass = classExists(className);
+        if (printClass == null){
             return;
         }
 
         // prints out the class's name
         System.out.println("Class: " + className);
 
-        // prints out the class's attributes
-        System.out.println("Attributes: ");
-        ArrayList<String> attrs = printClass.getAttrs();
-        for (int i = 0; i < attrs.size(); ++i) {
-            System.out.println(attrs.get(i));
+        // prints out the class's fields
+        System.out.println("Fields: ");
+        ArrayList<String> fields = printClass.getFields();
+        for (int i = 0; i < fields.size(); ++i) {
+            System.out.println("    " + fields.get(i));
         }
+
+        // prints out the class's methods
+        System.out.println("Methods: ");
+        ArrayList<ArrayList<String>> meths = printClass.getMethods();
+        for (int i = 0; i < meths.size(); ++i) {
+            ArrayList<String> targetMeth = meths.get(i);
+            System.out.println("    " + targetMeth.get(0));
+            System.out.println("        Params: " );
+            for (int x = 1; x < targetMeth.size(); ++x){
+                System.out.println("            " + targetMeth.get(x) );
+            }
+        }
+
+
 
         // prints out the class's relationships
         printRel(className);
-
         return;
     }
 
@@ -351,9 +516,12 @@ public class UMLEditor {
             classJArray.add(classes.get(i).saveClass());
         }
 
-        // Write out the JSON class array to the desired filename and catch
-        // IOExceptions if they occur (which will result in a stack trace)
-        try (FileWriter file = new FileWriter(fileName + ".json")) {
+        // Write out the JSON class array to the desired filename and put it in the "saves" directory
+        // and catch IOExceptions if they occur (which will result in a stack trace)
+        String filePath = new File("").getAbsolutePath();
+        // Make a "saves" directory in the umleditor to hold JSON save files
+        new File(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves").mkdirs();
+        try (FileWriter file = new FileWriter(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
             file.write(classJArray.toJSONString());
             file.flush();
         } catch (IOException e) {
@@ -365,9 +533,10 @@ public class UMLEditor {
         // Initiate the JSON parser
         JSONParser jPar = new JSONParser();
         
-        // Attempt to read the filename specified by the user or catch resulting exceptions
-        // if/when that fails
-        try (FileReader reader = new FileReader(fileName + ".json")) {
+        // Attempt to read the filename in the "saves" directory specified by 
+        // the user or catch resulting exceptions if/when that fails
+        String filePath = new File("").getAbsolutePath();
+        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
             // Save the JSON array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
@@ -381,45 +550,68 @@ public class UMLEditor {
                 this.addClass(className);
             }
 
-            // Loop through each class object in the array again to add the relationships and
-            // attributes for each class
+            // Loop through each class object in the array again to add the relationships,
+            // methods, and fields for each class
             for (int classNum = 0; classNum < classList.size(); ++classNum)  {
                 JSONObject singleClass = (JSONObject) classList.get(classNum);
 
                 // Save the values of the name, relationships, and attributes from the class object
                 String className = (String) singleClass.get("name");
-                JSONArray Rel = (JSONArray) singleClass.get("relationships");
-                JSONArray att = (JSONArray) singleClass.get("attributes");
+                JSONArray rels = (JSONArray) singleClass.get("relationships");
+                JSONArray methods = (JSONArray) singleClass.get("methods");
+                JSONArray fields = (JSONArray) singleClass.get("fields");
 
                 // Loop through each relationship in the relationship JSON array
                 // and add each relationship to the current class
-                for(int relNum = 0; relNum < Rel.size(); ++relNum) {
-                    JSONObject relation = (JSONObject) Rel.get(relNum);
+                for(int relNum = 0; relNum < rels.size(); ++relNum) {
+                    JSONObject relation = (JSONObject) rels.get(relNum);
 
                     // Save the status of the relationship relative to the current class (src or dest)
                     String relStatus = (String) relation.get("src/dest");
 
+                    // Save the type of the relationship
+                    String relType = (String) relation.get("type");
+
                     // Add the relationship in the correct order based on whether the
                     // current class is the source or destination
                     if (relStatus.equals("src")){
-                        this.addRel(className, (String) relation.get("className"));
+                        this.addRel(className, (String) relation.get("className"), relType);
                     } else { // status == dest
-                        this.addRel((String) relation.get("className"), className);
+                        this.addRel((String) relation.get("className"), className, relType);
                     }
                 }
 
-                // Loop through the attributes JSON array and add each attribute
-                for(int attrNum = 0; attrNum < att.size(); ++attrNum) {
-                    this.addAttr(className, (String) att.get(attrNum));
+                // Loop through the fields JSON array and add each field
+                for(int fieldNum = 0; fieldNum < fields.size(); ++fieldNum) {
+                    this.addAttr(className, (String) fields.get(fieldNum), "field");
+                }
+
+                // Loop through the methods JSON array and add each method
+                for(int methodNum = 0; methodNum < methods.size(); ++methodNum) {
+                    JSONArray method = (JSONArray) methods.get(methodNum);
+                    
+                    // Add the method to the class
+                    this.addAttr(className, (String) method.get(0), "method");
+
+                    // Add all params for the method to the class
+                    for(int paramNum = 1; paramNum < method.size(); ++paramNum) {
+                        this.addParam(className, (String) method.get(0), (String) method.get(paramNum));
+                    }
                 }
             }
         // Relevant exception catching: each results in a stack trace
-        } catch (FileNotFoundException e){
-            e.printStackTrace();
-        } catch (IOException e){
-            e.printStackTrace();
-        } catch (ParseException e){
+        } catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    // No-op function to ensure that the UMLEditor did not encounter issues while being constructed
+    public boolean noop() {
+        return true;
+    }
+
+    // Getter function for testing editor functionality
+    public ArrayList<UMLClass> getClasses() {
+        return classes;
     }
 }
