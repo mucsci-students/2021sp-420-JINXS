@@ -3,6 +3,11 @@ Command/shortcut	          	                 Description
 add
     class <class1>                               Creates a new UML class 
     rel <class1, class2, type>                   Adds a relationship between the two given classes
+    valid relationship types:
+    "inheritance"
+    "realization"
+    "aggregation"
+    "composition"
     field <class1, field1>                       Adds a field to a given class
     method  <class1, method1>                    Adds a method to a given class  
     param <class1, method1, param1>              Adds a parameter to a given method
