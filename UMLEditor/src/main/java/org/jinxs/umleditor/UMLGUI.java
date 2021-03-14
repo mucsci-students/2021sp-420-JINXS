@@ -19,6 +19,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
+// Mouse detection imports
+// Xavier & Nate
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseAdapter;
+
 
 
 public class UMLGUI implements ActionListener{
@@ -33,6 +39,9 @@ public class UMLGUI implements ActionListener{
     private static ArrayList<JPanel> panels = new ArrayList<JPanel>();
     private static ArrayList<String> rels = new ArrayList<String>(); 
      
+    // handleDrag Method
+    int x;
+    int y;
 
 
     
@@ -63,7 +72,7 @@ public class UMLGUI implements ActionListener{
 
     
 
-    public static void getFromProject(UMLEditor project){
+    public void getFromProject(UMLEditor project){
         // Delete all panels on the GUI to redraw the current state of the project
         // to the GUI
         panels.clear();
@@ -141,6 +150,7 @@ public class UMLGUI implements ActionListener{
 
             repaintPanel();
             panels.add(panel);
+            handleDrag(panel);
         }
     }
 
@@ -506,6 +516,28 @@ public class UMLGUI implements ActionListener{
         
     }
     
+    /************************************************************
+    * handleDrag method makes the classes draggable by mouse
+    * interaction
+    * Xavier & Nate
+    ************************************************************/
+    public void handleDrag(final JPanel panel){
+        
+        panel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent me) {
+                x = me.getX();
+                y = me.getY();
+            }
+        });
+        panel.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent me) {
+                me.translatePoint(me.getComponent().getLocation().x-x, me.getComponent().getLocation().y-y);
+                panel.setLocation(me.getX(), me.getY());
+            }
+        });
+    }
 
 
 
