@@ -98,7 +98,7 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n" + "$ The requested class name already exists\n"
+        String expected = "$ Class name cannot start with a number\n"
                 + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
 
         assertEquals("Adding a class starting with a number fails", expected, getOutput());
@@ -329,6 +329,7 @@ public class UMLInterfaceTest {
         String expected = "$ Class \"class1\" was added successfully\n"
                 + "$ method \"method1\" added to class \"class1\" succesfully\n"
                 + "$ Parameter \"param1\" was added successfully\n"
+                + "$ Parameter already exists\n"
                 + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
 
         assertEquals("Adding a simple param succeeds", expected, getOutput());
@@ -374,15 +375,17 @@ public class UMLInterfaceTest {
 
     @Test
     public void deleteSimpleRel() {
-        final String testString = "add class class1\n" + "add class class2\n" + "add rel class1 class2 realization\n"
+        final String testString = "add class class1\n" + "add class class2\n" + "add rel class1 class2 association\n"
                 + "delete rel class1 class2\n" + "quit";
 
         provideInput(testString);
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n" + "$ Class \"class2\" was added successfully\n"
-                + "$ Relationship between \"class1\" and \"class2\" added successfully\n" + "$ Relationship deleted\n"
+        String expected = "$ Class \"class1\" was added successfully\n"
+                + "$ Class \"class2\" was added successfully\n"
+                + "$ Relationship between \"class1\" and \"class2\" added successfully\n"
+                + "$ Relationship deleted\n"
                 + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
 
         assertEquals("Deleting a simple relationship succeeds", expected, getOutput());

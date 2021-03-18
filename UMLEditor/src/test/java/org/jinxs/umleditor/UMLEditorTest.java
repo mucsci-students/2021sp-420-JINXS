@@ -173,8 +173,8 @@ public class UMLEditorTest {
         editor.addRel("class1", "class2", "association");
         editor.changeRelType("class1", "class2", "invalidType");
 
-        assertEquals("Relationship type for both classes should remain unchanged", editor.getClasses().get(0).getRels().get(0).get(0), "association");
-        assertEquals("Relationship for both classes should still be association", editor.getClasses().get(0).getRels().get(0).get(0), editor.getClasses().get(1).getRels().get(0).get(0));
+        assertEquals("Relationship type for both classes should remain unchanged", editor.getClasses().get(0).getRels().get(0).get(2), "association");
+        assertEquals("Relationship for both classes should still be association", editor.getClasses().get(0).getRels().get(0).get(2), editor.getClasses().get(1).getRels().get(0).get(2));
     }
 
     // FIELD TESTS: ADD, DELETE, RENAME
