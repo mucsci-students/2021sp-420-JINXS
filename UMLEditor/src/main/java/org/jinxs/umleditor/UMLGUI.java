@@ -18,6 +18,19 @@ import java.util.Map;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+
+// Save and load imports
+// For writing out to a file when saving
+import java.io.FileWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+// For the JSON array of classes to be written to file
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 // Mouse detection imports
 // Xavier & Nate
@@ -31,15 +44,13 @@ public class UMLGUI implements ActionListener{
  
     private static JFrame window; 
     private static JMenuBar menu; 
-    //private static Map<String,JPanel> classList = new HashMap<String,JPanel>();
 
     private static UMLEditor project = new UMLEditor(); 
-    //private static JTextArea textArea; 
     private static JPanel panel;
     private static ArrayList<JPanel> panels = new ArrayList<JPanel>();
-    private static ArrayList<String> rels = new ArrayList<String>(); 
+    private static ArrayList<ArrayList<String>> classLocations = new ArrayList<ArrayList<String>>(); 
      
-    // handleDrag Method
+    // handleDrag global coordinates
     int x;
     int y;
 
@@ -49,7 +60,7 @@ public class UMLGUI implements ActionListener{
     public static void umlWindow(){
  
         window = new JFrame("Graphical User Interface");
-        window.setLayout(new GridLayout(5,5));
+        window.setLayout(null);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setSize(800,700);
         
@@ -73,20 +84,29 @@ public class UMLGUI implements ActionListener{
     
 
     public void getFromProject(UMLEditor project){
+        saveLocations();
+
         // Delete all panels on the GUI to redraw the current state of the project
         // to the GUI
+        for(int i = 0; i < panels.size(); i++){
+            window.remove(panels.get(i));
+        }
         panels.clear();
 
         // Create a panel for each class in the project
         ArrayList<UMLClass> classes = project.getClasses(); 
         for (int i = 0; i < classes.size(); ++i) {
             panel = new JPanel();
-            panel.setSize(800, 250);
+            panel.setSize(250, 250);
             panel.setVisible(true);
             window.add(panel); 
         
 		    JTextArea classTxt = new JTextArea("Classname: " + classes.get(i).name);
 		    classTxt.setEditable(false); 
+
+            // Set the name of the panel to the name of the class it holds
+            // so it can be identified and its location can be saved later
+            panel.setName(classTxt.getText().substring(11));
 
 		    Border bdClass = BorderFactory.createLineBorder(Color.GREEN);
 		    classTxt.setBorder(bdClass);
@@ -148,9 +168,23 @@ public class UMLGUI implements ActionListener{
                 methodText.setBorder(bdField);
             }
 
+            // Put a black border around the entire class panel so its boundaries
+            // are visible
+            Border bdPanel = BorderFactory.createLineBorder(Color.BLACK);
+            panel.setBorder(bdPanel);
+
             repaintPanel();
+
+            // Add the panel to the list of panels on the window
             panels.add(panel);
+
+            // Move the panel to its previous location before the editor panels
+            // were rebuilt
+            resetLocation(panel);
+
+            // Allow the panel to be draggable
             handleDrag(panel);
+            
         }
     }
 
@@ -334,20 +368,13 @@ public class UMLGUI implements ActionListener{
 
     public void actionPerformed(ActionEvent e){
         String command = e.getActionCommand();
-        if(panels.size() > 0){
-
-        for(int i = 0; i < panels.size(); i++){
-            window.remove(panels.get(i));
-        }
-        panels.clear();
-    }
 
         // CLASS COMMANDS
         if(command.equals("addClass")){
             String classToAdd = getText("Class to Add: ");
             project.addClass(classToAdd); 
             getFromProject(project); 
-            repaintPanel(); 
+            refresh();
                
         }
         if(command.equals("deleteClass")){
@@ -502,12 +529,11 @@ public class UMLGUI implements ActionListener{
         // SAVE/LOAD COMMANDS
         if (command.equals("Save")){
             String saveName = getText("Save Name: "); 
-            project.save(saveName);
+            saveWithLocations(saveName);
         } 
         if (command.equals("Load")){
             String loadName = getText("Name of save to load: "); 
-            project.load(loadName);
-            getFromProject(project);
+            loadWithLocations(loadName);
             refresh();
         } 
         if (command.equals("Exit")){
@@ -515,14 +541,131 @@ public class UMLGUI implements ActionListener{
         }
         
     }
-    
+
+    // Moves the specified panel to the location associated with it
+    // in the classLocations ArrayList. If the panel does not have
+    // a location saved, it is not moved
+    public void resetLocation(JPanel panel) {
+        for (int i = 0; i < classLocations.size(); ++i) {
+            if (panel.getName().equals(classLocations.get(i).get(0))) {
+                panel.setLocation(Integer.parseInt(classLocations.get(i).get(1)), Integer.parseInt(classLocations.get(i).get(2)));
+                repaintPanel();
+                refresh();
+            }
+        }
+    }
+
+    // Saves the x and y coordinates of each panel of the GUI 
+    // and puts them in the classLocations ArrayList
+    // The current locations saved in classLocations are cleared 
+    // before saving new locations
+    public void saveLocations() {
+        classLocations.clear();
+        for (int i = 0; i < panels.size(); ++i) {
+            ArrayList<String> coords = new ArrayList<String>(3);
+            coords.add(panels.get(i).getName());
+            coords.add(Integer.toString(panels.get(i).getX()));
+            coords.add(Integer.toString(panels.get(i).getY()));
+            classLocations.add(coords);
+        }
+    }
+
+    public void saveWithLocations (String saveName) {
+        // Save all classes to a JSON file excluding their coordinates
+        project.save(saveName);
+
+        // Save the current locations of the panels so they can be
+        // added to the JSON file that was just made
+        saveLocations();
+
+        // Make a new parser to read back through the JSON file
+        JSONParser jPar = new JSONParser();
+        
+        // Attempt to read the filename in the "saves" directory specified by 
+        // the user or catch resulting exceptions if/when that fails
+        String filePath = new File("").getAbsolutePath();
+        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + saveName + ".json")) {
+            // Save the JSON array from the parser
+            Object obj = jPar.parse(reader);
+            JSONArray classList = (JSONArray) obj;
+            
+            // Loop through each class object in the JSON array
+            for (int i = 0; i < classList.size(); ++i)  {
+                JSONObject singleClass = (JSONObject)classList.get(i);
+                String className = (String)singleClass.get("name");
+                JSONArray coordsArray = new JSONArray();
+
+                // Add the coordinates for each panel that are saved in the classLocations
+                // ArrayList to their respective JSON Object in the file
+                for (int j = 0; j < classLocations.size(); ++j) {
+                    if (className.equals(classLocations.get(j).get(0))) {
+                        coordsArray.add(classLocations.get(j).get(1));
+                        coordsArray.add(classLocations.get(j).get(2));
+                        singleClass.put("coordinates", coordsArray);
+                        classList.set(i, singleClass);
+                    }
+                }
+            }
+            try (FileWriter file = new FileWriter(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + saveName + ".json")) {
+                file.write(classList.toJSONString());
+                file.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void loadWithLocations (String loadName) {
+        // Load the UML classes into the GUI
+        project.load(loadName);
+        getFromProject(project);
+
+        // Create a JSON parser
+        JSONParser jPar = new JSONParser();
+
+        String filePath = new File("").getAbsolutePath();
+        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + loadName + ".json")) {
+            // Save the JSON classes array from the parser
+            Object obj = jPar.parse(reader);
+            JSONArray classList = (JSONArray) obj;
+            
+            // Loop through each class object in the JSON array
+            for (int i = 0; i < classList.size(); ++i)  {
+                JSONObject singleClass = (JSONObject)classList.get(i);
+                String className = (String)singleClass.get("name");
+
+                // Loop through each panel that was loaded to the GUI to see if it
+                // has coordinates saved in the JSON file it was loaded from
+                for (int j = 0; j < panels.size(); ++j) {
+                    if (className.equals(panels.get(j).getName())) {
+                        JSONArray coords = (JSONArray) singleClass.get("coordinates");
+                        panel = panels.get(j);
+                        // If the panel has coordinates saved, then the panel is moved to that
+                        // location in the GUI. If not, it is left at the default location
+                        try {
+                            panel.setLocation(Integer.parseInt((String)coords.get(0)), Integer.parseInt((String)coords.get(1)));
+                        } catch (Exception e) {
+                            continue;
+                        }
+                        repaintPanel();
+                        refresh();
+                    }
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
     /************************************************************
     * handleDrag method makes the classes draggable by mouse
     * interaction
     * Xavier & Nate
     ************************************************************/
     public void handleDrag(final JPanel panel){
-        
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent me) {
