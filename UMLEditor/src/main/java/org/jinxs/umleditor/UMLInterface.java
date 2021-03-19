@@ -8,11 +8,25 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.util.Scanner;
 
+// Save and load imports
+// For writing out to a file when saving
+import java.io.FileWriter;
+import java.io.IOException;
+
+// For the JSON array of classes to be written to file
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
 public class UMLInterface {
     
     // fields that we will use
     static BufferedReader brHelpDoc; 
     static boolean helpfile = true; // asks if the helpfile is present
+
+    // Holds class locations if a loaded file has GUI coordinates so they can be
+    // applied when the project is saved again
+    private static ArrayList<ArrayList<String>> classLocations = new ArrayList<ArrayList<String>>();
 
 
     /* 
@@ -266,6 +280,7 @@ public class UMLInterface {
                         }
                         else{
                             project.save(commands.get(1)); 
+                            restoreLoadCoords(commands.get(1));
                         }
                     break;
 
@@ -278,7 +293,8 @@ public class UMLInterface {
                             System.out.println("Too many Arguments for load command");
                         }
                         else{
-                            project.load(commands.get(1)); 
+                            project.load(commands.get(1));
+                            storeLoadCoords(commands.get(1)); 
                         }
                     break;
 
@@ -353,6 +369,88 @@ public class UMLInterface {
         }
 
         return commandList;
+    }
+
+    // Looks through the save file that was loaded and stores any GUI coordinates
+    // associated with each class that was added so they can be readded if/when
+    // the editor is saved again
+    public static void storeLoadCoords (String fileName) {
+        // Initiate the JSON parser
+        JSONParser jPar = new JSONParser();
+
+        // Open the file that was just loaded
+        String filePath = new File("").getAbsolutePath();
+        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
+            // Save the JSON array from the parser
+            Object obj = jPar.parse(reader);
+            JSONArray classList = (JSONArray) obj;
+
+            // Clear previously stored locations if another file was loaded earlier
+            classLocations.clear();
+
+            // Get each class' JSONObject and check if it has saved coordinates
+            for (int i = 0; i < classList.size(); ++i) {
+                JSONObject singleClass = (JSONObject)classList.get(i);
+
+                // Holds the coordinates and the class name
+                ArrayList<String> locations = new ArrayList<String>(3);
+                locations.add((String)singleClass.get("name"));
+
+                JSONArray coords = (JSONArray) singleClass.get("coordinates");
+                // If the class has coordinates, add them to the locations ArrayList
+                // and add the list to the classLocations ArrayList
+                if (coords != null) {
+                    locations.add((String)coords.get(0));
+                    locations.add((String)coords.get(1));
+                    classLocations.add(locations);
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void restoreLoadCoords (String fileName) {
+        // Initiate the JSON parser
+        JSONParser jPar = new JSONParser();
+        
+        // Attempt to read the filename in the "saves" directory specified by 
+        // the user or catch resulting exceptions if/when that fails
+        String filePath = new File("").getAbsolutePath();
+        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
+            // Save the JSON array from the parser
+            Object obj = jPar.parse(reader);
+            JSONArray classList = (JSONArray) obj;
+            
+            // Loop through each class object in the JSON array from the saved file 
+            for (int i = 0; i < classList.size(); ++i)  {
+                JSONObject singleClass = (JSONObject)classList.get(i);
+
+                // Get the current class' name and initialize a JSONArray to
+                // hold coordinates if they exist
+                String className = (String)singleClass.get("name");
+                JSONArray coordsArray = new JSONArray();
+                for (int j = 0; j < classLocations.size(); ++j) {
+                    // If the class from the JSON file exists in the classLocations
+                    // ArrayList, then it has coordinates that need to be added to the
+                    // JSON file
+                    if (className.equals(classLocations.get(j).get(0))) {
+                        coordsArray.add(classLocations.get(j).get(1));
+                        coordsArray.add(classLocations.get(j).get(2));
+                        singleClass.put("coordinates", coordsArray);
+                        classList.set(i, singleClass);
+                    }
+                }
+            }
+            try (FileWriter file = new FileWriter(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
+                file.write(classList.toJSONString());
+                file.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
