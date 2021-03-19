@@ -113,7 +113,7 @@ public class UMLEditor {
         }
         /*******************Place holder type check*******************/
         if (type.equals("inheritance") || type.equals("aggregation") || type.equals("composition") ||
-            type.equals("realization")){
+            type.equals("association")){
 
         }else if (!(type.equals(""))){
             System.out.println("Missing a Type, Please try again");
@@ -223,7 +223,7 @@ public class UMLEditor {
 
         /******************* Place holder type check *******************/
         if (newType.equals("inheritance") || newType.equals("aggregation") || newType.equals("composition")
-                || newType.equals("realization")) {
+                || newType.equals("association")) {
 
         } else if (!(newType.equals(""))) {
             System.out.println("Missing a Type, Please try again");
@@ -331,7 +331,7 @@ public class UMLEditor {
             if (classes.get(i).name.equals(className)) {
             boolean success = classes.get(i).renameAttr(oldAttr, newAttr, type);
             if (success) {
-                System.out.print("Attribute \"" + oldAttr + "\" for the class \"" + className + 
+                System.out.println("Attribute \"" + oldAttr + "\" for the class \"" + className + 
                                 "\" successfully renamed to \"" + newAttr + "\"");
             }
             // else the class function renameAttr will notify the user if the new attribute was a duplicate
@@ -388,7 +388,7 @@ public class UMLEditor {
 
         boolean success = foundClass.changeParam(methName, paramName, newParamName);
         if (success){
-            System.out.print("Parameter \"" + paramName + "\" for the class \"" + className + 
+            System.out.println("Parameter \"" + paramName + "\" for the class \"" + className + 
                 "\" successfully renamed to \"" + newParamName + "\"");
         }
         
