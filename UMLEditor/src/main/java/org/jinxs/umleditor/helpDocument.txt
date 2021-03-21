@@ -1,7 +1,7 @@
 Command/shortcut	          	                 Description
 -------------------------	                     --------------
 add
-    class <class1>                               Creates a new UML class 
+    class <class1>                               Creates a new UML class
     rel <class1, class2, type>                   Adds a relationship between the two given classes
     valid relationship types:
     "inheritance"
@@ -9,7 +9,7 @@ add
     "aggregation"
     "composition"
     field <class1, field1>                       Adds a field to a given class
-    method  <class1, method1>                    Adds a method to a given class  
+    method  <class1, method1>                    Adds a method to a given class
     param <class1, method1, param1>              Adds a parameter to a given method
 delete
     class <class1>                               Deletes the specified class
@@ -26,16 +26,16 @@ rename
     method <class1, method1, newMethodName>      Renames the given field name from the specified class
     param <class1,method1, param1, newParamName> Renames the given parameter from the specified class
     allParams <class1, method1, params>          Changes all the parameters from the specified class
-                                                                                                                                               
+
 printList                                        Prints the names of all existing classes
 
 printContents <class1>                           Prints the contents of a given class
 
-printRel  <class1>                               Prints the all the relationships between classes 
+printRel  <class1>                               Prints the all the relationships between classes
 
-help                                             Prints a help document with all viable commands 
+help                                             Prints a help document with all viable commands
 
-quit                                             Exits the the program 
+quit                                             Exits the the program
 
 save  <fileName>                                 Saves the project into a JSON file
 

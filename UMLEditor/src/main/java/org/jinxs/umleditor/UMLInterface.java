@@ -343,7 +343,12 @@ public class UMLInterface {
             String filePath = new File("").getAbsolutePath();
             brHelpDoc = new BufferedReader (new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/helpDocument.txt"));
         } catch (Exception FileNotFoundException) {
-            helpfile = false;
+            try {
+                String filePath = new File("").getAbsolutePath();
+                brHelpDoc = new BufferedReader (new FileReader(filePath + "/src/main/java/org/jinxs/umleditor/helpDocument.txt"));
+            } catch (Exception e) {
+                helpfile = false;
+            }
         }
         if(!helpfile){
             System.out.println("helpDocument.txt was not found");
