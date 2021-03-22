@@ -125,7 +125,7 @@ public class UMLEditorTest {
         assertTrue("class1 should have no relationships (request was rejected)", editor.getClasses().get(0).getRels().isEmpty());
         assertTrue("class2 should have no relationships (request was rejected)", editor.getClasses().get(1).getRels().isEmpty());
 
-        editor.addRel("class1", "class2", "association");
+        editor.addRel("class1", "class2", "realization");
 
         assertEquals("class1 should have one relationship", editor.getClasses().get(0).getRels().size(), 1);
         assertEquals("class2 should have one relationship", editor.getClasses().get(1).getRels().size(), 1);
@@ -138,7 +138,7 @@ public class UMLEditorTest {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
         editor.addClass("class2");
-        editor.addRel("class1", "class2", "association");
+        editor.addRel("class1", "class2", "realization");
 
         assertEquals("class1 should have one relationship", editor.getClasses().get(0).getRels().size(), 1);
         assertEquals("class2 should have one relationship", editor.getClasses().get(1).getRels().size(), 1);
@@ -156,7 +156,7 @@ public class UMLEditorTest {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
         editor.addClass("class2");
-        editor.addRel("class1", "class2", "association");
+        editor.addRel("class1", "class2", "realization");
         editor.changeRelType("class1", "class2", "aggregation");
 
         assertEquals("class1 should have one relationship", editor.getClasses().get(0).getRels().size(), 1);
@@ -170,11 +170,11 @@ public class UMLEditorTest {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
         editor.addClass("class2");
-        editor.addRel("class1", "class2", "association");
+        editor.addRel("class1", "class2", "realization");
         editor.changeRelType("class1", "class2", "invalidType");
 
-        assertEquals("Relationship type for both classes should remain unchanged", editor.getClasses().get(0).getRels().get(0).get(2), "association");
-        assertEquals("Relationship for both classes should still be association", editor.getClasses().get(0).getRels().get(0).get(2), editor.getClasses().get(1).getRels().get(0).get(2));
+        assertEquals("Relationship type for both classes should remain unchanged", editor.getClasses().get(0).getRels().get(0).get(2), "realization");
+        assertEquals("Relationship for both classes should still be realization", editor.getClasses().get(0).getRels().get(0).get(2), editor.getClasses().get(1).getRels().get(0).get(2));
     }
 
     // FIELD TESTS: ADD, DELETE, RENAME

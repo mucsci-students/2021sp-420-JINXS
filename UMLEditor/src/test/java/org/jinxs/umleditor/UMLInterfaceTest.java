@@ -375,7 +375,7 @@ public class UMLInterfaceTest {
 
     @Test
     public void deleteSimpleRel() {
-        final String testString = "add class class1\n" + "add class class2\n" + "add rel class1 class2 association\n"
+        final String testString = "add class class1\n" + "add class class2\n" + "add rel class1 class2 realization\n"
                 + "delete rel class1 class2\n" + "quit";
 
         provideInput(testString);

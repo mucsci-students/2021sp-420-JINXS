@@ -113,7 +113,7 @@ public class UMLEditor {
         }
         /*******************Place holder type check*******************/
         if (type.equals("inheritance") || type.equals("aggregation") || type.equals("composition") ||
-            type.equals("association")){
+            type.equals("realization")){
 
         }else if (!(type.equals(""))){
             System.out.println("Missing a Type, Please try again");
@@ -223,7 +223,7 @@ public class UMLEditor {
 
         /******************* Place holder type check *******************/
         if (newType.equals("inheritance") || newType.equals("aggregation") || newType.equals("composition")
-                || newType.equals("association")) {
+                || newType.equals("realization")) {
 
         } else if (!(newType.equals(""))) {
             System.out.println("Missing a Type, Please try again");
