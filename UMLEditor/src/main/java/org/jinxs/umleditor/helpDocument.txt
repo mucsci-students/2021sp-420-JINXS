@@ -40,3 +40,7 @@ quit                                             Exits the the program
 save  <fileName>                                 Saves the project into a JSON file
 
 load  <fileName>                                 Loads a project from a JSON file
+
+undo                                             Restores the previous state before the last command called
+
+redo                                             Restores the state reversed by calling undo

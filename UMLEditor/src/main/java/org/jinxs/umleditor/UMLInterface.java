@@ -72,6 +72,7 @@ public class UMLInterface {
                                     System.out.println("Too many Arguments for addClass command");
                                 }
                                 else{
+                                    project.saveToMeme(true);
                                     project.addClass(commands.get(2));
                                 }
                                 break;
@@ -84,7 +85,8 @@ public class UMLInterface {
                                     System.out.println("Too many Arguments for addRel command");
                                 }
                                 else{
-                                project.addRel(commands.get(2), commands.get(3), commands.get(4));
+                                    project.saveToMeme(true);
+                                    project.addRel(commands.get(2), commands.get(3), commands.get(4));
                                 }
                                 break; 
 
@@ -96,7 +98,8 @@ public class UMLInterface {
                                     System.out.println("Too many Arguments for addfield command");
                                 }
                                 else{
-                                project.addAttr(commands.get(2), commands.get(3), commands.get(1));
+                                    project.saveToMeme(true);
+                                    project.addAttr(commands.get(2), commands.get(3), commands.get(1));
                                 }
                                 break;
 
@@ -104,6 +107,7 @@ public class UMLInterface {
                                 if (commands.size() < 4) {
                                     System.out.println("Too few Arguments for addMethod command");
                                 }
+                                project.saveToMeme(true);
                                 project.addAttr(commands.get(2), commands.get(3),commands.get(1));
                                 for(int i = 4 ; i < commands.size(); i++){
                                     project.addParam(commands.get(2), commands.get(3), commands.get(i)); 
@@ -114,6 +118,7 @@ public class UMLInterface {
                                 if (commands.size() < 5) {
                                     System.out.println("Too few Arguments for addParam command");
                                 }
+                                project.saveToMeme(true);
                                 for(int i = 4 ; i < commands.size(); i++){
                                     project.addParam(commands.get(2), commands.get(3), commands.get(i)); 
                                 }
@@ -137,6 +142,7 @@ public class UMLInterface {
                             System.out.println("Too many Arguments for deleteClass command");
                         }
                         else{
+                            project.saveToMeme(true);
                             project.deleteClass(commands.get(2));
                         }
                         break;
@@ -149,7 +155,8 @@ public class UMLInterface {
                             System.out.println("Too many Arguments for deleteRel command");
                         }
                         else{
-                        project.delRel(commands.get(2), commands.get(3));
+                            project.saveToMeme(true);
+                            project.delRel(commands.get(2), commands.get(3));
                         }
                         break; 
 
@@ -161,7 +168,8 @@ public class UMLInterface {
                             System.out.println("Too many Arguments for deletefield command");
                         }
                         else{
-                        project.delAttr(commands.get(2), commands.get(3),commands.get(1));
+                            project.saveToMeme(true);
+                            project.delAttr(commands.get(2), commands.get(3),commands.get(1));
                         }
                         break;
 
@@ -169,22 +177,24 @@ public class UMLInterface {
                         if (commands.size() < 4) {
                             System.out.println("Too few Arguments for deleteMethod command");
                         }
+                        project.saveToMeme(true);
                         project.delAttr(commands.get(2), commands.get(3),commands.get(1));
-                    
                         break; 
                         
                         case "param":
                         if (commands.size() < 5) {
                             System.out.println("Too few Arguments for addParam command");
                         }
-                            project.deleteParam(commands.get(2), commands.get(3), commands.get(4)); 
+                        project.saveToMeme(true);
+                        project.deleteParam(commands.get(2), commands.get(3), commands.get(4));
                         break; 
 
                         case "allParams":
                         if (commands.size() < 4) {
                             System.out.println("Too few Arguments for deleteAllParams command");
                         }
-                            project.deleteAllParams(commands.get(2), commands.get(3)); 
+                        project.saveToMeme(true);
+                        project.deleteAllParams(commands.get(2), commands.get(3));
                         break; 
 
                         default:
@@ -205,6 +215,7 @@ public class UMLInterface {
                             System.out.println("Too many Arguments for renameClass command");
                         }
                         else{
+                            project.saveToMeme(true);
                             project.renameClass(commands.get(2),commands.get(3));
                         }
                         break;
@@ -217,6 +228,7 @@ public class UMLInterface {
                             System.out.println("Too many Arguments for renameRelType command");
                         }
                         else{
+                        project.saveToMeme(true);
                         project.changeRelType(commands.get(2), commands.get(3), commands.get(4));
                         }
                         break; 
@@ -229,6 +241,7 @@ public class UMLInterface {
                             System.out.println("Too many Arguments for renamefield command");
                         }
                         else{
+                        project.saveToMeme(true);
                         project.renameAttr(commands.get(2), commands.get(3), commands.get(4), commands.get(1));
                         }
                         break;
@@ -240,6 +253,7 @@ public class UMLInterface {
                         else if (commands.size() > 5) {
                             System.out.println("Too many Arguments for renameMethod command");
                         }
+                        project.saveToMeme(true);
                         project.renameAttr(commands.get(2), commands.get(3),commands.get(4),commands.get(1));
                         break; 
                         
@@ -247,7 +261,8 @@ public class UMLInterface {
                         if (commands.size() < 6) {
                             System.out.println("Too few Arguments for renameParam command");
                         }
-                            project.changeParam(commands.get(2), commands.get(3), commands.get(4), commands.get(5)); 
+                        project.saveToMeme(true);
+                        project.changeParam(commands.get(2), commands.get(3), commands.get(4), commands.get(5));
                         break; 
 
                         case "allParams":
@@ -258,7 +273,8 @@ public class UMLInterface {
                         for(int i = 4; i < commands.size(); i++){
                             params.add(commands.get(i)); 
                         }
-                            project.changeAllParams(commands.get(2), commands.get(3), params); 
+                        project.saveToMeme(true);
+                        project.changeAllParams(commands.get(2), commands.get(3), params);
                         break; 
 
                         default:
@@ -329,10 +345,29 @@ public class UMLInterface {
                         }
                     break;
 
+                    case "undo":
+                        if (commands.size() < 1) {
+                            System.out.println("Too few Arguments for undo command");
+                        } else if (commands.size() > 1) {
+                            System.out.println("Too many Arguments for undo command");
+                        } else {
+                            project.undo();
+                        }
+                    break;
+
+                    case "redo":
+                        if (commands.size() < 1) {
+                            System.out.println("Too few Arguments for redo command");
+                        } else if (commands.size() > 1) {
+                            System.out.println("Too many Arguments for redo command");
+                        } else {
+                            project.redo();
+                        }
+                    break;
+
                     //If command is not one of the specified commands above then we print an error message
                     default:
                         System.out.println("Error: " + commands.get(0) + " is not a recognized command");
-
             }
         }
     }

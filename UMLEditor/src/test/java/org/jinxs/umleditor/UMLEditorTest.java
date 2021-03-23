@@ -372,5 +372,4 @@ public class UMLEditorTest {
 
         assertEquals("newMethod should have one param named one", editor.getClasses().get(0).getMethods().get(0).get(1), "one");
     }
-
 }
