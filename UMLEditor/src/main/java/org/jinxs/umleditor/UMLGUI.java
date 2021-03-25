@@ -256,9 +256,11 @@ public class UMLGUI implements ActionListener{
                 methodText.setBorder(bdField);
             }
 
+            panel.setSize(panel.getWidth() + 8, panel.getHeight() + 8);
+            
             // Put a black border around the entire class panel so its boundaries
             // are visible
-            Border bdPanel = BorderFactory.createLineBorder(Color.BLACK);
+            Border bdPanel = BorderFactory.createLineBorder(Color.BLACK, 4);
             panel.setBorder(bdPanel);
 
             repaintPanel();
@@ -528,6 +530,7 @@ public class UMLGUI implements ActionListener{
         if(command.contains("DeleteClass")){
             //String classToDelete = getText("Class to Delete: ");
             //System.out.println(command.substring(11));
+            saveToMeme(true);
             project.deleteClass(command.substring(11));
             getFromProject(project); 
             updateClassDropdowns();
@@ -537,6 +540,7 @@ public class UMLGUI implements ActionListener{
         if(command.contains("RenameClass")){
             //String class1 = getText("Class to rename: ");
             String newName = getText("New name: ");
+            saveToMeme(true);
             project.renameClass(command.substring(11), newName);
             getFromProject(project);
             updateClassDropdowns();
@@ -597,6 +601,7 @@ public class UMLGUI implements ActionListener{
         if (command.contains("AddField")){
             //String classToAdd = getText("Class: "); 
             String fieldToAdd = getText("Field Name: "); 
+            saveToMeme(true);
             project.addAttr(command.substring(8), fieldToAdd, "field");
             getFromProject(project);
             updateFieldDropdowns();
@@ -606,6 +611,7 @@ public class UMLGUI implements ActionListener{
             //String className = getText("Class: "); 
             //String fieldToDel = getText("Field to Delete: "); 
             int classEnd = command.indexOf("*");
+            saveToMeme(true);
             project.delAttr(command.substring(11, classEnd), command.substring(classEnd + 1), "field");
             getFromProject(project);
             updateFieldDropdowns();
@@ -616,6 +622,7 @@ public class UMLGUI implements ActionListener{
             //String oldField = getText("Field to Rename: ");
             String newField = getText("New Field Name: ");
             int classEnd = command.indexOf("*");
+            saveToMeme(true);
             project.renameAttr(command.substring(11, classEnd), command.substring(classEnd + 1), newField, "field");
             getFromProject(project);
             updateFieldDropdowns();
@@ -633,6 +640,7 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Delete Method")){
             String className = getText("Class: "); 
             String methodToDelete = getText("Method to Delete: "); 
+            saveToMeme(true);
             project.delAttr(className, methodToDelete, "method");
             getFromProject(project);
             refresh();
@@ -641,6 +649,7 @@ public class UMLGUI implements ActionListener{
             String className = getText("Class: "); 
             String methodToRename = getText("Method to Rename: "); 
             String newMethodName = getText("New Method Name: "); 
+            saveToMeme(true);
             project.renameAttr(className, methodToRename, newMethodName, "method");
             getFromProject(project);
             refresh();
