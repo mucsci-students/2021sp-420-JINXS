@@ -698,4 +698,8 @@ public class UMLEditor {
     public ArrayList<UMLClass> getClasses() {
         return classes;
     }
+
+    public void clear() {
+        classes.clear();
+    }
 }

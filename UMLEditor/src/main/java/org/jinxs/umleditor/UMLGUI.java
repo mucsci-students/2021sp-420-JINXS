@@ -49,6 +49,10 @@ public class UMLGUI implements ActionListener{
     private static JPanel panel;
     private static ArrayList<JPanel> panels = new ArrayList<JPanel>();
     private static ArrayList<ArrayList<String>> classLocations = new ArrayList<ArrayList<String>>(); 
+
+    // Undo/Redo momento variables
+    private Memento undoMeme;
+    private Memento redoMeme;
      
     // handleDrag global coordinates
     int x;
@@ -203,13 +207,15 @@ public class UMLGUI implements ActionListener{
         JMenu file = new JMenu("File"); 
         JMenuItem save = new JMenuItem("Save");
 		JMenuItem load = new JMenuItem("Load");
-		JMenuItem exit = new JMenuItem("Exit");
+        JMenuItem undo = new JMenuItem("Undo");
+        JMenuItem redo = new JMenuItem("Redo");
+        JMenuItem exit = new JMenuItem("Exit");
 
-        JMenuItem[] fileArray = {save,load,exit}; 
-        String[] labelText = {"Save","Load","Exit"}; 
+        JMenuItem[] fileArray = {save,load,undo,redo,exit}; 
+        String[] labelText = {"Save","Load","Undo","Redo","Exit"};
              
 
-        for(int i = 0; i < 3; ++i)
+        for(int i = 0; i < 5; ++i)
 		{
 			file.add(fileArray[i]);
 			fileArray[i].setToolTipText(labelText[i]);
@@ -355,6 +361,8 @@ public class UMLGUI implements ActionListener{
 
     public UMLGUI() {
         umlWindow();
+        undoMeme = new Memento();
+        redoMeme = new Memento();
 
         for (int i = 0; i < menu.getMenuCount(); ++i) {
             JMenu singleMenu = menu.getMenu(i);
@@ -372,13 +380,14 @@ public class UMLGUI implements ActionListener{
         // CLASS COMMANDS
         if(command.equals("addClass")){
             String classToAdd = getText("Class to Add: ");
+            saveToMeme(true);
             project.addClass(classToAdd); 
             getFromProject(project); 
             refresh();
-               
         }
         if(command.equals("deleteClass")){
             String classToDelete = getText("Class to Delete: ");
+            saveToMeme(true);
             project.deleteClass(classToDelete);
             getFromProject(project); 
             refresh(); 
@@ -386,6 +395,7 @@ public class UMLGUI implements ActionListener{
         if(command.equals("renameClass")){
             String class1 = getText("Class to rename: ");
             String class2 = getText("New name: ");
+            saveToMeme(true);
             project.renameClass(class1, class2);
             getFromProject(project);
             refresh();
@@ -394,6 +404,7 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Inheritance")){
             String relToAdd = getText("Source Class: "); 
             String relToAdd2 = getText("Destination Class: "); 
+            saveToMeme(true);
             project.addRel(relToAdd, relToAdd2, "inheritance");
             getFromProject(project);
             refresh();
@@ -401,6 +412,7 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Aggregation")){
             String relToAdd = getText("Source Class: "); 
             String relToAdd2 = getText("Destination Class: "); 
+            saveToMeme(true);
             project.addRel(relToAdd, relToAdd2, "aggregation");
             getFromProject(project);
             refresh();
@@ -408,6 +420,7 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Composition")){
             String relToAdd = getText("Source Class: "); 
             String relToAdd2 = getText("Destination Class: "); 
+            saveToMeme(true);
             project.addRel(relToAdd, relToAdd2, "composition");
             getFromProject(project);
             refresh();
@@ -415,6 +428,7 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Realization")){
             String relToAdd = getText("Source Class: "); 
             String relToAdd2 = getText("Destination Class: "); 
+            saveToMeme(true);
             project.addRel(relToAdd, relToAdd2, "realization");
             getFromProject(project);
             refresh();
@@ -423,6 +437,7 @@ public class UMLGUI implements ActionListener{
             String class1 = getText("Class 1: "); 
             String class2 = getText("Class 2: ");
             String type = getText("New type: ");
+            saveToMeme(true);
             project.changeRelType(class1, class2, type);
             getFromProject(project);
             refresh();
@@ -430,6 +445,7 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Delete Relationship")){
             String class1 = getText("Class 1: "); 
             String class2 = getText("Class 2: "); 
+            saveToMeme(true);
             project.delRel(class1, class2);
             getFromProject(project);
             refresh();
@@ -438,6 +454,7 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Add Field")){
             String classToAdd = getText("Class: "); 
             String fieldToAdd = getText("Field Name: "); 
+            saveToMeme(true);
             project.addAttr(classToAdd, fieldToAdd, "field");
             getFromProject(project);
             refresh();
@@ -445,6 +462,7 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Delete Field")){
             String className = getText("Class: "); 
             String fieldToDel = getText("Field to Delete: "); 
+            saveToMeme(true);
             project.delAttr(className, fieldToDel, "field");
             getFromProject(project);
             refresh();
@@ -453,6 +471,7 @@ public class UMLGUI implements ActionListener{
             String className = getText("Class: "); 
             String oldField = getText("Field to Rename: ");
             String newField = getText("New Field Name: ");
+            saveToMeme(true);
             project.renameAttr(className, oldField, newField, "field");
             getFromProject(project);
             refresh();
@@ -461,6 +480,7 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Add Method")){
             String classToAdd = getText("Class: "); 
             String methodToAdd = getText("Method Name: "); 
+            saveToMeme(true);
             project.addAttr(classToAdd, methodToAdd, "method");
             getFromProject(project);
             refresh();
@@ -469,6 +489,7 @@ public class UMLGUI implements ActionListener{
             String classToAdd = getText("Class: "); 
             String methodToAdd = getText("Method Name: "); 
             String paramToAdd = getText("Parameter Name: "); 
+            saveToMeme(true);
             project.addParam(classToAdd, methodToAdd, paramToAdd);
             getFromProject(project);
             refresh();
@@ -476,7 +497,8 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Delete Parameter")){
             String className = getText("Class: "); 
             String methodName = getText("Method Name: "); 
-            String paramName = getText("Parameter to Delete: "); 
+            String paramName = getText("Parameter to Delete: ");
+            saveToMeme(true); 
             project.deleteParam(className, methodName, paramName);
             getFromProject(project);
             refresh();
@@ -484,6 +506,7 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Delete All Parameters")){
             String className = getText("Class: "); 
             String methodName = getText("Method to delete all params from: ");  
+            saveToMeme(true);
             project.deleteAllParams(className, methodName);
             getFromProject(project);
             refresh();
@@ -493,6 +516,7 @@ public class UMLGUI implements ActionListener{
             String methodName = getText("Method Name: "); 
             String oldParam = getText("Parameter to Change: "); 
             String newParam = getText("New Parameter Name: ");
+            saveToMeme(true);
             project.changeParam(className, methodName, oldParam, newParam);
             getFromProject(project);
             refresh();
@@ -522,6 +546,7 @@ public class UMLGUI implements ActionListener{
                 params.add(paramName);
                 --paramNum;
             }
+            saveToMeme(true);
             project.changeAllParams(className, methodName, params);
             getFromProject(project);
             refresh();
@@ -536,10 +561,20 @@ public class UMLGUI implements ActionListener{
             loadWithLocations(loadName);
             refresh();
         } 
+        // SAVE/LOAD COMMANDS
+        if (command.equals("Undo")){
+            undo();
+            getFromProject(project);
+            refresh();
+        } 
+        if (command.equals("Redo")){
+            redo();
+            getFromProject(project);
+            refresh();
+        } 
         if (command.equals("Exit")){
-           exitPrompt(e); 
+            exitPrompt(e); 
         }
-        
     }
 
     // Moves the specified panel to the location associated with it
@@ -657,7 +692,163 @@ public class UMLGUI implements ActionListener{
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
 
+    public void saveToMeme(boolean meme) {
+        saveLocations();
+        // Create a JSON array to hold all of the classes
+        JSONArray classJArray = new JSONArray();
+
+        ArrayList<UMLClass> classes = project.getClasses();
+
+        // Loop through the list of classes to save each class and add its
+        // resulting JSON object to the JSON class array
+        for (int i = 0; i < classes.size(); ++i) {
+            JSONObject singleClass = classes.get(i).saveClass();
+
+            String className = (String)singleClass.get("name");
+
+            JSONArray coordsArray = new JSONArray();
+
+            // Add the coordinates for each panel that are saved in the classLocations
+            // ArrayList to their respective JSON Object in the file
+            for (int j = 0; j < classLocations.size(); ++j) {
+                if (className.equals(classLocations.get(j).get(0))) {
+                    coordsArray.add(classLocations.get(j).get(1));
+                    coordsArray.add(classLocations.get(j).get(2));
+                    singleClass.put("coordinates", coordsArray);
+                }
+            }
+
+            classJArray.add(singleClass);
+        }
+
+        if (meme) {
+            undoMeme.saveState(classJArray.toJSONString());
+            redoMeme.clear();
+        }
+        else {
+            if (undoMeme.numStates() != 0) {
+                redoMeme.saveState(classJArray.toJSONString());
+            }
+        }
+    }
+
+    // boolean meme should be true for undo and false for redo
+    public void loadFromMeme(boolean meme) {
+        JSONParser jPar = new JSONParser();
+
+        try {
+            String state = meme ? undoMeme.loadState() : redoMeme.loadState();
+            if (state == null) {
+                return;
+            }
+            project.clear();
+
+            Object obj = jPar.parse(state);
+            
+            JSONArray classList = (JSONArray) obj;
+
+            // Loop through each class object in the JSON array and add each class to the
+            // UMLEditor
+            // This ensures that each relationship can be added for each class during a
+            // second loop
+            // as addRel will fail if one or both classes do no already exist
+            for (int i = 0; i < classList.size(); ++i) {
+                JSONObject singleClass = (JSONObject) classList.get(i);
+                String className = (String) singleClass.get("name");
+                project.addClass(className);
+            }
+
+            // Loop through each class object in the array again to add the relationships,
+            // methods, and fields for each class
+            for (int classNum = 0; classNum < classList.size(); ++classNum) {
+                JSONObject singleClass = (JSONObject) classList.get(classNum);
+
+                // Save the values of the name, relationships, and attributes from the class
+                // object
+                String className = (String) singleClass.get("name");
+                JSONArray rels = (JSONArray) singleClass.get("relationships");
+                JSONArray methods = (JSONArray) singleClass.get("methods");
+                JSONArray fields = (JSONArray) singleClass.get("fields");
+                JSONArray coords = (JSONArray) singleClass.get("coordinates");
+
+                // Loop through each relationship in the relationship JSON array
+                // and add each relationship to the current class
+                for (int relNum = 0; relNum < rels.size(); ++relNum) {
+                    JSONObject relation = (JSONObject) rels.get(relNum);
+
+                    // Save the status of the relationship relative to the current class (src or
+                    // dest)
+                    String relStatus = (String) relation.get("src/dest");
+
+                    // Save the type of the relationship
+                    String relType = (String) relation.get("type");
+
+                    // Add the relationship in the correct order based on whether the
+                    // current class is the source or destination
+                    if (relStatus.equals("src")) {
+                        project.addRel(className, (String) relation.get("className"), relType);
+                    } else { // status == dest
+                        project.addRel((String) relation.get("className"), className, relType);
+                    }
+                }
+
+                // Loop through the fields JSON array and add each field
+                for (int fieldNum = 0; fieldNum < fields.size(); ++fieldNum) {
+                    project.addAttr(className, (String) fields.get(fieldNum), "field");
+                }
+
+                // Loop through the methods JSON array and add each method
+                for (int methodNum = 0; methodNum < methods.size(); ++methodNum) {
+                    JSONArray method = (JSONArray) methods.get(methodNum);
+
+                    // Add the method to the class
+                    project.addAttr(className, (String) method.get(0), "method");
+
+                    // Add all params for the method to the class
+                    for (int paramNum = 1; paramNum < method.size(); ++paramNum) {
+                        project.addParam(className, (String) method.get(0), (String) method.get(paramNum));
+                    }
+                }
+
+                // Loop through the coordinates JSON array and set each location
+                for (int fieldNum = 0; fieldNum < fields.size(); ++fieldNum) {
+                    project.addAttr(className, (String) fields.get(fieldNum), "field");
+                }
+
+                getFromProject(project);
+
+                // Loop through each panel that was loaded to the GUI to see if it
+                // has coordinates saved in the JSON file it was loaded from
+                for (int j = 0; j < panels.size(); ++j) {
+                    if (className.equals(panels.get(j).getName())) {
+                        panel = panels.get(j);
+                        // If the panel has coordinates saved, then the panel is moved to that
+                        // location in the GUI. If not, it is left at the default location
+                        try {
+                            panel.setLocation(Integer.parseInt((String)coords.get(0)), Integer.parseInt((String)coords.get(1)));
+                        } catch (Exception e) {
+                            continue;
+                        }
+                        repaintPanel();
+                        refresh();
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void undo() {
+        saveToMeme(false);
+        loadFromMeme(true);
+    }
+
+    public void redo() {
+        loadFromMeme(false);
     }
 
     /************************************************************
@@ -669,6 +860,7 @@ public class UMLGUI implements ActionListener{
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent me) {
+                saveToMeme(true);
                 x = me.getX();
                 y = me.getY();
             }

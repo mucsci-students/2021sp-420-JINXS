@@ -242,8 +242,8 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" does not currently exist\n$ ".replaceAll("\\n|\\r\\n",
-                System.getProperty("line.separator"));
+        String expected = "$ Class \"class1\" does not currently exist\n"
+                        + "$ ";
 
         assertEquals("Adding a field to a nonexistant class fails", expected, getOutput().replaceAll("\r", ""));
     }
@@ -291,8 +291,8 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" does not currently exist\n$ ".replaceAll("\\n|\\r\\n",
-                System.getProperty("line.separator"));
+        String expected = "$ Class \"class1\" does not currently exist\n"
+                        + "$ ";
 
         assertEquals("Adding a method to a nonexistant class fails", expected, getOutput().replaceAll("\r", ""));
     }
