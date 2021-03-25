@@ -542,6 +542,16 @@ public class UMLGUI implements ActionListener{
             String newName = getText("New name: ");
             saveToMeme(true);
             project.renameClass(command.substring(11), newName);
+            
+            // Change the panel's name in the panels array so its
+            // location will stay the same when calling resetLocation
+            for (int i = 0; i < panels.size(); ++i) {
+                if (panels.get(i).getName().equals(command.substring(11))) {
+                    panels.get(i).setName(newName);
+                    break;
+                }
+            }
+
             getFromProject(project);
             updateClassDropdowns();
             updateFieldDropdowns();
@@ -1015,10 +1025,14 @@ public class UMLGUI implements ActionListener{
     public void undo() {
         saveToMeme(false);
         loadFromMeme(true);
+        updateClassDropdowns();
+        updateFieldDropdowns();
     }
 
     public void redo() {
         loadFromMeme(false);
+        updateClassDropdowns();
+        updateFieldDropdowns();
     }
 
     /************************************************************
