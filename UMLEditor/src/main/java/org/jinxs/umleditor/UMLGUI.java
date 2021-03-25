@@ -46,6 +46,7 @@ public class UMLGUI implements ActionListener{
     private static JMenuBar menu; 
 
     private static UMLEditor project = new UMLEditor(); 
+
     private static JPanel panel;
     private static ArrayList<JPanel> panels = new ArrayList<JPanel>();
     private static ArrayList<ArrayList<String>> classLocations = new ArrayList<ArrayList<String>>(); 
@@ -59,16 +60,37 @@ public class UMLGUI implements ActionListener{
     int y;
 
 
-    
+    // Constructs the GUI by building and adding the menus
+    public UMLGUI() {
+        umlWindow();
+        undoMeme = new Memento();
+        redoMeme = new Memento();
 
+        // Adds an action listener to each menu option so the correct
+        // action can be performed when they are clicked
+        for (int i = 0; i < menu.getMenuCount(); ++i) {
+            JMenu singleMenu = menu.getMenu(i);
+            for (int j = 0; j < singleMenu.getItemCount(); ++j) {
+                JMenuItem menuItem = singleMenu.getItem(j);
+                menuItem.addActionListener(this);
+            }
+        }
+    }
+
+    // Creates the GUI window and adds each menu list to the menu bar
     public static void umlWindow(){
- 
-        window = new JFrame("Graphical User Interface");
+        // Gives the window a name
+        window = new JFrame("Graphical UML Editor");
+
+        // The layout for the window is set to null to allow the user to move classes to
+        // any desired location on the GUI
         window.setLayout(null);
+
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setSize(800,700);
         
-
+        // Creates the menu bar and creates each menu option dropdown
+        // for each class functionality
         menu = new JMenuBar(); 
         createFileMenu(menu); 
         createClassMenu(menu); 
@@ -79,15 +101,14 @@ public class UMLGUI implements ActionListener{
 
         window.setJMenuBar(menu);
 
-
-
         window.setVisible(true);   
-
     }
 
     
-
+    // Builds the GUI view from the state of the underlying project/model
     public void getFromProject(UMLEditor project){
+        // Save the locations of each panel so they can be moved back
+        // once the panels are rebuilt from the project
         saveLocations();
 
         // Delete all panels on the GUI to redraw the current state of the project
@@ -101,22 +122,32 @@ public class UMLGUI implements ActionListener{
         ArrayList<UMLClass> classes = project.getClasses(); 
         for (int i = 0; i < classes.size(); ++i) {
             panel = new JPanel();
-            panel.setSize(250, 250);
-            panel.setVisible(true);
+
+            // Each panel uses a vertical box layout so that the class name comes first
+            // followed by the fields then methods in a vertical display
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
             window.add(panel); 
-        
-		    JTextArea classTxt = new JTextArea("Classname: " + classes.get(i).name);
-		    classTxt.setEditable(false); 
+
+            // Create the textarea that holds the name of the class
+		    JTextArea classTxt = new JTextArea(classes.get(i).name);
+            classTxt.setEditable(false);
+           
+            // Set the initial size of the panel to just fit the class name
+            panel.setSize((int)classTxt.getPreferredSize().getWidth(), 20);
 
             // Set the name of the panel to the name of the class it holds
             // so it can be identified and its location can be saved later
-            panel.setName(classTxt.getText().substring(11));
+            panel.setName(classTxt.getText());
 
+            // Give the class name a green border
 		    Border bdClass = BorderFactory.createLineBorder(Color.GREEN);
 		    classTxt.setBorder(bdClass);
 
+            // Add the textarea to the panel
             panel.add(classTxt);
 
+            /* Old relationship builder: not needed once arrows are implemented
             // Create a panel for each relationship in the project
             ArrayList<ArrayList<String>> rels = classes.get(i).getRels();
 
@@ -138,36 +169,89 @@ public class UMLGUI implements ActionListener{
                 relDest.setBorder(bdRel);
                 relType.setBorder(bdRel);
             } 
+            */
 
+            // Store the fields for the current class
             ArrayList<String> fields = classes.get(i).getFields();
 
-            for(int j = 0; j < fields.size(); j++){
-                String field = fields.get(j);
+            // If fields exist in the project for the current class, add them to a textarea with 
+            // each on their own line
+            // The size of the panel will also adjust its height and width to hold each new field
+            if(fields.size() > 0){
+                String str = ""; 
+                for(int j = 0; j < fields.size(); j++){
+                    // Make the panel 20 pixels taller for each field
+                    panel.setSize(panel.getWidth(), (panel.getHeight() + 20));
 
-                JTextArea fieldText = new JTextArea("Field" + (j+1) +": " + field);
-                fieldText.setEditable(false);
+                    String field = fields.get(j);
+                    // Fence-post problem: only add a new line character for each
+                    // field beyond the first one
+                    if (j != 0){
+                        str += "\n"; 
+                    } 
+                    str += field;
+                }
+                // Add all of the fields to  JTextArea
+                JTextArea fieldsText = new JTextArea(str);
+                fieldsText.setEditable(false);
 
-                panel.add(fieldText);
+                // Change the width of the panel if a field is longer than the current width
+                panel.setSize(Math.max((int)fieldsText.getPreferredSize().getWidth(), panel.getWidth()), panel.getHeight());
 
+                // Add the panel to the window
+                panel.add(fieldsText);
+
+                // Give the fields a blue border
                 Border bdField = BorderFactory.createLineBorder(Color.BLUE);
-                fieldText.setBorder(bdField);
-            } 
+                fieldsText.setBorder(bdField);
+            }
 
+            // Get and store the methods from the project
             ArrayList<ArrayList<String>> methods = classes.get(i).getMethods();
 
-            for(int j = 0; j < methods.size(); j++){
-                String methodName = methods.get(j).get(0);
+            // If methods exist in the project for this class, add them to a textarea with each on 
+            // their own line 
+            // The size of the panel will also adjust its height and width to hold each new method
+            if (methods.size() > 0) {
+                String methodString = "";
 
-                JTextArea methodText = new JTextArea("Method: " + methodName + ": Params: ");
+                for(int j = 0; j < methods.size(); j++) {
+                    // Make the panel 20 pixels taller for each method
+                    panel.setSize(panel.getWidth(), (panel.getHeight() + 20));
+                    
+                    String methodName = methods.get(j).get(0);
+                    // Fencepost problem: only add a newline before every method
+                    // after the first one
+                    if (j != 0) {
+                        methodString += "\n";
+                    }
+
+                    // Put the fields for the current method in parentheses like an actual method
+                    methodString += methodName + "(";
+
+                    for(int k = 1; k < methods.get(j).size(); ++k){
+                        String param = methods.get(j).get(k);
+                        // Fencepost problem: only add a comma if another param exists
+                        // beyond the first
+                        if (k != 1) {
+                            methodString += ", ";
+                        }
+                        methodString += param;
+                    }
+                    // Complete the param part of the string with a paren and semicolon like a real method
+                    methodString += ");";
+                }
+                // Build a textarea from the methods string that was constructed
+                JTextArea methodText = new JTextArea(methodString);
                 methodText.setEditable(false);
 
-                for(int k = 1; k < methods.get(j).size(); ++k){
-                    String param = methods.get(j).get(k);
-                    methodText.append(param + ", ");
-                }
+                // Update the panel's width if the length of a method exceeds the current width
+                panel.setSize(Math.max((int)methodText.getPreferredSize().getWidth(), panel.getWidth()), panel.getHeight());
 
+                // Add the methods textarea to the panel
                 panel.add(methodText);
 
+                // Give the methods/params an orange border
                 Border bdField = BorderFactory.createLineBorder(Color.ORANGE);
                 methodText.setBorder(bdField);
             }
@@ -188,7 +272,6 @@ public class UMLGUI implements ActionListener{
 
             // Allow the panel to be draggable
             handleDrag(panel);
-            
         }
     }
 
@@ -227,20 +310,17 @@ public class UMLGUI implements ActionListener{
 
     public static void createClassMenu(JMenuBar menu){
         JMenu classes = new JMenu("Class"); 
-        JMenuItem addClass = new JMenuItem("Create class");
-		JMenuItem deleteClass = new JMenuItem("Delete class");
-		JMenuItem renameClass = new JMenuItem("Rename class");
+        JMenuItem addClass = new JMenuItem("Create Class");
+		//JMenuItem deleteClass = new JMenuItem("Delete Class");
+		//JMenuItem renameClass = new JMenuItem("Rename Class");
 
-        JMenuItem[] classArray = {addClass,deleteClass, renameClass}; 
-        String[] labelText = {"addClass", "deleteClass" , "renameClass"}; 
-        String[] commands = {"addClass", "deleteClass", "renameClass"}; 
-             
+        JMenuItem[] classArray = {addClass}; //, deleteClass, renameClass}; 
+        String[] labelText = {"Create Class"}; //, "Delete Class" , "Rename Class"}; 
 
-        for(int i = 0; i < 3; ++i)
+        for(int i = 0; i < 1; ++i)
 		{
 			classes.add(classArray[i]);
 			classArray[i].setToolTipText(labelText[i]);
-            classArray[i].setActionCommand(commands[i]);
 		}
 
         menu.add(classes); 
@@ -274,21 +354,21 @@ public class UMLGUI implements ActionListener{
     public static void createFieldMenu(JMenuBar menu){
         JMenu field = new JMenu("Field"); 
 
-        JMenuItem addField = new JMenuItem("Add Field");
-        JMenuItem deleteField = new JMenuItem("Delete Field");
-        JMenuItem renameField = new JMenuItem("Rename Field");
+        //JMenuItem addField = new JMenuItem("Add Field");
+        //JMenuItem deleteField = new JMenuItem("Delete Field");
+        //JMenuItem renameField = new JMenuItem("Rename Field");
 
 
-        JMenuItem[] fieldArray = {addField, deleteField, renameField}; 
-        String[] labelText = {"Add Field","Delete Field","Rename Field"}; 
+        //JMenuItem[] fieldArray = {addField, deleteField, renameField}; 
+        //String[] labelText = {"Add Field","Delete Field","Rename Field"}; 
              
-
+        /*
         for(int i = 0; i < 3; ++i)
 		{
 			field.add(fieldArray[i]);
 			fieldArray[i].setToolTipText(labelText[i]);
-			
 		}
+        */
 
         menu.add(field); 
     }
@@ -339,6 +419,79 @@ public class UMLGUI implements ActionListener{
         menu.add(param); 
     }
 
+    private void updateClassDropdowns() {
+        if (menu.getMenu(1).getItemCount() > 1) {
+            menu.getMenu(1).remove(1);
+            menu.getMenu(1).remove(1);
+        }
+
+        ArrayList<UMLClass> currClasses = project.getClasses();
+
+        if (currClasses.size() == 0) {
+           return;
+        }
+
+        JMenu deleteSubMenu = new JMenu("Delete Class");
+        JMenu renameSubMenu = new JMenu("Rename Class");
+        for (int i = 0; i < currClasses.size(); ++i) {
+            deleteSubMenu.add(new JMenuItem(currClasses.get(i).name));
+            renameSubMenu.add(new JMenuItem(currClasses.get(i).name));
+            deleteSubMenu.getItem(i).addActionListener(this);
+            renameSubMenu.getItem(i).addActionListener(this);
+            deleteSubMenu.getItem(i).setActionCommand("DeleteClass" + currClasses.get(i).name);
+            renameSubMenu.getItem(i).setActionCommand("RenameClass" + currClasses.get(i).name);;
+        }
+
+        menu.getMenu(1).add(deleteSubMenu);
+        menu.getMenu(1).add(renameSubMenu);
+    }
+
+    private void updateFieldDropdowns() {
+        if (menu.getMenu(3).getItemCount() > 0) {
+            menu.getMenu(3).remove(0);
+            menu.getMenu(3).remove(0);
+            menu.getMenu(3).remove(0);
+        }
+
+        ArrayList<UMLClass> currClasses = project.getClasses();
+
+        if (currClasses.size() == 0) {
+           return;
+        }
+
+        JMenu addSubMenu = new JMenu("Add Field");
+        JMenu deleteSubMenu = new JMenu("Delete Field");
+        JMenu renameSubMenu = new JMenu("Rename Field");
+        for (int i = 0; i < currClasses.size(); ++i) {
+            addSubMenu.add(new JMenuItem(currClasses.get(i).name)); 
+            addSubMenu.getItem(i).addActionListener(this);
+            addSubMenu.getItem(i).setActionCommand("AddField" + currClasses.get(i).name);
+
+            JMenu delClassesMenu = new JMenu(currClasses.get(i).name);
+            //deleteSubMenu.add(delClassesMenu);
+
+            JMenu renameClassesMenu = new JMenu(currClasses.get(i).name);
+            //renameSubMenu.add(renameClassesMenu);
+
+            ArrayList<String> classFields = currClasses.get(i).getFields();
+            for (int j = 0; j < classFields.size(); ++j) {
+                delClassesMenu.add(new JMenuItem(classFields.get(j)));
+                renameClassesMenu.add(new JMenuItem(classFields.get(j)));
+                delClassesMenu.getItem(j).addActionListener(this);
+                renameClassesMenu.getItem(j).addActionListener(this);
+                delClassesMenu.getItem(j).setActionCommand("DeleteField" + currClasses.get(i).name + "*" + classFields.get(j));
+                renameClassesMenu.getItem(j).setActionCommand("RenameField" + currClasses.get(i).name + "*" + classFields.get(j));
+            }
+            
+            deleteSubMenu.add(delClassesMenu);
+            renameSubMenu.add(renameClassesMenu);
+        }
+
+        menu.getMenu(3).add(addSubMenu);
+        menu.getMenu(3).add(deleteSubMenu);
+        menu.getMenu(3).add(renameSubMenu);
+    }
+
     private String getText(String string)
 	{
 		String str = JOptionPane.showInputDialog(window, string, JOptionPane.PLAIN_MESSAGE);
@@ -359,45 +512,35 @@ public class UMLGUI implements ActionListener{
       }
     }
 
-    public UMLGUI() {
-        umlWindow();
-        undoMeme = new Memento();
-        redoMeme = new Memento();
-
-        for (int i = 0; i < menu.getMenuCount(); ++i) {
-            JMenu singleMenu = menu.getMenu(i);
-            for (int j = 0; j < singleMenu.getItemCount(); ++j) {
-                JMenuItem menuItem = singleMenu.getItem(j);
-                menuItem.addActionListener(this);
-            }
-        }
-
-    }
-
     public void actionPerformed(ActionEvent e){
         String command = e.getActionCommand();
 
         // CLASS COMMANDS
-        if(command.equals("addClass")){
+        if(command.equals("Create Class")){
             String classToAdd = getText("Class to Add: ");
             saveToMeme(true);
             project.addClass(classToAdd); 
             getFromProject(project); 
+            updateClassDropdowns();
+            updateFieldDropdowns();
             refresh();
         }
-        if(command.equals("deleteClass")){
-            String classToDelete = getText("Class to Delete: ");
-            saveToMeme(true);
-            project.deleteClass(classToDelete);
+        if(command.contains("DeleteClass")){
+            //String classToDelete = getText("Class to Delete: ");
+            //System.out.println(command.substring(11));
+            project.deleteClass(command.substring(11));
             getFromProject(project); 
+            updateClassDropdowns();
+            updateFieldDropdowns();
             refresh(); 
         }
-        if(command.equals("renameClass")){
-            String class1 = getText("Class to rename: ");
-            String class2 = getText("New name: ");
-            saveToMeme(true);
-            project.renameClass(class1, class2);
+        if(command.contains("RenameClass")){
+            //String class1 = getText("Class to rename: ");
+            String newName = getText("New name: ");
+            project.renameClass(command.substring(11), newName);
             getFromProject(project);
+            updateClassDropdowns();
+            updateFieldDropdowns();
             refresh();
         }
         // RELATIONSHIP COMMANDS
@@ -451,29 +594,31 @@ public class UMLGUI implements ActionListener{
             refresh();
         } 
         // FIELD COMMANDS
-        if (command.equals("Add Field")){
-            String classToAdd = getText("Class: "); 
+        if (command.contains("AddField")){
+            //String classToAdd = getText("Class: "); 
             String fieldToAdd = getText("Field Name: "); 
-            saveToMeme(true);
-            project.addAttr(classToAdd, fieldToAdd, "field");
+            project.addAttr(command.substring(8), fieldToAdd, "field");
             getFromProject(project);
+            updateFieldDropdowns();
             refresh();
         } 
-        if (command.equals("Delete Field")){
-            String className = getText("Class: "); 
-            String fieldToDel = getText("Field to Delete: "); 
-            saveToMeme(true);
-            project.delAttr(className, fieldToDel, "field");
+        if (command.contains("DeleteField")){
+            //String className = getText("Class: "); 
+            //String fieldToDel = getText("Field to Delete: "); 
+            int classEnd = command.indexOf("*");
+            project.delAttr(command.substring(11, classEnd), command.substring(classEnd + 1), "field");
             getFromProject(project);
+            updateFieldDropdowns();
             refresh();
         } 
-        if (command.equals("Rename Field")){
-            String className = getText("Class: "); 
-            String oldField = getText("Field to Rename: ");
+        if (command.contains("RenameField")){
+            //String className = getText("Class: "); 
+            //String oldField = getText("Field to Rename: ");
             String newField = getText("New Field Name: ");
-            saveToMeme(true);
-            project.renameAttr(className, oldField, newField, "field");
+            int classEnd = command.indexOf("*");
+            project.renameAttr(command.substring(11, classEnd), command.substring(classEnd + 1), newField, "field");
             getFromProject(project);
+            updateFieldDropdowns();
             refresh();
         } 
         // METHOD COMMANDS
@@ -485,6 +630,22 @@ public class UMLGUI implements ActionListener{
             getFromProject(project);
             refresh();
         } 
+        if (command.equals("Delete Method")){
+            String className = getText("Class: "); 
+            String methodToDelete = getText("Method to Delete: "); 
+            project.delAttr(className, methodToDelete, "method");
+            getFromProject(project);
+            refresh();
+        } 
+        if (command.equals("Rename Method")){
+            String className = getText("Class: "); 
+            String methodToRename = getText("Method to Rename: "); 
+            String newMethodName = getText("New Method Name: "); 
+            project.renameAttr(className, methodToRename, newMethodName, "method");
+            getFromProject(project);
+            refresh();
+        } 
+        // PARAMETER COMMANDS
         if (command.equals("Add Parameter")){
             String classToAdd = getText("Class: "); 
             String methodToAdd = getText("Method Name: "); 
@@ -880,4 +1041,3 @@ public class UMLGUI implements ActionListener{
        new UMLGUI();
     }
 }
-
