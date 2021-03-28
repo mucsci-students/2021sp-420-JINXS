@@ -94,10 +94,10 @@ public class UMLGUI implements ActionListener{
         menu = new JMenuBar(); 
         createFileMenu(menu); 
         createClassMenu(menu); 
-        createRelationshipMenu(menu); 
-        createFieldMenu(menu);  
-        createMethodMenu(menu);
-        createParamMenu(menu); 
+        menu.add(new JMenu("Relationship"));
+        menu.add(new JMenu("Field")); 
+        menu.add(new JMenu("Method"));
+        menu.add(new JMenu("Parameter"));
 
         window.setJMenuBar(menu);
 
@@ -277,7 +277,6 @@ public class UMLGUI implements ActionListener{
         }
     }
 
-    
     private static void refresh(){
         window.repaint(); 
     }
@@ -286,7 +285,6 @@ public class UMLGUI implements ActionListener{
         panel.revalidate(); 
         panel.repaint(); 
     }
-
 
     public static void createFileMenu(JMenuBar menu){
         JMenu file = new JMenu("File"); 
@@ -313,115 +311,17 @@ public class UMLGUI implements ActionListener{
     public static void createClassMenu(JMenuBar menu){
         JMenu classes = new JMenu("Class"); 
         JMenuItem addClass = new JMenuItem("Create Class");
-		//JMenuItem deleteClass = new JMenuItem("Delete Class");
-		//JMenuItem renameClass = new JMenuItem("Rename Class");
 
-        JMenuItem[] classArray = {addClass}; //, deleteClass, renameClass}; 
-        String[] labelText = {"Create Class"}; //, "Delete Class" , "Rename Class"}; 
-
-        for(int i = 0; i < 1; ++i)
-		{
-			classes.add(classArray[i]);
-			classArray[i].setToolTipText(labelText[i]);
-		}
+		classes.add(addClass);
+		addClass.setToolTipText("Create Class");
 
         menu.add(classes); 
     }
 
-    public static void createRelationshipMenu(JMenuBar menu){
-        JMenu relationship = new JMenu("Relationship"); 
-        JMenuItem in = new JMenuItem("Inheritance");
-        JMenuItem ag = new JMenuItem("Aggregation");
-        JMenuItem comp = new JMenuItem("Composition");
-        JMenuItem gen = new JMenuItem("Realization");
-        JMenuItem change = new JMenuItem("Change Relation Type");
-        JMenuItem del = new JMenuItem("Delete Relationship");
-
-
-		
-
-        JMenuItem[] relArray = {in,ag,comp,gen,change,del}; 
-        String[] labelText = {"Inheritance", "Aggregation", "Composition", "Realization", 
-                                    "Change Relation Type", "Delete Relationship"};      
-
-        for(int i = 0; i < 6; ++i)
-		{
-			relationship.add(relArray[i]);
-			relArray[i].setToolTipText(labelText[i]);
-		}
-
-        menu.add(relationship); 
-    }
-
-    public static void createFieldMenu(JMenuBar menu){
-        JMenu field = new JMenu("Field"); 
-
-        //JMenuItem addField = new JMenuItem("Add Field");
-        //JMenuItem deleteField = new JMenuItem("Delete Field");
-        //JMenuItem renameField = new JMenuItem("Rename Field");
-
-
-        //JMenuItem[] fieldArray = {addField, deleteField, renameField}; 
-        //String[] labelText = {"Add Field","Delete Field","Rename Field"}; 
-             
-        /*
-        for(int i = 0; i < 3; ++i)
-		{
-			field.add(fieldArray[i]);
-			fieldArray[i].setToolTipText(labelText[i]);
-		}
-        */
-
-        menu.add(field); 
-    }
-
-    public static void createMethodMenu(JMenuBar menu){
-        JMenu method = new JMenu("Method"); 
-
-        JMenuItem addMethod = new JMenuItem("Add Method");
-        JMenuItem deleteMethod = new JMenuItem("Delete Method");
-        JMenuItem renameMethod = new JMenuItem("Rename Method");
-	
-
-        JMenuItem[] methodArray = {addMethod, deleteMethod, renameMethod}; 
-        String[] labelText = {"Add Method","Delete Method","Rename Method"}; 
-             
-
-        for(int i = 0; i < 3; ++i)
-		{
-			method.add(methodArray[i]);
-			methodArray[i].setToolTipText(labelText[i]);
-			
-		}
-
-        menu.add(method); 
-    }
-
-    public static void createParamMenu(JMenuBar menu){
-        JMenu param = new JMenu("Parameter"); 
-
-        JMenuItem addParam = new JMenuItem("Add Parameter");
-        JMenuItem deleteParam = new JMenuItem("Delete Parameter");
-        JMenuItem deleteAllParams = new JMenuItem("Delete All Parameters");
-        JMenuItem renameParam = new JMenuItem("Rename Parameter");
-        JMenuItem renameAllParams = new JMenuItem("Rename All Parameters");
-	
-
-        JMenuItem[] paramArray = {addParam, deleteParam, deleteAllParams, renameParam, renameAllParams}; 
-        String[] labelText = {"Add Parameter","Delete Parameter","Delete All Parameters", "Rename Parameter", "Rename All Parameters"}; 
-             
-
-        for(int i = 0; i < 5; ++i)
-		{
-			param.add(paramArray[i]);
-			paramArray[i].setToolTipText(labelText[i]);
-			
-		}
-
-        menu.add(param); 
-    }
-
+    // Updates the available dropdowns for the "class" menu based on the state of the
+    // underlying project/model
     private void updateClassDropdowns() {
+        // If dropdowns exist, delete them to rebuild the menu
         if (menu.getMenu(1).getItemCount() > 1) {
             menu.getMenu(1).remove(1);
             menu.getMenu(1).remove(1);
@@ -429,26 +329,35 @@ public class UMLGUI implements ActionListener{
 
         ArrayList<UMLClass> currClasses = project.getClasses();
 
+        // If there are no classes, no dropdowns need to be added
         if (currClasses.size() == 0) {
            return;
         }
 
+        // If classes exist, add the option to delete and rename classes
         JMenu deleteSubMenu = new JMenu("Delete Class");
         JMenu renameSubMenu = new JMenu("Rename Class");
+
+        // For each class, add a dropdown to both the delete and rename dropdowns
+        // for that class
         for (int i = 0; i < currClasses.size(); ++i) {
             deleteSubMenu.add(new JMenuItem(currClasses.get(i).name));
             renameSubMenu.add(new JMenuItem(currClasses.get(i).name));
             deleteSubMenu.getItem(i).addActionListener(this);
             renameSubMenu.getItem(i).addActionListener(this);
-            deleteSubMenu.getItem(i).setActionCommand("DeleteClass" + currClasses.get(i).name);
-            renameSubMenu.getItem(i).setActionCommand("RenameClass" + currClasses.get(i).name);;
+            deleteSubMenu.getItem(i).setActionCommand("DeleteClass" + "*" + currClasses.get(i).name);
+            renameSubMenu.getItem(i).setActionCommand("RenameClass" + "*" + currClasses.get(i).name);;
         }
 
+        // Add each sub-dropdown to the main menu option
         menu.getMenu(1).add(deleteSubMenu);
         menu.getMenu(1).add(renameSubMenu);
     }
 
+    // Updates the available dropdowns for the "field" menu based on the state of the
+    // underlying project/model
     private void updateFieldDropdowns() {
+        // If dropdowns exist, delete them to rebuild the menu
         if (menu.getMenu(3).getItemCount() > 0) {
             menu.getMenu(3).remove(0);
             menu.getMenu(3).remove(0);
@@ -457,41 +366,450 @@ public class UMLGUI implements ActionListener{
 
         ArrayList<UMLClass> currClasses = project.getClasses();
 
+        // If there are no classes, no dropdowns need to be added
         if (currClasses.size() == 0) {
            return;
         }
 
+        // If classes exist, add the option to add, delete, and rename fields
         JMenu addSubMenu = new JMenu("Add Field");
         JMenu deleteSubMenu = new JMenu("Delete Field");
         JMenu renameSubMenu = new JMenu("Rename Field");
+
         for (int i = 0; i < currClasses.size(); ++i) {
+            // For each class, add a dropdown to add a field to that class
             addSubMenu.add(new JMenuItem(currClasses.get(i).name)); 
             addSubMenu.getItem(i).addActionListener(this);
-            addSubMenu.getItem(i).setActionCommand("AddField" + currClasses.get(i).name);
+            addSubMenu.getItem(i).setActionCommand("AddField" + "*" + currClasses.get(i).name);
 
             JMenu delClassesMenu = new JMenu(currClasses.get(i).name);
-            //deleteSubMenu.add(delClassesMenu);
 
             JMenu renameClassesMenu = new JMenu(currClasses.get(i).name);
-            //renameSubMenu.add(renameClassesMenu);
 
+            // For each field in the current class, add the option to rename or delete it
+            // from its class name dropdown
             ArrayList<String> classFields = currClasses.get(i).getFields();
             for (int j = 0; j < classFields.size(); ++j) {
                 delClassesMenu.add(new JMenuItem(classFields.get(j)));
                 renameClassesMenu.add(new JMenuItem(classFields.get(j)));
                 delClassesMenu.getItem(j).addActionListener(this);
                 renameClassesMenu.getItem(j).addActionListener(this);
-                delClassesMenu.getItem(j).setActionCommand("DeleteField" + currClasses.get(i).name + "*" + classFields.get(j));
-                renameClassesMenu.getItem(j).setActionCommand("RenameField" + currClasses.get(i).name + "*" + classFields.get(j));
+                delClassesMenu.getItem(j).setActionCommand("DeleteField" + "*" + currClasses.get(i).name + "*" + classFields.get(j));
+                renameClassesMenu.getItem(j).setActionCommand("RenameField" + "*" + currClasses.get(i).name + "*" + classFields.get(j));
             }
             
+            // Add the field dropdowns to each class dropdown
             deleteSubMenu.add(delClassesMenu);
             renameSubMenu.add(renameClassesMenu);
         }
 
+        // Add the submenus to the top level dropdowns
         menu.getMenu(3).add(addSubMenu);
         menu.getMenu(3).add(deleteSubMenu);
         menu.getMenu(3).add(renameSubMenu);
+    }
+
+    // Updates the available dropdowns for the "method" menu based on the state of the
+    // underlying project/model
+    private void updateMethodDropdowns() {
+        // If dropdowns exist, delete them to rebuild the menu
+        if (menu.getMenu(4).getItemCount() > 0) {
+            menu.getMenu(4).remove(0);
+            menu.getMenu(4).remove(0);
+            menu.getMenu(4).remove(0);
+        }
+
+        ArrayList<UMLClass> currClasses = project.getClasses();
+
+        // If there are no classes, no dropdowns need to be added
+        if (currClasses.size() == 0) {
+           return;
+        }
+
+        // If classes exist, add the option to add, delete, and rename methods
+        JMenu addSubMenu = new JMenu("Add Method");
+        JMenu deleteSubMenu = new JMenu("Delete Method");
+        JMenu renameSubMenu = new JMenu("Rename Method");
+
+        for (int i = 0; i < currClasses.size(); ++i) {
+            // For each class, add a dropdown to add a method to that class
+            addSubMenu.add(new JMenuItem(currClasses.get(i).name)); 
+            addSubMenu.getItem(i).addActionListener(this);
+            addSubMenu.getItem(i).setActionCommand("AddMethod" + "*" + currClasses.get(i).name);
+
+            JMenu delClassesMenu = new JMenu(currClasses.get(i).name);
+
+            JMenu renameClassesMenu = new JMenu(currClasses.get(i).name);
+
+            // For each method in the current class, add the option to rename or delete it
+            // from its class name dropdown
+            ArrayList<ArrayList<String>> classMethods = currClasses.get(i).getMethods();
+            for (int j = 0; j < classMethods.size(); ++j) {
+                delClassesMenu.add(new JMenuItem(classMethods.get(j).get(0)));
+                renameClassesMenu.add(new JMenuItem(classMethods.get(j).get(0)));
+                delClassesMenu.getItem(j).addActionListener(this);
+                renameClassesMenu.getItem(j).addActionListener(this);
+                delClassesMenu.getItem(j).setActionCommand("DeleteMethod" + "*" + currClasses.get(i).name + "*" + classMethods.get(j).get(0));
+                renameClassesMenu.getItem(j).setActionCommand("RenameMethod" + "*" + currClasses.get(i).name + "*" + classMethods.get(j).get(0));
+            }
+            
+            // Add the method dropdowns to each class dropdown
+            deleteSubMenu.add(delClassesMenu);
+            renameSubMenu.add(renameClassesMenu);
+        }
+
+        // Add the submenus to the top level dropdowns
+        menu.getMenu(4).add(addSubMenu);
+        menu.getMenu(4).add(deleteSubMenu);
+        menu.getMenu(4).add(renameSubMenu);
+    }
+
+    // Updates the available dropdowns for the "parameter" menu based on the state of the
+    // underlying project/model
+    private void updateParameterDropdowns() {
+        // If dropdowns exist, delete them to rebuild the menu
+        if (menu.getMenu(5).getItemCount() > 0) {
+            menu.getMenu(5).remove(0);
+            menu.getMenu(5).remove(0);
+            menu.getMenu(5).remove(0);
+            menu.getMenu(5).remove(0);
+            menu.getMenu(5).remove(0);
+        }
+
+        ArrayList<UMLClass> currClasses = project.getClasses();
+
+        // If there are no classes, no dropdowns need to be added
+        if (currClasses.size() == 0) {
+           return;
+        }
+
+        // If classes exist, add the parameter options
+        JMenu addSubMenu = new JMenu("Add Parameter");
+        JMenu deleteSubMenu = new JMenu("Delete Parameter");
+        JMenu deleteAllSubMenu = new JMenu("Delete All Parameters");
+        JMenu renameSubMenu = new JMenu("Rename Parameter");
+        JMenu changeAllSubMenu = new JMenu("Change All Parameters");
+
+        for (int i = 0; i < currClasses.size(); ++i) {
+
+            ArrayList<ArrayList<String>> currMethods =  currClasses.get(i).getMethods();
+
+            // Create a dropdown for each menu that has the class names
+            JMenu addClassesMenu = new JMenu(currClasses.get(i).name);
+            JMenu delClassesMenu = new JMenu(currClasses.get(i).name);
+            JMenu delAllClassesMenu = new JMenu(currClasses.get(i).name);
+            JMenu renameClassesMenu = new JMenu(currClasses.get(i).name);
+            JMenu changeAllClassesMenu = new JMenu(currClasses.get(i).name);
+
+            // For each method in each class, add a dropdown for its params to
+            // its class dropdown
+            for (int j = 0; j < currMethods.size(); ++j) {
+                // For each method, add a dropdown to add a param to it
+                addClassesMenu.add(new JMenuItem(currMethods.get(j).get(0))); 
+                addClassesMenu.getItem(j).addActionListener(this);
+                addClassesMenu.getItem(j).setActionCommand("AddParameter" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).get(0));
+
+                // For each param in each method, add a dropdown to delete it
+                JMenu methodDelParams = new JMenu(currMethods.get(j).get(0));
+                for (int k = 1; k < currMethods.get(j).size(); ++k) {
+                    methodDelParams.add(new JMenuItem(currMethods.get(j).get(k)));
+                    methodDelParams.getItem(k-1).addActionListener(this);
+                    methodDelParams.getItem(k-1).setActionCommand("DeleteParameter" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).get(0) + "*" + currMethods.get(j).get(k));
+                }
+
+                delClassesMenu.add(methodDelParams); 
+
+                // For each method, add a dropdown to delete all parameters from it
+                delAllClassesMenu.add(new JMenuItem(currMethods.get(j).get(0))); 
+                delAllClassesMenu.getItem(j).addActionListener(this);
+                delAllClassesMenu.getItem(j).setActionCommand("DeleteAllParameters" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).get(0));
+            
+                // For each param in each method, add a dropdown to rename it
+                JMenu methodRenameParams = new JMenu(currMethods.get(j).get(0));
+                for (int k = 1; k < currMethods.get(j).size(); ++k) {
+                    methodRenameParams.add(new JMenuItem(currMethods.get(j).get(k)));
+                    methodRenameParams.getItem(k-1).addActionListener(this);
+                    methodRenameParams.getItem(k-1).setActionCommand("RenameParameter" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).get(0) + "*" + currMethods.get(j).get(k));
+                }
+
+                renameClassesMenu.add(methodRenameParams); 
+
+                // For each method, add a dropdown to change all of its params
+                changeAllClassesMenu.add(new JMenuItem(currMethods.get(j).get(0))); 
+                changeAllClassesMenu.getItem(j).addActionListener(this);
+                changeAllClassesMenu.getItem(j).setActionCommand("ChangeAllParameters" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).get(0));
+            }
+
+            // Add each class menu to its command submenu
+            addSubMenu.add(addClassesMenu);
+            deleteSubMenu.add(delClassesMenu);
+            deleteAllSubMenu.add(delAllClassesMenu);
+            renameSubMenu.add(renameClassesMenu);
+            changeAllSubMenu.add(changeAllClassesMenu);
+        }
+
+        // Add the submenus to the top level dropdowns
+        menu.getMenu(5).add(addSubMenu);
+        menu.getMenu(5).add(deleteSubMenu);
+        menu.getMenu(5).add(deleteAllSubMenu);
+        menu.getMenu(5).add(renameSubMenu);
+        menu.getMenu(5).add(changeAllSubMenu);
+    }
+
+    // Updates the available dropdowns for the "parameter" menu based on the state of the
+    // underlying project/model
+    private void updateRelDropdowns() {
+        // If dropdowns exist, delete them to rebuild the menu
+        if (menu.getMenu(2).getItemCount() > 0) {
+            menu.getMenu(2).remove(0);
+            menu.getMenu(2).remove(0);
+            menu.getMenu(2).remove(0);
+        }
+
+        ArrayList<UMLClass> currClasses = project.getClasses();
+
+        // If there are no classes, no dropdowns need to be added
+        if (currClasses.size() == 0) {
+           return;
+        }
+
+        // If classes exist, add in relationship options
+        JMenu add = new JMenu("Add Relationship");
+        JMenu change = new JMenu("Change Relation Type");
+        JMenu del = new JMenu("Delete Relationship");
+
+        // List each rel type for adding a relationship
+        JMenu in = new JMenu("Inheritance");
+        JMenu ag = new JMenu("Aggregation");
+        JMenu comp = new JMenu("Composition");
+        JMenu real = new JMenu("Realization");
+
+        // Make a dropdown for each class in the project/model for inheritance
+        for (int i = 0; i < currClasses.size(); ++i) {
+            String currClassName = currClasses.get(i).name;
+            JMenu currClassMenu = new JMenu(currClassName);
+
+            ArrayList<ArrayList<String>> currClassRels = currClasses.get(i).getRels();
+            
+            // Keep a list of classes that have a relationship with the current class
+            ArrayList<String> relClasses = new ArrayList<String>();
+            for (int j = 0; j < currClassRels.size(); ++j) {
+                relClasses.add(currClassRels.get(j).get(0));
+            }
+
+            // Add all other classes that do not have a relationship with the current
+            // class as options in that class' menu
+            for (int j = 0; j < currClasses.size(); ++j) {
+                String otherClassName = currClasses.get(j).name;
+                if (!otherClassName.equals(currClassName)) {
+                    if (!relClasses.contains(otherClassName)) {
+                        JMenuItem relClass = new JMenuItem(otherClassName);
+                        relClass.addActionListener(this);
+                        relClass.setActionCommand("AddRelationship" + "*" + currClassName + "*" + otherClassName + "*" + "inheritance");
+                        currClassMenu.add(relClass);
+                    }
+                }
+            }
+
+            in.add(currClassMenu);
+        }
+
+        // Make a dropdown for each class in the project/model for aggregation
+        for (int i = 0; i < currClasses.size(); ++i) {
+            String currClassName = currClasses.get(i).name;
+            JMenu currClassMenu = new JMenu(currClassName);
+
+            ArrayList<ArrayList<String>> currClassRels = currClasses.get(i).getRels();
+            
+            // Keep a list of classes that have a relationship with the current class
+            ArrayList<String> relClasses = new ArrayList<String>();
+            for (int j = 0; j < currClassRels.size(); ++j) {
+                relClasses.add(currClassRels.get(j).get(0));
+            }
+
+            // Add all other classes that do not have a relationship with the current
+            // class as options in that class' menu
+            for (int j = 0; j < currClasses.size(); ++j) {
+                String otherClassName = currClasses.get(j).name;
+                if (!otherClassName.equals(currClassName)) {
+                    if (!relClasses.contains(otherClassName)) {
+                        JMenuItem relClass = new JMenuItem(otherClassName);
+                        relClass.addActionListener(this);
+                        relClass.setActionCommand("AddRelationship" + "*" + currClassName + "*" + otherClassName + "*" + "aggregation");
+                        currClassMenu.add(relClass);
+                    }
+                }
+            }
+
+            ag.add(currClassMenu);
+        }
+
+        // Make a dropdown for each class in the project/model for composition
+        for (int i = 0; i < currClasses.size(); ++i) {
+            String currClassName = currClasses.get(i).name;
+            JMenu currClassMenu = new JMenu(currClassName);
+
+            ArrayList<ArrayList<String>> currClassRels = currClasses.get(i).getRels();
+            
+            // Keep a list of classes that have a relationship with the current class
+            ArrayList<String> relClasses = new ArrayList<String>();
+            for (int j = 0; j < currClassRels.size(); ++j) {
+                relClasses.add(currClassRels.get(j).get(0));
+            }
+
+            // Add all other classes that do not have a relationship with the current
+            // class as options in that class' menu
+            for (int j = 0; j < currClasses.size(); ++j) {
+                String otherClassName = currClasses.get(j).name;
+                if (!otherClassName.equals(currClassName)) {
+                    if (!relClasses.contains(otherClassName)) {
+                        JMenuItem relClass = new JMenuItem(otherClassName);
+                        relClass.addActionListener(this);
+                        relClass.setActionCommand("AddRelationship" + "*" + currClassName + "*" + otherClassName + "*" + "composition");
+                        currClassMenu.add(relClass);
+                    }
+                }
+            }
+
+            comp.add(currClassMenu);
+        }
+
+        // Make a dropdown for each class in the project/model for realization
+        for (int i = 0; i < currClasses.size(); ++i) {
+            String currClassName = currClasses.get(i).name;
+            JMenu currClassMenu = new JMenu(currClassName);
+
+            ArrayList<ArrayList<String>> currClassRels = currClasses.get(i).getRels();
+            
+            // Keep a list of classes that have a relationship with the current class
+            ArrayList<String> relClasses = new ArrayList<String>();
+            for (int j = 0; j < currClassRels.size(); ++j) {
+                relClasses.add(currClassRels.get(j).get(0));
+            }
+
+            // Add all other classes that do not have a relationship with the current
+            // class as options in that class' menu
+            for (int j = 0; j < currClasses.size(); ++j) {
+                String otherClassName = currClasses.get(j).name;
+                if (!otherClassName.equals(currClassName)) {
+                    if (!relClasses.contains(otherClassName)) {
+                        JMenuItem relClass = new JMenuItem(otherClassName);
+                        relClass.addActionListener(this);
+                        relClass.setActionCommand("AddRelationship" + "*" + currClassName + "*" + otherClassName + "*" + "realization");
+                        currClassMenu.add(relClass);
+                    }
+                }
+            }
+
+            real.add(currClassMenu);
+        }
+
+        // Make a dropdown for each class in the project/model to change or delete its 
+        // rel type (if it has any relationships)
+        for (int i = 0; i < currClasses.size(); ++i) {
+            String currClassName = currClasses.get(i).name;
+
+            ArrayList<ArrayList<String>> currClassRels = currClasses.get(i).getRels();
+            
+            // Keep a list of classes that have a relationship with the current class
+            ArrayList<ArrayList<String>> relClassesDests = new ArrayList<ArrayList<String>>();
+            for (int j = 0; j < currClassRels.size(); ++j) {
+                if (currClassRels.get(j).get(1).equals("src")) {
+                    ArrayList<String> nameType = new ArrayList<String>(2);
+
+                    nameType.add(currClassRels.get(j).get(0));
+                    nameType.add(currClassRels.get(j).get(2));
+
+                    relClassesDests.add(nameType);
+                }
+            }
+
+            // Add all other classes that do have a relationship with the current
+            // class as options in that class' menu
+            for (int j = 0; j < currClasses.size(); ++j) {
+                String otherClassName = currClasses.get(j).name;
+                if (!otherClassName.equals(currClassName)) {
+                    // Pair the current class with its destinations
+                    for (int k = 0; k < relClassesDests.size(); ++k) {
+                        if (relClassesDests.get(k).get(0).equals(otherClassName)) {
+                            JMenu relationship = new JMenu(currClassName + " -> " + otherClassName);
+    
+                            // Add an inheritance option if it's not the current relationship
+                            if (!relClassesDests.get(k).get(1).equals("inheritance")) {
+                                JMenuItem inher =  new JMenuItem("Inheritance");
+                                inher.addActionListener(this);
+                                inher.setActionCommand("ChangeRelationType" + "*" + currClassName + "*" + otherClassName + "*" + "inheritance");
+                                relationship.add(inher);
+                            }
+
+                            // Add an aggregation option if it's not the current relationship
+                            if (!relClassesDests.get(k).get(1).equals("aggregation")) {
+                                JMenuItem inher =  new JMenuItem("Aggregation");
+                                inher.addActionListener(this);
+                                inher.setActionCommand("ChangeRelationType" + "*" + currClassName + "*" + otherClassName + "*" + "aggregation");
+                                relationship.add(inher);
+                            }
+
+                            // Add a composition option if it's not the current relationship
+                            if (!relClassesDests.get(k).get(1).equals("composition")) {
+                                JMenuItem inher =  new JMenuItem("Compostion");
+                                inher.addActionListener(this);
+                                inher.setActionCommand("ChangeRelationType" + "*" + currClassName + "*" + otherClassName + "*" + "composition");
+                                relationship.add(inher);
+                            }
+
+                            // Add a realization option if it's not the current relationship
+                            if (!relClassesDests.get(k).get(1).equals("realization")) {
+                                JMenuItem inher =  new JMenuItem("Realization");
+                                inher.addActionListener(this);
+                                inher.setActionCommand("ChangeRelationType" + "*" + currClassName + "*" + otherClassName + "*" + "realization");
+                                relationship.add(inher);
+                            }
+
+                            change.add(relationship);
+                        }
+                    }
+                }
+            }
+
+            // Add a dropdown for each relationship in the delete menu
+            for (int j = 0; j < currClasses.size(); ++j) {
+                String otherClassName = currClasses.get(j).name;
+                if (!otherClassName.equals(currClassName)) {
+                    // Pair the current class with its destinations
+                    for (int k = 0; k < relClassesDests.size(); ++k) {
+                        if (relClassesDests.get(k).get(0).equals(otherClassName)) {
+                            JMenuItem relationship = new JMenuItem(currClassName + " -> " + otherClassName);
+                            relationship.addActionListener(this);
+                            relationship.setActionCommand("DeleteRelationship" + "*" + currClassName + "*" + otherClassName);
+
+                            del.add(relationship);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Add the type dropdowns to the add relationship menu
+        add.add(in);
+        add.add(ag);
+        add.add(comp);
+        add.add(real);
+
+        // Add the menus to the topmost menu
+        menu.getMenu(2).add(add);
+        menu.getMenu(2).add(change);
+        menu.getMenu(2).add(del);
+    }
+
+    // Updates all of the dropdowns by updating each one with their specific
+    // updater
+    private void updateAllDropdowns() {
+        updateClassDropdowns();
+        updateRelDropdowns();
+        updateFieldDropdowns();
+        updateMethodDropdowns();
+        updateParameterDropdowns();
     }
 
     private String getText(String string)
@@ -516,202 +834,209 @@ public class UMLGUI implements ActionListener{
 
     public void actionPerformed(ActionEvent e){
         String command = e.getActionCommand();
+        String[] args = command.split("\\*");
 
         // CLASS COMMANDS
-        if(command.equals("Create Class")){
+        if(args[0].equals("Create Class")){
             String classToAdd = getText("Class to Add: ");
+            // If cancel is pressed when getting text from the user, the string will
+            // be null, so check for it and exit the function if so (do nothing)
+            if (classToAdd == null) {
+                return;
+            }
             saveToMeme(true);
-            project.addClass(classToAdd); 
+            project.addClass(classToAdd);
             getFromProject(project); 
-            updateClassDropdowns();
-            updateFieldDropdowns();
+            updateAllDropdowns();
             refresh();
+            return;
         }
-        if(command.contains("DeleteClass")){
-            //String classToDelete = getText("Class to Delete: ");
-            //System.out.println(command.substring(11));
+        if(args[0].equals("DeleteClass")){
             saveToMeme(true);
-            project.deleteClass(command.substring(11));
+            project.deleteClass(args[1]);
             getFromProject(project); 
-            updateClassDropdowns();
-            updateFieldDropdowns();
+            updateAllDropdowns();
             refresh(); 
         }
-        if(command.contains("RenameClass")){
-            //String class1 = getText("Class to rename: ");
+        if(args[0].equals("RenameClass")){
             String newName = getText("New name: ");
+            // If cancel is pressed when getting text from the user, the string will
+            // be null, so check for it and exit the function if so (do nothing)
+            if (newName == null) {
+                return;
+            }
             saveToMeme(true);
-            project.renameClass(command.substring(11), newName);
+            project.renameClass(args[1], newName);
             
             // Change the panel's name in the panels array so its
             // location will stay the same when calling resetLocation
             for (int i = 0; i < panels.size(); ++i) {
-                if (panels.get(i).getName().equals(command.substring(11))) {
+                if (panels.get(i).getName().equals(args[1])) {
                     panels.get(i).setName(newName);
                     break;
                 }
             }
 
             getFromProject(project);
-            updateClassDropdowns();
-            updateFieldDropdowns();
+            updateAllDropdowns();
             refresh();
         }
         // RELATIONSHIP COMMANDS
-        if (command.equals("Inheritance")){
-            String relToAdd = getText("Source Class: "); 
-            String relToAdd2 = getText("Destination Class: "); 
+        if (args[0].equals("AddRelationship")){
             saveToMeme(true);
-            project.addRel(relToAdd, relToAdd2, "inheritance");
+            project.addRel(args[1], args[2], args[3]);
             getFromProject(project);
+            updateRelDropdowns();
             refresh();
         } 
-        if (command.equals("Aggregation")){
-            String relToAdd = getText("Source Class: "); 
-            String relToAdd2 = getText("Destination Class: "); 
+        if (args[0].equals("ChangeRelationType")){
             saveToMeme(true);
-            project.addRel(relToAdd, relToAdd2, "aggregation");
+            project.changeRelType(args[1], args[2], args[3]);
             getFromProject(project);
+            updateRelDropdowns();
             refresh();
         } 
-        if (command.equals("Composition")){
-            String relToAdd = getText("Source Class: "); 
-            String relToAdd2 = getText("Destination Class: "); 
+        if (args[0].equals("DeleteRelationship")){
             saveToMeme(true);
-            project.addRel(relToAdd, relToAdd2, "composition");
+            project.delRel(args[1], args[2]);
             getFromProject(project);
-            refresh();
-        } 
-        if (command.equals("Realization")){
-            String relToAdd = getText("Source Class: "); 
-            String relToAdd2 = getText("Destination Class: "); 
-            saveToMeme(true);
-            project.addRel(relToAdd, relToAdd2, "realization");
-            getFromProject(project);
-            refresh();
-        } 
-        if (command.equals("Change Relation Type")){
-            String class1 = getText("Class 1: "); 
-            String class2 = getText("Class 2: ");
-            String type = getText("New type: ");
-            saveToMeme(true);
-            project.changeRelType(class1, class2, type);
-            getFromProject(project);
-            refresh();
-        } 
-        if (command.equals("Delete Relationship")){
-            String class1 = getText("Class 1: "); 
-            String class2 = getText("Class 2: "); 
-            saveToMeme(true);
-            project.delRel(class1, class2);
-            getFromProject(project);
+            updateRelDropdowns();
             refresh();
         } 
         // FIELD COMMANDS
-        if (command.contains("AddField")){
-            //String classToAdd = getText("Class: "); 
+        if (args[0].equals("AddField")){
             String fieldToAdd = getText("Field Name: "); 
+            // If cancel is pressed when getting text from the user, the string will
+            // be null, so check for it and exit the function if so (do nothing)
+            if (fieldToAdd == null) {
+                return;
+            }
             saveToMeme(true);
-            project.addAttr(command.substring(8), fieldToAdd, "field");
+            project.addAttr(args[1], fieldToAdd, "field");
             getFromProject(project);
             updateFieldDropdowns();
             refresh();
         } 
-        if (command.contains("DeleteField")){
-            //String className = getText("Class: "); 
-            //String fieldToDel = getText("Field to Delete: "); 
-            int classEnd = command.indexOf("*");
+        if (args[0].equals("DeleteField")){
             saveToMeme(true);
-            project.delAttr(command.substring(11, classEnd), command.substring(classEnd + 1), "field");
+            project.delAttr(args[1], args[2], "field");
             getFromProject(project);
             updateFieldDropdowns();
             refresh();
         } 
-        if (command.contains("RenameField")){
-            //String className = getText("Class: "); 
-            //String oldField = getText("Field to Rename: ");
+        if (args[0].equals("RenameField")){
             String newField = getText("New Field Name: ");
-            int classEnd = command.indexOf("*");
+            // If cancel is pressed when getting text from the user, the string will
+            // be null, so check for it and exit the function if so (do nothing)
+            if (newField == null) {
+                return;
+            }
             saveToMeme(true);
-            project.renameAttr(command.substring(11, classEnd), command.substring(classEnd + 1), newField, "field");
+            project.renameAttr(args[1], args[2], newField, "field");
             getFromProject(project);
             updateFieldDropdowns();
             refresh();
         } 
         // METHOD COMMANDS
-        if (command.equals("Add Method")){
-            String classToAdd = getText("Class: "); 
+        if (args[0].equals("AddMethod")){
             String methodToAdd = getText("Method Name: "); 
+            // If cancel is pressed when getting text from the user, the string will
+            // be null, so check for it and exit the function if so (do nothing)
+            if (methodToAdd == null) {
+                return;
+            }
             saveToMeme(true);
-            project.addAttr(classToAdd, methodToAdd, "method");
+            project.addAttr(args[1], methodToAdd, "method");
             getFromProject(project);
+            updateMethodDropdowns();
+            updateParameterDropdowns();
             refresh();
         } 
-        if (command.equals("Delete Method")){
-            String className = getText("Class: "); 
-            String methodToDelete = getText("Method to Delete: "); 
+        if (args[0].equals("DeleteMethod")){
             saveToMeme(true);
-            project.delAttr(className, methodToDelete, "method");
+            project.delAttr(args[1], args[2], "method");
             getFromProject(project);
+            updateMethodDropdowns();
+            updateParameterDropdowns();
             refresh();
         } 
-        if (command.equals("Rename Method")){
-            String className = getText("Class: "); 
-            String methodToRename = getText("Method to Rename: "); 
+        if (args[0].equals("RenameMethod")){
             String newMethodName = getText("New Method Name: "); 
+            // If cancel is pressed when getting text from the user, the string will
+            // be null, so check for it and exit the function if so (do nothing)
+            if (newMethodName == null) {
+                return;
+            }
             saveToMeme(true);
-            project.renameAttr(className, methodToRename, newMethodName, "method");
+            project.renameAttr(args[1], args[2], newMethodName, "method");
+            updateMethodDropdowns();
             getFromProject(project);
+            updateParameterDropdowns();
             refresh();
         } 
         // PARAMETER COMMANDS
-        if (command.equals("Add Parameter")){
-            String classToAdd = getText("Class: "); 
-            String methodToAdd = getText("Method Name: "); 
+        if (args[0].equals("AddParameter")){
+            //String classToAdd = getText("Class: "); 
+            //String methodToAdd = getText("Method Name: "); 
             String paramToAdd = getText("Parameter Name: "); 
+            // If cancel is pressed when getting text from the user, the string will
+            // be null, so check for it and exit the function if so (do nothing)
+            if (paramToAdd == null) {
+                return;
+            }
             saveToMeme(true);
-            project.addParam(classToAdd, methodToAdd, paramToAdd);
+            project.addParam(args[1], args[2], paramToAdd);
             getFromProject(project);
+            updateParameterDropdowns();
             refresh();
         } 
-        if (command.equals("Delete Parameter")){
-            String className = getText("Class: "); 
-            String methodName = getText("Method Name: "); 
-            String paramName = getText("Parameter to Delete: ");
+        if (args[0].equals("DeleteParameter")){
             saveToMeme(true); 
-            project.deleteParam(className, methodName, paramName);
+            project.deleteParam(args[1], args[2], args[3]);
             getFromProject(project);
+            updateParameterDropdowns();
             refresh();
         } 
-        if (command.equals("Delete All Parameters")){
-            String className = getText("Class: "); 
-            String methodName = getText("Method to delete all params from: ");  
+        if (args[0].equals("DeleteAllParameters")){
             saveToMeme(true);
-            project.deleteAllParams(className, methodName);
+            project.deleteAllParams(args[1], args[2]);
             getFromProject(project);
+            updateParameterDropdowns();
             refresh();
         } 
-        if (command.equals("Rename Parameter")){
-            String className = getText("Class: "); 
-            String methodName = getText("Method Name: "); 
-            String oldParam = getText("Parameter to Change: "); 
+        if (args[0].equals("RenameParameter")){
             String newParam = getText("New Parameter Name: ");
+            // If cancel is pressed when getting text from the user, the string will
+            // be null, so check for it and exit the function if so (do nothing)
+            if (newParam == null) {
+                return;
+            }
             saveToMeme(true);
-            project.changeParam(className, methodName, oldParam, newParam);
+            project.changeParam(args[1], args[2], args[3], newParam);
             getFromProject(project);
+            updateParameterDropdowns();
             refresh();
         } 
-        if (command.equals("Rename All Parameters")){
-            String className = getText("Class: "); 
-            String methodName = getText("Name of method to change all params: "); 
-
+        if (args[0].equals("ChangeAllParameters")){
             // parseInt will fail if given a non-number, so the user
             // will be continuously asked for a number of parameters
             // until they provide a number
             boolean inputIsInt = false;
+            boolean asked = false;
             int paramNum = 0;
             while (!inputIsInt) {
-                String numOfParams = getText("How many params to add: ");
+                String numOfParams;
+                if (!asked) {
+                    numOfParams = getText("How many params to add: ");
+                    asked = true;
+                } else {
+                    numOfParams = getText("How many params to add: (Please enter a number)");
+                }
+                // Exit this command if cancel is pressed
+                if (numOfParams == null) {
+                    return;
+                }
+                // Otherwise try to read the integer and re-ask if not an int
                 try {
                     inputIsInt = true;
                     paramNum = Integer.parseInt(numOfParams);
@@ -720,14 +1045,19 @@ public class UMLGUI implements ActionListener{
                 }
             }
 
+            // Build an ArrayList of params to be passed to the controller
             ArrayList<String> params = new ArrayList<String>(paramNum);
             while (paramNum > 0){
                 String paramName = getText("New param name: ");
+                if (paramName == null) {
+                    return;
+                }
                 params.add(paramName);
                 --paramNum;
             }
+
             saveToMeme(true);
-            project.changeAllParams(className, methodName, params);
+            project.changeAllParams(args[1], args[2], params);
             getFromProject(project);
             refresh();
         } 
