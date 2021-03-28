@@ -107,10 +107,12 @@ public class UMLInterface {
                                 if (commands.size() < 4) {
                                     System.out.println("Too few Arguments for addMethod command");
                                 }
+                                else{
                                 project.saveToMeme(true);
                                 project.addAttr(commands.get(2), commands.get(3),commands.get(1));
                                 for(int i = 4 ; i < commands.size(); i++){
                                     project.addParam(commands.get(2), commands.get(3), commands.get(i)); 
+                                }
                                 }
                                 break; 
                                 
@@ -118,10 +120,13 @@ public class UMLInterface {
                                 if (commands.size() < 5) {
                                     System.out.println("Too few Arguments for addParam command");
                                 }
+                                else{
                                 project.saveToMeme(true);
                                 for(int i = 4 ; i < commands.size(); i++){
                                     project.addParam(commands.get(2), commands.get(3), commands.get(i)); 
                                 }
+                                }
+
                                 break; 
 
                                 default:
@@ -494,13 +499,16 @@ public class UMLInterface {
     }
 
     public static void main(String[] args) {
+        
         if (args.length == 0) {
             UMLGUI gui = new UMLGUI();
         }
         else if (args.length > 0) {
             if (args.length == 1 && args[0].equals("--cli")) {
+                
                 UMLEditor project = new UMLEditor();
                 commandInterface(project);
+                
             }
             else {
                 System.out.print("Unrecognized argument(s): \"");
@@ -512,6 +520,7 @@ public class UMLInterface {
                 }
                 System.out.println("\"");
             }
+            
         }
     }
 }
