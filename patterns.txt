@@ -1,0 +1,67 @@
+﻿Sprint 3 User Stories
+Team JINXS
+CSCI 420 - Software Engineering, Spring 2021
+Jon, Ian B., Nate, Xavier, Simon
+
+
+1. Builder:
+   - Currently, the getFromProject method is a huge function that builds the GUI based on the various pieces of each class in the underlying model. 
+   File Name: UMLGUI.java  
+   Line #: 109 - 278
+
+
+2. Observer:
+   - handleDrag in the GUI notifies the dragged panel, global position variables, and memento every time a panel is dragged through a one-to-many dependency.
+   File Name: UMLGUI.java  
+   Line #: 1373 - 1389
+
+
+3. Memento:
+   - Exists in its own file and has implementation for the GUI and the command line. Used for undo and redo.
+   File Name: Memento.java  
+   Line #: 1 - 35
+
+
+4. State:
+   - Dropdowns change their behavior based on the state of the underlying model in the GUI.
+   File Name: UMLGUI.java 
+   Line #: 359 - 410
+
+
+5. Interpreter:
+   - Load interprets JSON and turns it into Java-digestible data structures based on the data the JSON holds
+   File Name: UMLEditor.java
+   Line #: 526 - 601
+
+
+6. Mediator:
+   - The editor/controller handles relationships that the UML classes don’t handle themselves. The classes don’t explicitly reference other class objects, but the editor defines and handles the relationships between the actual UML class objects.
+   File Name: UMLEditor.java
+   Line #: 110 - 243
+
+
+7. Facade:
+   - The dropdowns provide a facade for dealing with commands from the editor. Each dropdown from the editor simplifies a command or piece of a command that is provided to the model.
+   File Name: UMLGUI.java 
+   Line #: 321-803
+
+
+8. Command:
+   - The dropdowns save all of the information about the request into a String which is interpreted by the actionevent method
+   File Name: UMLGUI.java 
+   Line #: 321-803, specifically lines like 452, 453, 525, 532 and others where all necessary information is put into a command String
+
+
+9. Proxy:
+   - The CLI and GUI act as proxies for using the UMLEditor interface with controlled and intelligent access to the parts of the model
+   File Names: UMLGUI.java and UMLInterface.java
+
+
+10. Composite:
+   - Applies to how the GUI dropdowns are structured: Editor has classes, classes have fields, methods, and relationships, and those components have individual instances
+   File Name: UMLGUI.java 
+   Line #: 321-803
+
+
+11. MVC:
+   - Our UMLClass file acts as the model, the UMLEditor file acts as the controller, and the UMLGUI/UMLInterface files act as views.
