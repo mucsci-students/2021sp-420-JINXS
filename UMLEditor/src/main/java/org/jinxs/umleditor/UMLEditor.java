@@ -41,7 +41,7 @@ public class UMLEditor {
 
         // Ensure the class name does not contain special characters (except for '_')
         // By matching with a regex
-        Pattern p = Pattern.compile("[^a-z0-9_ ]", Pattern.CASE_INSENSITIVE);
+        Pattern p = Pattern.compile("[^a-z0-9_]", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(className);
         boolean containsSpecChars = m.find();
 
