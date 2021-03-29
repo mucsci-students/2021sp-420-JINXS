@@ -8,11 +8,25 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.util.Scanner;
 
+// Save and load imports
+// For writing out to a file when saving
+import java.io.FileWriter;
+import java.io.IOException;
+
+// For the JSON array of classes to be written to file
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
 public class UMLInterface {
     
     // fields that we will use
     static BufferedReader brHelpDoc; 
     static boolean helpfile = true; // asks if the helpfile is present
+
+    // Holds class locations if a loaded file has GUI coordinates so they can be
+    // applied when the project is saved again
+    private static ArrayList<ArrayList<String>> classLocations = new ArrayList<ArrayList<String>>();
 
 
     /* 
@@ -58,6 +72,7 @@ public class UMLInterface {
                                     System.out.println("Too many Arguments for addClass command");
                                 }
                                 else{
+                                    project.saveToMeme(true);
                                     project.addClass(commands.get(2));
                                 }
                                 break;
@@ -70,7 +85,8 @@ public class UMLInterface {
                                     System.out.println("Too many Arguments for addRel command");
                                 }
                                 else{
-                                project.addRel(commands.get(2), commands.get(3), commands.get(4));
+                                    project.saveToMeme(true);
+                                    project.addRel(commands.get(2), commands.get(3), commands.get(4));
                                 }
                                 break; 
 
@@ -82,7 +98,8 @@ public class UMLInterface {
                                     System.out.println("Too many Arguments for addfield command");
                                 }
                                 else{
-                                project.addAttr(commands.get(2), commands.get(3), commands.get(1));
+                                    project.saveToMeme(true);
+                                    project.addAttr(commands.get(2), commands.get(3), commands.get(1));
                                 }
                                 break;
 
@@ -90,9 +107,12 @@ public class UMLInterface {
                                 if (commands.size() < 4) {
                                     System.out.println("Too few Arguments for addMethod command");
                                 }
+                                else{
+                                project.saveToMeme(true);
                                 project.addAttr(commands.get(2), commands.get(3),commands.get(1));
                                 for(int i = 4 ; i < commands.size(); i++){
                                     project.addParam(commands.get(2), commands.get(3), commands.get(i)); 
+                                }
                                 }
                                 break; 
                                 
@@ -100,9 +120,13 @@ public class UMLInterface {
                                 if (commands.size() < 5) {
                                     System.out.println("Too few Arguments for addParam command");
                                 }
+                                else{
+                                project.saveToMeme(true);
                                 for(int i = 4 ; i < commands.size(); i++){
                                     project.addParam(commands.get(2), commands.get(3), commands.get(i)); 
                                 }
+                                }
+
                                 break; 
 
                                 default:
@@ -123,6 +147,7 @@ public class UMLInterface {
                             System.out.println("Too many Arguments for deleteClass command");
                         }
                         else{
+                            project.saveToMeme(true);
                             project.deleteClass(commands.get(2));
                         }
                         break;
@@ -135,7 +160,8 @@ public class UMLInterface {
                             System.out.println("Too many Arguments for deleteRel command");
                         }
                         else{
-                        project.delRel(commands.get(2), commands.get(3));
+                            project.saveToMeme(true);
+                            project.delRel(commands.get(2), commands.get(3));
                         }
                         break; 
 
@@ -147,7 +173,8 @@ public class UMLInterface {
                             System.out.println("Too many Arguments for deletefield command");
                         }
                         else{
-                        project.delAttr(commands.get(2), commands.get(3),commands.get(1));
+                            project.saveToMeme(true);
+                            project.delAttr(commands.get(2), commands.get(3),commands.get(1));
                         }
                         break;
 
@@ -155,22 +182,24 @@ public class UMLInterface {
                         if (commands.size() < 4) {
                             System.out.println("Too few Arguments for deleteMethod command");
                         }
+                        project.saveToMeme(true);
                         project.delAttr(commands.get(2), commands.get(3),commands.get(1));
-                    
                         break; 
                         
                         case "param":
                         if (commands.size() < 5) {
                             System.out.println("Too few Arguments for addParam command");
                         }
-                            project.deleteParam(commands.get(2), commands.get(3), commands.get(4)); 
+                        project.saveToMeme(true);
+                        project.deleteParam(commands.get(2), commands.get(3), commands.get(4));
                         break; 
 
                         case "allParams":
                         if (commands.size() < 4) {
                             System.out.println("Too few Arguments for deleteAllParams command");
                         }
-                            project.deleteAllParams(commands.get(2), commands.get(3)); 
+                        project.saveToMeme(true);
+                        project.deleteAllParams(commands.get(2), commands.get(3));
                         break; 
 
                         default:
@@ -191,6 +220,7 @@ public class UMLInterface {
                             System.out.println("Too many Arguments for renameClass command");
                         }
                         else{
+                            project.saveToMeme(true);
                             project.renameClass(commands.get(2),commands.get(3));
                         }
                         break;
@@ -203,6 +233,7 @@ public class UMLInterface {
                             System.out.println("Too many Arguments for renameRelType command");
                         }
                         else{
+                        project.saveToMeme(true);
                         project.changeRelType(commands.get(2), commands.get(3), commands.get(4));
                         }
                         break; 
@@ -215,6 +246,7 @@ public class UMLInterface {
                             System.out.println("Too many Arguments for renamefield command");
                         }
                         else{
+                        project.saveToMeme(true);
                         project.renameAttr(commands.get(2), commands.get(3), commands.get(4), commands.get(1));
                         }
                         break;
@@ -226,6 +258,7 @@ public class UMLInterface {
                         else if (commands.size() > 5) {
                             System.out.println("Too many Arguments for renameMethod command");
                         }
+                        project.saveToMeme(true);
                         project.renameAttr(commands.get(2), commands.get(3),commands.get(4),commands.get(1));
                         break; 
                         
@@ -233,7 +266,8 @@ public class UMLInterface {
                         if (commands.size() < 6) {
                             System.out.println("Too few Arguments for renameParam command");
                         }
-                            project.changeParam(commands.get(2), commands.get(3), commands.get(4), commands.get(5)); 
+                        project.saveToMeme(true);
+                        project.changeParam(commands.get(2), commands.get(3), commands.get(4), commands.get(5));
                         break; 
 
                         case "allParams":
@@ -244,7 +278,8 @@ public class UMLInterface {
                         for(int i = 4; i < commands.size(); i++){
                             params.add(commands.get(i)); 
                         }
-                            project.changeAllParams(commands.get(2), commands.get(3), params); 
+                        project.saveToMeme(true);
+                        project.changeAllParams(commands.get(2), commands.get(3), params);
                         break; 
 
                         default:
@@ -266,6 +301,7 @@ public class UMLInterface {
                         }
                         else{
                             project.save(commands.get(1)); 
+                            restoreLoadCoords(commands.get(1));
                         }
                     break;
 
@@ -278,7 +314,8 @@ public class UMLInterface {
                             System.out.println("Too many Arguments for load command");
                         }
                         else{
-                            project.load(commands.get(1)); 
+                            project.load(commands.get(1));
+                            storeLoadCoords(commands.get(1)); 
                         }
                     break;
 
@@ -313,10 +350,29 @@ public class UMLInterface {
                         }
                     break;
 
+                    case "undo":
+                        if (commands.size() < 1) {
+                            System.out.println("Too few Arguments for undo command");
+                        } else if (commands.size() > 1) {
+                            System.out.println("Too many Arguments for undo command");
+                        } else {
+                            project.undo();
+                        }
+                    break;
+
+                    case "redo":
+                        if (commands.size() < 1) {
+                            System.out.println("Too few Arguments for redo command");
+                        } else if (commands.size() > 1) {
+                            System.out.println("Too many Arguments for redo command");
+                        } else {
+                            project.redo();
+                        }
+                    break;
+
                     //If command is not one of the specified commands above then we print an error message
                     default:
                         System.out.println("Error: " + commands.get(0) + " is not a recognized command");
-
             }
         }
     }
@@ -327,7 +383,12 @@ public class UMLInterface {
             String filePath = new File("").getAbsolutePath();
             brHelpDoc = new BufferedReader (new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/helpDocument.txt"));
         } catch (Exception FileNotFoundException) {
-            helpfile = false;
+            try {
+                String filePath = new File("").getAbsolutePath();
+                brHelpDoc = new BufferedReader (new FileReader(filePath + "/src/main/java/org/jinxs/umleditor/helpDocument.txt"));
+            } catch (Exception e) {
+                helpfile = false;
+            }
         }
         if(!helpfile){
             System.out.println("helpDocument.txt was not found");
@@ -355,14 +416,99 @@ public class UMLInterface {
         return commandList;
     }
 
+    // Looks through the save file that was loaded and stores any GUI coordinates
+    // associated with each class that was added so they can be readded if/when
+    // the editor is saved again
+    public static void storeLoadCoords (String fileName) {
+        // Initiate the JSON parser
+        JSONParser jPar = new JSONParser();
+
+        // Open the file that was just loaded
+        String filePath = new File("").getAbsolutePath();
+        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
+            // Save the JSON array from the parser
+            Object obj = jPar.parse(reader);
+            JSONArray classList = (JSONArray) obj;
+
+            // Clear previously stored locations if another file was loaded earlier
+            classLocations.clear();
+
+            // Get each class' JSONObject and check if it has saved coordinates
+            for (int i = 0; i < classList.size(); ++i) {
+                JSONObject singleClass = (JSONObject)classList.get(i);
+
+                // Holds the coordinates and the class name
+                ArrayList<String> locations = new ArrayList<String>(3);
+                locations.add((String)singleClass.get("name"));
+
+                JSONArray coords = (JSONArray) singleClass.get("coordinates");
+                // If the class has coordinates, add them to the locations ArrayList
+                // and add the list to the classLocations ArrayList
+                if (coords != null) {
+                    locations.add((String)coords.get(0));
+                    locations.add((String)coords.get(1));
+                    classLocations.add(locations);
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void restoreLoadCoords (String fileName) {
+        // Initiate the JSON parser
+        JSONParser jPar = new JSONParser();
+        
+        // Attempt to read the filename in the "saves" directory specified by 
+        // the user or catch resulting exceptions if/when that fails
+        String filePath = new File("").getAbsolutePath();
+        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
+            // Save the JSON array from the parser
+            Object obj = jPar.parse(reader);
+            JSONArray classList = (JSONArray) obj;
+            
+            // Loop through each class object in the JSON array from the saved file 
+            for (int i = 0; i < classList.size(); ++i)  {
+                JSONObject singleClass = (JSONObject)classList.get(i);
+
+                // Get the current class' name and initialize a JSONArray to
+                // hold coordinates if they exist
+                String className = (String)singleClass.get("name");
+                JSONArray coordsArray = new JSONArray();
+                for (int j = 0; j < classLocations.size(); ++j) {
+                    // If the class from the JSON file exists in the classLocations
+                    // ArrayList, then it has coordinates that need to be added to the
+                    // JSON file
+                    if (className.equals(classLocations.get(j).get(0))) {
+                        coordsArray.add(classLocations.get(j).get(1));
+                        coordsArray.add(classLocations.get(j).get(2));
+                        singleClass.put("coordinates", coordsArray);
+                        classList.set(i, singleClass);
+                    }
+                }
+            }
+            try (FileWriter file = new FileWriter(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
+                file.write(classList.toJSONString());
+                file.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
+        
         if (args.length == 0) {
             UMLGUI gui = new UMLGUI();
         }
         else if (args.length > 0) {
             if (args.length == 1 && args[0].equals("--cli")) {
+                
                 UMLEditor project = new UMLEditor();
                 commandInterface(project);
+                
             }
             else {
                 System.out.print("Unrecognized argument(s): \"");
@@ -374,6 +520,7 @@ public class UMLInterface {
                 }
                 System.out.println("\"");
             }
+            
         }
     }
 }

@@ -70,10 +70,10 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+        String expected = "$ "
+                + "$ ";
 
-        assertEquals("Adding a simple class succeeds", expected, getOutput());
+        assertEquals("Adding a simple class succeeds", expected, getOutput().replaceAll("\r", ""));
     }
 
     @Test
@@ -84,10 +84,10 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n" + "$ The requested class name already exists\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+        String expected = "$ " + "$ The requested class name already exists\n"
+                + "$ ";
 
-        assertEquals("Adding a duplicate class fails", expected, getOutput());
+        assertEquals("Adding a duplicate class fails", expected, getOutput().replaceAll("\r", ""));
     }
 
     @Test
@@ -98,10 +98,10 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n" + "$ The requested class name already exists\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+        String expected = "$ Class name cannot start with a number\n"
+                + "$ ";
 
-        assertEquals("Adding a class starting with a number fails", expected, getOutput());
+        assertEquals("Adding a class starting with a number fails", expected, getOutput().replaceAll("\r", ""));
     }
 
     @Test
@@ -113,9 +113,9 @@ public class UMLInterfaceTest {
         UMLInterface.main(new String[] { "--cli" });
 
         String expected = "$ The class name cannot contain special characters or spaces\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+                + "$ ";
 
-        assertEquals("Adding a class with a special character fails", expected, getOutput());
+        assertEquals("Adding a class with a special character fails", expected, getOutput().replaceAll("\r", ""));
     }
 
     // "add rel" tests
@@ -130,11 +130,11 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n" + "$ Class \"class2\" was added successfully\n"
-                + "$ Relationship between \"class1\" and \"class2\" added successfully\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+        String expected = "$ " + "$ "
+                + "$ "
+                + "$ ";
 
-        assertEquals("Adding a simple relationship succeeds", expected, getOutput());
+        assertEquals("Adding a simple relationship succeeds", expected, getOutput().replaceAll("\r", ""));
     }
 
     @Test
@@ -146,12 +146,12 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n" + "$ Class \"class2\" was added successfully\n"
-                + "$ Relationship between \"class1\" and \"class2\" added successfully\n"
+        String expected = "$ " + "$ "
+                + "$ "
                 + "$ Relationship between \"class1\" and \"class2\" already exists\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+                + "$ ";
 
-        assertEquals("Adding a duplicate relationship fails", expected, getOutput());
+        assertEquals("Adding a duplicate relationship fails", expected, getOutput().replaceAll("\r", ""));
     }
 
     @Test
@@ -163,11 +163,11 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n" + "$ Class \"class2\" was added successfully\n"
+        String expected = "$ " + "$ "
                 + "$ Missing a Type, Please try again\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+                + "$ ";
 
-        assertEquals("Adding an invalid rel fails", expected, getOutput());
+        assertEquals("Adding an invalid rel fails", expected, getOutput().replaceAll("\r", ""));
     }
 
     @Test
@@ -178,11 +178,11 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n" + "$ Class \"class2\" was added successfully\n"
+        String expected = "$ " + "$ "
                 + "$ Too few Arguments for addRel command\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+                + "$ ";
 
-        assertEquals("Adding a rel with no type fails", expected, getOutput());
+        assertEquals("Adding a rel with no type fails", expected, getOutput().replaceAll("\r", ""));
     }
 
     @Test
@@ -194,9 +194,9 @@ public class UMLInterfaceTest {
         UMLInterface.main(new String[] { "--cli" });
 
         String expected = "$ Class does not exsist\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+                + "$ ";
 
-        assertEquals("Adding a duplicate relationship fails", expected, getOutput());
+        assertEquals("Adding a duplicate relationship fails", expected, getOutput().replaceAll("\r", ""));
     }
 
     // "add field" tests
@@ -210,11 +210,11 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n"
-                + "$ Field \"field1\" added to class \"class1\" succesfully\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+        String expected = "$ "
+                + "$ "
+                + "$ ";
 
-        assertEquals("Adding a simple field succeeds", expected, getOutput());
+        assertEquals("Adding a simple field succeeds", expected, getOutput().replaceAll("\r", ""));
     }
 
     @Test
@@ -226,12 +226,12 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n"
-                + "$ Field \"field1\" added to class \"class1\" succesfully\n"
+        String expected = "$ "
+                + "$ "
                 + "$ field \"field1\" is already a field of class \"class1\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+                + "$ ";
 
-        assertEquals("Adding a duplicate field fails", expected, getOutput());
+        assertEquals("Adding a duplicate field fails", expected, getOutput().replaceAll("\r", ""));
     }
 
     @Test
@@ -242,10 +242,10 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" does not currently exist$ ".replaceAll("\\n|\\r\\n",
-                System.getProperty("line.separator"));
+        String expected = "$ Class \"class1\" does not currently exist\n"
+                        + "$ ";
 
-        assertEquals("Adding a field to a nonexistant class fails", expected, getOutput());
+        assertEquals("Adding a field to a nonexistant class fails", expected, getOutput().replaceAll("\r", ""));
     }
 
     // "add method" tests
@@ -259,11 +259,11 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n"
-                + "$ method \"method1\" added to class \"class1\" succesfully\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+        String expected = "$ "
+                + "$ "
+                + "$ ";
 
-        assertEquals("Adding a simple method succeeds", expected, getOutput());
+        assertEquals("Adding a simple method succeeds", expected, getOutput().replaceAll("\r", ""));
     }
 
     @Test
@@ -275,12 +275,12 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n"
-                + "$ method \"method1\" added to class \"class1\" succesfully\n"
+        String expected = "$ "
+                + "$ "
                 + "$ method \"method1\" is already a method of class \"class1\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+                + "$ ";
 
-        assertEquals("Adding a duplicate method fails", expected, getOutput());
+        assertEquals("Adding a duplicate method fails", expected, getOutput().replaceAll("\r", ""));
     }
 
     @Test
@@ -291,10 +291,10 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" does not currently exist$ ".replaceAll("\\n|\\r\\n",
-                System.getProperty("line.separator"));
+        String expected = "$ Class \"class1\" does not currently exist\n"
+                        + "$ ";
 
-        assertEquals("Adding a method to a nonexistant class fails", expected, getOutput());
+        assertEquals("Adding a method to a nonexistant class fails", expected, getOutput().replaceAll("\r", ""));
     }
 
     // "add param" tests
@@ -309,12 +309,12 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n"
-                + "$ method \"method1\" added to class \"class1\" succesfully\n"
-                + "$ Parameter \"param1\" was added successfully\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+        String expected = "$ "
+                + "$ "
+                + "$ "
+                + "$ ";
 
-        assertEquals("Adding a simple param succeeds", expected, getOutput());
+        assertEquals("Adding a simple param succeeds", expected, getOutput().replaceAll("\r", ""));
     }
 
     @Test
@@ -326,12 +326,13 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n"
-                + "$ method \"method1\" added to class \"class1\" succesfully\n"
-                + "$ Parameter \"param1\" was added successfully\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+        String expected = "$ "
+                + "$ "
+                + "$ "
+                + "$ Parameter already exists\n"
+                + "$ ";
 
-        assertEquals("Adding a simple param succeeds", expected, getOutput());
+        assertEquals("Adding a simple param succeeds", expected, getOutput().replaceAll("\r", ""));
     }
 
     // "delete" command tests
@@ -348,11 +349,11 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n"
-                + "$ Class \"class1\" was deleted successfully\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+        String expected = "$ "
+                + "$ "
+                + "$ ";
 
-        assertEquals("Deleting a simple class succeeds", expected, getOutput());
+        assertEquals("Deleting a simple class succeeds", expected, getOutput().replaceAll("\r", ""));
     }
 
     @Test
@@ -364,9 +365,9 @@ public class UMLInterfaceTest {
         UMLInterface.main(new String[] { "--cli" });
 
         String expected = "$ The requested class to delete does not exist\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+                + "$ ";
 
-        assertEquals("Deleting a nonexistant class does nothing", expected, getOutput());
+        assertEquals("Deleting a nonexistant class does nothing", expected, getOutput().replaceAll("\r", ""));
     }
 
     // "delete rel" tests
@@ -381,11 +382,13 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n" + "$ Class \"class2\" was added successfully\n"
-                + "$ Relationship between \"class1\" and \"class2\" added successfully\n" + "$ Relationship deleted\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+        String expected = "$ "
+                + "$ "
+                + "$ "
+                + "$ "
+                + "$ ";
 
-        assertEquals("Deleting a simple relationship succeeds", expected, getOutput());
+        assertEquals("Deleting a simple relationship succeeds", expected, getOutput().replaceAll("\r", ""));
     }
 
     @Test
@@ -396,11 +399,11 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n" + "$ Class \"class2\" was added successfully\n"
+        String expected = "$ " + "$ "
                 + "$ Relationship between \"class1\" and \"class2\" does not exsist\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+                + "$ ";
 
-        assertEquals("Deleting a nonexistant relationship does nothing", expected, getOutput());
+        assertEquals("Deleting a nonexistant relationship does nothing", expected, getOutput().replaceAll("\r", ""));
     }
 
     // "delete field" tests
@@ -415,12 +418,12 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n"
-                + "$ Field \"field1\" added to class \"class1\" succesfully\n"
-                + "$ Attribute \"field1\" was deleted successfully\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+        String expected = "$ "
+                + "$ "
+                + "$ "
+                + "$ ";
 
-        assertEquals("Deleting a simple field succeeds", expected, getOutput());
+        assertEquals("Deleting a simple field succeeds", expected, getOutput().replaceAll("\r", ""));
     }
 
     @Test
@@ -431,10 +434,10 @@ public class UMLInterfaceTest {
 
         UMLInterface.main(new String[] { "--cli" });
 
-        String expected = "$ Class \"class1\" was added successfully\n" + "$ Attribute \"field1\" does not exist\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+        String expected = "$ " + "$ Attribute \"field1\" does not exist\n"
+                + "$ ";
 
-        assertEquals("Deleting a nonexistant field does nothing", expected, getOutput());
+        assertEquals("Deleting a nonexistant field does nothing", expected, getOutput().replaceAll("\r", ""));
     }
 
     // Miscellaneous command tests
@@ -449,43 +452,205 @@ public class UMLInterfaceTest {
         UMLInterface.main(new String[] { "--cli" });
 
         String expected = "$ Command/shortcut	          	                 Description\n"
-                + "-------------------------	                     --------------\n" + "add\n"
-                + "class <class1>                               Creates a new UML class \n"
-                + "rel <class1, class2, type>                   Adds a relationship between the two given classes\n"
-                + "field <class1, field1>                       Adds a field to a given class\n"
-                + "method  <class1, method1>                    Adds a method to a given class  \n"
-                + "param <class1, method1, param1>              Adds a parameter to a given method\n" + "delete\n"
-                + "class <class1>                               Deletes the specified class\n"
-                + "rel  <class1, class2>                        Deletes a relationship between the two given classes\n"
-                + "field  <class1>                              Deletes the given field from the specified class\n"
-                + "method  <class1>                             Deletes the given method from the specified class\n"
-                + "param <class1,method1, param1>               Deletes the given parameter from the specified class\n"
-                + "allParams <class1,method1>                   Deletes all parameters from the specified class\n\n"
+                + "-------------------------	                     --------------\n" 
+                + "add\n"
+                + "    class <class1>                               Creates a new UML class\n"
+                + "    rel <class1, class2, type>                   Adds a relationship between the two given classes\n"
+                + "    valid relationship types:\n"
+                + "    \"inheritance\"\n"
+                + "    \"realization\"\n"
+                + "    \"aggregation\"\n"
+                + "    \"composition\"\n"
+                + "    field <class1, field1>                       Adds a field to a given class\n"
+                + "    method  <class1, method1>                    Adds a method to a given class\n"
+                + "    param <class1, method1, param1>              Adds a parameter to a given method\n"
+                + "delete\n"
+                + "    class <class1>                               Deletes the specified class\n"
+                + "    rel  <class1, class2>                        Deletes a relationship between the two given classes\n"
+                + "    field  <class1>                              Deletes the given field from the specified class\n"
+                + "    method  <class1>                             Deletes the given method from the specified class\n"
+                + "    param <class1,method1, param1>               Deletes the given parameter from the specified class\n"
+                + "    allParams <class1,method1>                   Deletes all parameters from the specified class\n\n"
                 + "rename\n"
-                + "class <class1, newName>                      Renames a class to a new specified class name\n"
-                + "relType <class1, class2, newType>            Changes the type of relationship\n"
-                + "field <class1, field1, newfieldName>         Renames the given field name from the specified class\n"
-                + "method <class1, method1, newMethodName>      Renames the given field name from the specified class\n"
-                + "param <class1,method1, param1, newParamName> Renames the given parameter from the specified class\n"
-                + "allParams <class1, method1, params>          Changes all the parameters from the specified class\n" +
+                + "    class <class1, newName>                      Renames a class to a new specified class name\n"
+                + "    relType <class1, class2, newType>            Changes the type of relationship\n"
+                + "    field <class1, field1, newfieldName>         Renames the given field name from the specified class\n"
+                + "    method <class1, method1, newMethodName>      Renames the given field name from the specified class\n"
+                + "    param <class1,method1, param1, newParamName> Renames the given parameter from the specified class\n"
+                + "    allParams <class1, method1, params>          Changes all the parameters from the specified class\n\n" +
 
                 "printList                                        Prints the names of all existing classes\n\n" +
 
                 "printContents <class1>                           Prints the contents of a given class\n\n" +
 
-                "printRel  <class1>                               Prints the all the relationships between classes \n\n"
-                +
+                "printRel  <class1>                               Prints the all the relationships between classes\n\n" +
 
-                "help                                             Prints a help document with all viable commands \n\n"
-                +
+                "help                                             Prints a help document with all viable commands\n\n" +
 
-                "quit                                             Exits the the program \n\n" +
+                "quit                                             Exits the the program\n\n" +
 
                 "save  <fileName>                                 Saves the project into a JSON file\n\n" +
 
-                "load  <fileName>                                 Loads a project from a JSON file\n"
-                + "$ ".replaceAll("\\n|\\r\\n", System.getProperty("line.separator"));
+                "load  <fileName>                                 Loads a project from a JSON file\n\n" +
 
-        assertEquals("Help command prints the help doc", expected, getOutput());
+                "undo                                             Restores the previous state before the last command called\n\n" +
+
+                "redo                                             Restores the state reversed by calling undo\n"
+
+                + "$ ";
+
+        assertEquals("Help command prints the help doc", expected, getOutput().replaceAll("\r", ""));
+    }
+
+    @Test
+    public void undoTest() {
+        final String testString = "undo\n" + "quit";
+
+        provideInput(testString);
+
+        UMLInterface.main(new String[] { "--cli" });
+
+        String expected = "$ " + "$ ";
+
+        assertEquals("Undo should print nothing", expected, getOutput().replaceAll("\r", ""));
+    }
+
+    @Test
+    public void undoWithExtraArgs() {
+        final String testString = "undo test\n" + "quit";
+
+        provideInput(testString);
+
+        UMLInterface.main(new String[] { "--cli" });
+
+        String expected = "$ Too many Arguments for undo command\n" + "$ ";
+
+        assertEquals("Command should not have been recognized", expected, getOutput().replaceAll("\r", ""));
+    }
+
+    @Test
+    public void redoTest() {
+        final String testString = "redo\n" + "quit";
+
+        provideInput(testString);
+
+        UMLInterface.main(new String[] { "--cli" });
+
+        String expected = "$ " + "$ ";
+
+        assertEquals("Redo should print nothing", expected, getOutput().replaceAll("\r", ""));
+    }
+
+    @Test
+    public void redoWithExtraArgs() {
+        final String testString = "redo test\n" + "quit";
+
+        provideInput(testString);
+
+        UMLInterface.main(new String[] { "--cli" });
+
+        String expected = "$ Too many Arguments for redo command\n" + "$ ";
+
+        assertEquals("Command should not have been recognized", expected, getOutput().replaceAll("\r", ""));
+    }
+
+    @Test
+    public void undoOne() {
+        final String testString = "add class class1\n" + "undo\n" + "printList\n" + "quit";
+
+        provideInput(testString);
+
+        UMLInterface.main(new String[] { "--cli" });
+
+        String expected = "$ " + "$ " + "$ " + "$ ";
+
+        assertEquals("There shouldn't be any classes", expected, getOutput().replaceAll("\r", ""));
+    }
+
+    @Test
+    public void undoMax() {
+        final String testString = "add class class1\n" +
+                "add class class2\n" +
+                "add class class3\n" +
+                "add class class4\n" +
+                "add class class5\n" +
+                "add class class6\n" +
+                "add class class7\n" +
+                "add class class8\n" +
+                "add class class9\n" +
+                "add class class10\n" +
+                "add class class11\n" +
+                "undo\n" + "undo\n" + "undo\n" + "undo\n" + "undo\n" + "undo\n" + "undo\n" +
+                "undo\n" + "undo\n" + "undo\n" + "undo\n" +
+                "printList\n" + "quit";
+        
+        provideInput(testString);
+
+        UMLInterface.main(new String[] { "--cli" });
+
+        String expected = "$ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ class1\n$ ";
+
+        assertEquals("There should only be only class", expected, getOutput().replaceAll("\r", ""));
+    }
+
+    @Test
+    public void undoRel() {
+        final String testString = "add class class1\n" + "add class class2\n" +
+                "add rel class1 class2 inheritance\n" + "undo\n" + "printList\n" + "quit";
+
+        provideInput(testString);
+
+        UMLInterface.main(new String[] { "--cli" });
+
+        String expected = "$ " + "$ " + "$ " + "$ " + "$ class1\nclass2\n" + "$ ";
+
+        assertEquals("There should be two classes with no relationship", expected, getOutput().replaceAll("\r", ""));
+    }
+
+    @Test
+    public void redoOne() {
+        final String testString = "add class class1\n" + "undo\n" + "redo\n" + "printList\n" + "quit";
+
+        provideInput(testString);
+
+        UMLInterface.main(new String[] { "--cli" });
+
+        String expected = "$ " + "$ " + "$ " + "$ class1\n" + "$ ";
+
+        assertEquals("There should only be one class", expected, getOutput().replaceAll("\r", ""));
+    }
+
+    @Test
+    public void redoMax() {
+        final String testString = "add class class1\n" + "add class class2\n" + "add class class3\n"
+                + "add class class4\n" + "add class class5\n" + "add class class6\n" + "add class class7\n"
+                + "add class class8\n" + "add class class9\n" + "add class class10\n" + "add class class11\n"
+                + "undo\n" + "undo\n" + "undo\n" + "undo\n" + "undo\n" + "undo\n" + "undo\n" + "undo\n" + "undo\n" + "undo\n"
+                + "undo\n"
+                + "redo\n" + "redo\n" + "redo\n" + "redo\n" + "redo\n" + "redo\n" + "redo\n" + "redo\n" + "redo\n"
+                + "redo\n"
+                + "printList\n" + "quit";
+
+        provideInput(testString);
+
+        UMLInterface.main(new String[] { "--cli" });
+
+        String expected = "$ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ "
+                + "class1\nclass2\nclass3\nclass4\nclass5\nclass6\nclass7\nclass8\nclass9\nclass10\nclass11\n$ ";
+
+        assertEquals("There should be eleven classes", expected, getOutput().replaceAll("\r", ""));
+    }
+
+    @Test
+    public void redoMoreThanUndo() {
+        final String testString = "add class class1\n" + "undo\n" + "redo\n" + "redo\n" + "printList\n" + "quit";
+
+        provideInput(testString);
+
+        UMLInterface.main(new String[] { "--cli" });
+
+        String expected = "$ " + "$ " + "$ " + "$ " + "$ class1\n" + "$ ";
+
+        assertEquals("There should only be one class", expected, getOutput().replaceAll("\r", ""));
     }
 }

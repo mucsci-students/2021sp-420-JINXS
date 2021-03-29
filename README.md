@@ -2,6 +2,8 @@
 
 This is a command line based UML Editor.
 
+Design patterns used in this project can be found [here](https://docs.google.com/document/d/1hxUT51G07pBQSvu6s3pGFEkdWPJ4yEN7tVUG1QJKwqw/edit?usp=sharing) or in the patterns.txt file in the code.
+
 ### Installation
 
 [Java](https://www.java.com/en/download/) 8 (or above) is required to run the editor.

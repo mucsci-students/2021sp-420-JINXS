@@ -11,6 +11,6 @@ function setup() {
 
 function editor() {
 
-    java -jar UMLEditor/target/UMLEditor-1.0.jar $@
+    java -jar UMLEditor/target/UMLEditor-3.0.jar $@
 
 }

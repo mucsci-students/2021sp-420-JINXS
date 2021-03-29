@@ -229,8 +229,8 @@ public class UMLClass {
 
         for (int i = 1; i < targetMethod.size(); ++i){
             if (targetMethod.get(i).equals(paramName)){
-               targetMethod.remove(i);
-               return true;
+                targetMethod.remove(i);
+                return true;
             }
         }
 
@@ -273,8 +273,8 @@ public class UMLClass {
 
         for (int i = 1; i < targetMethod.size(); ++i){
             if (targetMethod.get(i).equals(oldName)){
-               targetMethod.set(i, newName);
-               return true;
+                targetMethod.set(i, newName);
+                return true;
             }
         }
 
