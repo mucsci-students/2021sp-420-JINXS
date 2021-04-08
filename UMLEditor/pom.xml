@@ -36,6 +36,13 @@
             <artifactId>jline</artifactId>
             <version>3.19.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.jline/jline-terminal-jna -->
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline-terminal-jna</artifactId>
+            <version>3.19.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

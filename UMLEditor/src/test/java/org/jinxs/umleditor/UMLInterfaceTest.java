@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /*
- * Unit tests for UMLInterface.
+ * Unit tests for Main.
  */
 public class UMLInterfaceTest {
 
@@ -68,7 +68,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ "
                 + "$ ";
@@ -82,7 +82,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ " + "$ The requested class name already exists\n"
                 + "$ ";
@@ -96,7 +96,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ Class name cannot start with a number\n"
                 + "$ ";
@@ -110,7 +110,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ The class name cannot contain special characters or spaces\n"
                 + "$ ";
@@ -128,7 +128,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ " + "$ "
                 + "$ "
@@ -144,7 +144,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ " + "$ "
                 + "$ "
@@ -161,7 +161,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ " + "$ "
                 + "$ Missing a Type, Please try again\n"
@@ -176,7 +176,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ " + "$ "
                 + "$ Too few Arguments for addRel command\n"
@@ -191,7 +191,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ Class does not exsist\n"
                 + "$ ";
@@ -208,7 +208,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ "
                 + "$ "
@@ -224,7 +224,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ "
                 + "$ "
@@ -240,7 +240,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ Class \"class1\" does not currently exist\n"
                         + "$ ";
@@ -257,7 +257,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ "
                 + "$ "
@@ -273,7 +273,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ "
                 + "$ "
@@ -289,7 +289,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ Class \"class1\" does not currently exist\n"
                         + "$ ";
@@ -307,7 +307,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ "
                 + "$ "
@@ -324,7 +324,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ "
                 + "$ "
@@ -347,7 +347,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ "
                 + "$ "
@@ -362,7 +362,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ The requested class to delete does not exist\n"
                 + "$ ";
@@ -380,7 +380,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ "
                 + "$ "
@@ -397,7 +397,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ " + "$ "
                 + "$ Relationship between \"class1\" and \"class2\" does not exsist\n"
@@ -416,7 +416,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ "
                 + "$ "
@@ -432,7 +432,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ " + "$ Attribute \"field1\" does not exist\n"
                 + "$ ";
@@ -449,53 +449,51 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
-        String expected = "$ Command/shortcut	          	                 Description\n"
-                + "-------------------------	                     --------------\n" 
-                + "add\n"
-                + "    class <class1>                               Creates a new UML class\n"
-                + "    rel <class1, class2, type>                   Adds a relationship between the two given classes\n"
-                + "    valid relationship types:\n"
-                + "    \"inheritance\"\n"
-                + "    \"realization\"\n"
-                + "    \"aggregation\"\n"
-                + "    \"composition\"\n"
-                + "    field <class1, field1>                       Adds a field to a given class\n"
-                + "    method  <class1, method1>                    Adds a method to a given class\n"
-                + "    param <class1, method1, param1>              Adds a parameter to a given method\n"
-                + "delete\n"
-                + "    class <class1>                               Deletes the specified class\n"
-                + "    rel  <class1, class2>                        Deletes a relationship between the two given classes\n"
-                + "    field  <class1>                              Deletes the given field from the specified class\n"
-                + "    method  <class1>                             Deletes the given method from the specified class\n"
-                + "    param <class1,method1, param1>               Deletes the given parameter from the specified class\n"
-                + "    allParams <class1,method1>                   Deletes all parameters from the specified class\n\n"
-                + "rename\n"
-                + "    class <class1, newName>                      Renames a class to a new specified class name\n"
-                + "    relType <class1, class2, newType>            Changes the type of relationship\n"
-                + "    field <class1, field1, newfieldName>         Renames the given field name from the specified class\n"
-                + "    method <class1, method1, newMethodName>      Renames the given field name from the specified class\n"
-                + "    param <class1,method1, param1, newParamName> Renames the given parameter from the specified class\n"
-                + "    allParams <class1, method1, params>          Changes all the parameters from the specified class\n\n" +
-
-                "printList                                        Prints the names of all existing classes\n\n" +
-
-                "printContents <class1>                           Prints the contents of a given class\n\n" +
-
-                "printRel  <class1>                               Prints the all the relationships between classes\n\n" +
-
-                "help                                             Prints a help document with all viable commands\n\n" +
-
-                "quit                                             Exits the the program\n\n" +
-
-                "save  <fileName>                                 Saves the project into a JSON file\n\n" +
-
-                "load  <fileName>                                 Loads a project from a JSON file\n\n" +
-
-                "undo                                             Restores the previous state before the last command called\n\n" +
-
-                "redo                                             Restores the state reversed by calling undo\n"
+        String expected = "$ Command/shortcut	          	                        Description\n" +
+            "-------------------------	                            --------------\n" +
+            "add\n" +
+            "    class <class1>                                      Creates a new UML class\n" +
+            "    rel <class1, class2, relType>                       Adds a relationship between the two given classes\n" +
+            "    valid relationship types:\n" +
+            "    \"inheritance\", \"realization\", \"aggregation\", \"composition\"\n" +
+            "    field <class1, dataType, field1>                    Adds a field to a given class\n" +
+            "    method <class1, returnType, method1>                Adds a method to a given class\n" +
+            "    param <class1, method1, dataType, param1>           Adds a parameter to a given method\n" +
+            "\n" +
+            "delete\n" +
+            "    class <class1>                                      Deletes the specified class\n" +
+            "    rel <class1, class2>                                Deletes a relationship between the two given classes\n" +
+            "    field <class1>                                      Deletes the given field from the specified class\n" +
+            "    method <class1>                                     Deletes the given method from the specified class\n" +
+            "    param <class1, method1, param1>                     Deletes the given parameter from the specified class\n" +
+            "    allParams <class1,method1>                          Deletes all parameters from the specified class\n" +
+            "\n" +
+            "rename\n" +
+            "    class <class1, newName>                             Renames a class to a new specified class name\n" +
+            "    field <class1, field1, newfieldName>                Renames the given field name from the specified class\n" +
+            "    method <class1, method1, newMethodName>             Renames the given field name from the specified class\n" +
+            "    param <class1, method1, param1, newParamName>       Renames the given parameter from the specified class\n" +
+            "    allParams <class1, method1, type1, param1, ...>     Changes all the parameters from the specified class\n" +
+            "\n" +
+            "change\n" +
+            "    relType <class1, class2, newRelType>                Changes the type of relationship\n" +
+            "    fieldType <class1, field1, newDataType>             Changes the data type of a field\n" +
+            "    methodType <class1, method1, newReturnType>         Changes the return type of a method\n" +
+            "    paramType <class1, method1, param1, newDataType>    Changes the data type of a parameter\n" +
+            "\n" +
+            "\n" +
+            "printList                   Prints the names of all existing classes\n" +
+            "printContents <class1>      Prints the contents of a given class\n" +
+            "printRel <class1>           Prints the all the relationships between classes\n" +
+            "help                        Prints a help document with all viable commands\n" +
+            "quit                        Exits the the program\n" +
+            "save <fileName>             Saves the project into a JSON file\n" +
+            "load <fileName>             Loads a project from a JSON file\n" +
+            "undo                        Restores the previous state before the last command called\n" +
+            "redo                        Restores the state reversed by calling undo\n" +
+            "\n"
 
                 + "$ ";
 
@@ -508,7 +506,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ " + "$ ";
 
@@ -521,7 +519,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ Too many Arguments for undo command\n" + "$ ";
 
@@ -534,7 +532,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ " + "$ ";
 
@@ -547,7 +545,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ Too many Arguments for redo command\n" + "$ ";
 
@@ -560,7 +558,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ " + "$ " + "$ " + "$ ";
 
@@ -586,7 +584,7 @@ public class UMLInterfaceTest {
         
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ class1\n$ ";
 
@@ -600,7 +598,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ " + "$ " + "$ " + "$ " + "$ class1\nclass2\n" + "$ ";
 
@@ -613,7 +611,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ " + "$ " + "$ " + "$ class1\n" + "$ ";
 
@@ -633,7 +631,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ "
                 + "class1\nclass2\nclass3\nclass4\nclass5\nclass6\nclass7\nclass8\nclass9\nclass10\nclass11\n$ ";
@@ -647,7 +645,7 @@ public class UMLInterfaceTest {
 
         provideInput(testString);
 
-        UMLInterface.main(new String[] { "--cli" });
+        Main.main(new String[] { "--cli" });
 
         String expected = "$ " + "$ " + "$ " + "$ " + "$ class1\n" + "$ ";
 

@@ -58,16 +58,21 @@ public class UMLTerminal{
 
         try{
             TerminalBuilder builder = TerminalBuilder.builder();
-            terminal = builder.dumb(true).build();
+            terminal = builder.system(true).build();
             reader = LineReaderBuilder.builder().terminal(terminal).build();
             boolean result = true;
 
             while(result){
-                String line = null;
-                line = reader.readLine("$ ", null, (MaskingCallback) null, null);
-                line = line.trim();
-                ArrayList<String> commands = new ArrayList<String>(Arrays.asList(line.split(" ")));
-                result = interpreter(commands);
+                try {
+                    String line = null;
+                    line = reader.readLine("$ ", null, (MaskingCallback) null, null);
+                    line = line.trim();
+                    ArrayList<String> commands = new ArrayList<String>(Arrays.asList(line.split(" ")));
+                    result = interpreter(commands);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         catch (Exception e){
@@ -106,8 +111,8 @@ public class UMLTerminal{
 
             //Add a class to the project
             case "add":
-                    switch(commands.get(1)){
-                        case "class":
+                switch(commands.get(1)){
+                    case "class":
                         if (commands.size() < 3) {
                             System.out.println("Too few Arguments for addClass command");
                         }
@@ -118,9 +123,9 @@ public class UMLTerminal{
                             project.saveToMeme(true);
                             project.addClass(commands.get(2));
                         }
-                        break;
+                    break;
 
-                        case "rel":
+                    case "rel":
                         if (commands.size() < 5) {
                             System.out.println("Too few Arguments for addRel command");
                         }
@@ -131,210 +136,241 @@ public class UMLTerminal{
                             project.saveToMeme(true);
                             project.addRel(commands.get(2), commands.get(3), commands.get(4));
                         }
-                        break; 
+                    break; 
 
-                        case "field":
-                        if (commands.size() < 4) {
+                    case "field":
+                        if (commands.size() < 5) {
                             System.out.println("Too few Arguments for addfield command");
                         }
-                        else if (commands.size() > 4) {
+                        else if (commands.size() > 5) {
                             System.out.println("Too many Arguments for addfield command");
                         }
                         else{
                             project.saveToMeme(true);
-                            project.addAttr(commands.get(2), commands.get(3), commands.get(1));
+                            project.addAttr(commands.get(2), commands.get(4), commands.get(1), commands.get(3));
                         }
-                        break;
+                    break;
 
-                        case "method":
-                        if (commands.size() < 4) {
+                    case "method":
+                        if (commands.size() < 5) {
                             System.out.println("Too few Arguments for addMethod command");
                         }
                         else{
-                        project.saveToMeme(true);
-                        project.addAttr(commands.get(2), commands.get(3),commands.get(1));
-                        for(int i = 4 ; i < commands.size(); i++){
-                            project.addParam(commands.get(2), commands.get(3), commands.get(i)); 
+                            project.saveToMeme(true);
+                            project.addAttr(commands.get(2), commands.get(4),commands.get(1), commands.get(3));
+                            for(int i = 5; i < commands.size(); i += 2){
+                                project.addParam(commands.get(2), commands.get(4), commands.get(i + 1), commands.get(i));
+                            }
                         }
-                        }
-                        break; 
-                        
-                        case "param":
+                    break; 
+                    
+                    case "param":
                         if (commands.size() < 5) {
                             System.out.println("Too few Arguments for addParam command");
                         }
                         else{
-                        project.saveToMeme(true);
-                        for(int i = 4 ; i < commands.size(); i++){
-                            project.addParam(commands.get(2), commands.get(3), commands.get(i)); 
+                            project.saveToMeme(true);
+                            for(int i = 4; i < commands.size(); i += 2){
+                                project.addParam(commands.get(2), commands.get(3), commands.get(i + 1), commands.get(i)); 
+                            }
                         }
-                        }
+                    break; 
 
-                        break; 
-
-                        default:
+                    default:
                         System.out.println("Add + " + commands.get(1) + " is not a valid command"); 
-                        break;
+                    break;
 
-                    }     
+                }
             break;
 
             //Deletes a class from the project
             case "delete":
-            switch(commands.get(1)){
-                case "class":
-                if (commands.size() < 3) {
-                    System.out.println("Too few Arguments for deleteClass command");
-                }
-                else if (commands.size() > 3) {
-                    System.out.println("Too many Arguments for deleteClass command");
-                }
-                else{
-                    project.saveToMeme(true);
-                    project.deleteClass(commands.get(2));
-                }
-                break;
+                switch(commands.get(1)){
+                    case "class":
+                        if (commands.size() < 3) {
+                            System.out.println("Too few Arguments for deleteClass command");
+                        }
+                        else if (commands.size() > 3) {
+                            System.out.println("Too many Arguments for deleteClass command");
+                        }
+                        else{
+                            project.saveToMeme(true);
+                            project.deleteClass(commands.get(2));
+                        }
+                    break;
 
-                case "rel":
-                if (commands.size() < 4) {
-                    System.out.println("Too few Arguments for deleteRel command");
-                }
-                else if (commands.size() > 4) {
-                    System.out.println("Too many Arguments for deleteRel command");
-                }
-                else{
-                    project.saveToMeme(true);
-                    project.delRel(commands.get(2), commands.get(3));
-                }
-                break; 
+                    case "rel":
+                        if (commands.size() < 4) {
+                            System.out.println("Too few Arguments for deleteRel command");
+                        }
+                        else if (commands.size() > 4) {
+                            System.out.println("Too many Arguments for deleteRel command");
+                        }
+                        else{
+                            project.saveToMeme(true);
+                            project.delRel(commands.get(2), commands.get(3));
+                        }
+                    break; 
 
-                case "field":
-                if (commands.size() < 4) {
-                    System.out.println("Too few Arguments for deletefield command");
-                }
-                else if (commands.size() > 4) {
-                    System.out.println("Too many Arguments for deletefield command");
-                }
-                else{
-                    project.saveToMeme(true);
-                    project.delAttr(commands.get(2), commands.get(3),commands.get(1));
-                }
-                break;
+                    case "field":
+                        if (commands.size() < 4) {
+                            System.out.println("Too few Arguments for deletefield command");
+                        }
+                        else if (commands.size() > 4) {
+                            System.out.println("Too many Arguments for deletefield command");
+                        }
+                        else{
+                            project.saveToMeme(true);
+                            project.delAttr(commands.get(2), commands.get(3),commands.get(1));
+                        }
+                    break;
 
-                case "method":
-                if (commands.size() < 4) {
-                    System.out.println("Too few Arguments for deleteMethod command");
-                }
-                project.saveToMeme(true);
-                project.delAttr(commands.get(2), commands.get(3),commands.get(1));
-                break; 
-                
-                case "param":
-                if (commands.size() < 5) {
-                    System.out.println("Too few Arguments for addParam command");
-                }
-                project.saveToMeme(true);
-                project.deleteParam(commands.get(2), commands.get(3), commands.get(4));
-                break; 
+                    case "method":
+                        if (commands.size() < 4) {
+                            System.out.println("Too few Arguments for deleteMethod command");
+                        }
+                        project.saveToMeme(true);
+                        project.delAttr(commands.get(2), commands.get(3),commands.get(1));
+                    break; 
+                    
+                    case "param":
+                        if (commands.size() < 5) {
+                            System.out.println("Too few Arguments for addParam command");
+                        }
+                        project.saveToMeme(true);
+                        project.deleteParam(commands.get(2), commands.get(3), commands.get(4));
+                    break; 
 
-                case "allParams":
-                if (commands.size() < 4) {
-                    System.out.println("Too few Arguments for deleteAllParams command");
+                    case "allParams":
+                        if (commands.size() < 4) {
+                            System.out.println("Too few Arguments for deleteAllParams command");
+                        }
+                        project.saveToMeme(true);
+                        project.deleteAllParams(commands.get(2), commands.get(3));
+                    break; 
+
+                    default:
+                        System.out.println("Delete + " + commands.get(1) + " is not a valid command"); 
+                    break;
+
                 }
-                project.saveToMeme(true);
-                project.deleteAllParams(commands.get(2), commands.get(3));
-                break; 
-
-                default:
-                System.out.println("Delete + " + commands.get(1) + " is not a valid command"); 
-                break;
-
-            }  
             break;
 
             //Renames a class in the project to a new name
             case "rename":
-            switch(commands.get(1)){
-                case "class":
-                if (commands.size() < 4) {
-                    System.out.println("Too few Arguments for renameClass command");
-                }
-                else if (commands.size() > 4) {
-                    System.out.println("Too many Arguments for renameClass command");
-                }
-                else{
-                    project.saveToMeme(true);
-                    project.renameClass(commands.get(2),commands.get(3));
-                }
-                break;
+                switch(commands.get(1)){
+                    case "class":
+                        if (commands.size() < 4) {
+                            System.out.println("Too few Arguments for renameClass command");
+                        }
+                        else if (commands.size() > 4) {
+                            System.out.println("Too many Arguments for renameClass command");
+                        }
+                        else{
+                            project.saveToMeme(true);
+                            project.renameClass(commands.get(2),commands.get(3));
+                        }
+                    break;
 
-                case "relType":
-                if (commands.size() < 5) {
-                    System.out.println("Too few Arguments for renameRelType command");
-                }
-                else if (commands.size() > 5) {
-                    System.out.println("Too many Arguments for renameRelType command");
-                }
-                else{
-                project.saveToMeme(true);
-                project.changeRelType(commands.get(2), commands.get(3), commands.get(4));
-                }
-                break; 
+                    case "field":
+                        if (commands.size() < 5) {
+                            System.out.println("Too few Arguments for renamefield command");
+                        }
+                        else if (commands.size() > 5) {
+                            System.out.println("Too many Arguments for renamefield command");
+                        }
+                        else{
+                            project.saveToMeme(true);
+                            project.renameAttr(commands.get(2), commands.get(3), commands.get(4), commands.get(1));
+                        }
+                    break;
 
-                case "field":
-                if (commands.size() < 5) {
-                    System.out.println("Too few Arguments for renamefield command");
-                }
-                else if (commands.size() > 5) {
-                    System.out.println("Too many Arguments for renamefield command");
-                }
-                else{
-                project.saveToMeme(true);
-                project.renameAttr(commands.get(2), commands.get(3), commands.get(4), commands.get(1));
-                }
-                break;
+                    case "method":
+                        if (commands.size() < 4) {
+                            System.out.println("Too few Arguments for renameMethod command");
+                        }
+                        else if (commands.size() > 5) {
+                            System.out.println("Too many Arguments for renameMethod command");
+                        }
+                        project.saveToMeme(true);
+                        project.renameAttr(commands.get(2), commands.get(3),commands.get(4),commands.get(1));
+                    break; 
+                    
+                    case "param":
+                        if (commands.size() < 6) {
+                            System.out.println("Too few Arguments for renameParam command");
+                        }
+                        project.saveToMeme(true);
+                        project.changeParamName(commands.get(2), commands.get(3), commands.get(4), commands.get(5));
+                    break; 
 
-                case "method":
-                if (commands.size() < 4) {
-                    System.out.println("Too few Arguments for renameMethod command");
-                }
-                else if (commands.size() > 5) {
-                    System.out.println("Too many Arguments for renameMethod command");
-                }
-                project.saveToMeme(true);
-                project.renameAttr(commands.get(2), commands.get(3),commands.get(4),commands.get(1));
-                break; 
-                
-                case "param":
-                if (commands.size() < 6) {
-                    System.out.println("Too few Arguments for renameParam command");
-                }
-                project.saveToMeme(true);
-                project.changeParam(commands.get(2), commands.get(3), commands.get(4), commands.get(5));
-                break; 
+                    case "allParams":
+                        if (commands.size() < 5) {
+                            System.out.println("Too few Arguments for renameAllParams command");
+                        }
+                        ArrayList<String> params = new ArrayList<String>();
+                        ArrayList<String> pTypes = new ArrayList<String>();
+                        for(int i = 4; i < commands.size(); i += 2){
+                            params.add(commands.get(i + 1));
+                            pTypes.add(commands.get(i));
+                        }
+                        project.saveToMeme(true);
+                        project.changeAllParams(commands.get(2), commands.get(3), params, pTypes);
+                    break; 
 
-                case "allParams":
-                if (commands.size() < 5) {
-                    System.out.println("Too few Arguments for renameAllParams command");
+                    default:
+                        System.out.println("Rename + " + commands.get(1) + " is not a valid command"); 
+                    break;
                 }
-                ArrayList<String> params = new ArrayList<String>();
-                for(int i = 4; i < commands.size(); i++){
-                    params.add(commands.get(i)); 
-                }
-                project.saveToMeme(true);
-                project.changeAllParams(commands.get(2), commands.get(3), params);
-                break; 
-
-                default:
-                System.out.println("Rename + " + commands.get(1) + " is not a valid command"); 
-                break;
-
-            }  
-        
             break;
+            case "change":
+                switch(commands.get(1)) {
+                    case "relType":
+                        if (commands.size() < 5) {
+                            System.out.println("Too few Arguments for change relType command");
+                        } else if (commands.size() > 5) {
+                            System.out.println("Too many Arguments for change relType command");
+                        } else {
+                            project.saveToMeme(true);
+                            project.changeRelType(commands.get(2), commands.get(3), commands.get(4));
+                        }
+                    break;
 
+                    case "fieldType":
+                        if (commands.size() < 5) {
+                            System.out.println("Too few Arguments for change fieldType command");
+                        } else if (commands.size() > 5) {
+                            System.out.println("Too many Arguments for change fieldType command");
+                        } else {
+                            project.saveToMeme(true);
+                            project.changeFieldType(commands.get(2), commands.get(3), commands.get(4));
+                        }
+                    break;
 
-            //Saves current project into a JSON named file
+                    case "methodType":
+                        if (commands.size() < 5) {
+                            System.out.println("Too few Arguments for change fieldType command");
+                        } else if (commands.size() > 5) {
+                            System.out.println("Too many Arguments for change fieldType command");
+                        } else {
+                            project.saveToMeme(true);
+                            project.changeMethodType(commands.get(2), commands.get(3), commands.get(4));
+                        }
+                    break;
+
+                    case "paramType":
+                        if (commands.size() < 6) {
+                            System.out.println("Too few Arguments for change fieldType command");
+                        } else if (commands.size() > 6) {
+                            System.out.println("Too many Arguments for change fieldType command");
+                        } else {
+                            project.saveToMeme(true);
+                            project.changeParamType(commands.get(2), commands.get(3), commands.get(4), commands.get(5));
+                        }
+                    break;
+                }
+            break;
+                //Saves current project into a JSON named file
             case "save":
                 if(commands.size() < 2){
                     System.out.println("Too few Arguments for save command");
@@ -416,6 +452,7 @@ public class UMLTerminal{
             //If command is not one of the specified commands above then we print an error message
             default:
                 System.out.println("Error: " + commands.get(0) + " is not a recognized command");
+            break;
         }
         return true;
     }

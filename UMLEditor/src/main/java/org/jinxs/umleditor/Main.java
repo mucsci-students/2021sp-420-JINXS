@@ -8,9 +8,7 @@ public class Main{
         }
         else if (args.length > 0) {
             if (args.length == 1 && args[0].equals("--cli")) {
-                
                 UMLTerminal.build();
-                
             }
             else {
                 System.out.print("Unrecognized argument(s): \"");
@@ -22,7 +20,6 @@ public class Main{
                 }
                 System.out.println("\"");
             }
-            
         }
     }
 }
