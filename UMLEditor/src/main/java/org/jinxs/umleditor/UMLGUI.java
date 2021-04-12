@@ -1148,7 +1148,7 @@ public class UMLGUI extends JPanel implements ActionListener{
 
     public void saveWithLocations (String saveName) {
         // Save all classes to a JSON file excluding their coordinates
-        project.save(saveName);
+        project.save(saveName, null);
 
         // Save the current locations of the panels so they can be
         // added to the JSON file that was just made
@@ -1159,8 +1159,9 @@ public class UMLGUI extends JPanel implements ActionListener{
         
         // Attempt to read the filename in the "saves" directory specified by 
         // the user or catch resulting exceptions if/when that fails
-        String filePath = new File("").getAbsolutePath();
-        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + saveName + ".json")) {
+        //String filePath = new File("").getAbsolutePath();
+        //System.out.print
+        try (FileReader reader = new FileReader("saves/" + saveName + ".json")) {
             // Save the JSON array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
@@ -1182,7 +1183,7 @@ public class UMLGUI extends JPanel implements ActionListener{
                     }
                 }
             }
-            try (FileWriter file = new FileWriter(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + saveName + ".json")) {
+            try (FileWriter file = new FileWriter("saves/" + saveName + ".json")) {
                 file.write(classList.toJSONString());
                 file.flush();
             } catch (IOException e) {
@@ -1195,14 +1196,13 @@ public class UMLGUI extends JPanel implements ActionListener{
 
     public void loadWithLocations (String loadName) {
         // Load the UML classes into the GUI
-        project.load(loadName);
+        project.load(loadName, null);
         getFromProject(project);
 
         // Create a JSON parser
         JSONParser jPar = new JSONParser();
 
-        String filePath = new File("").getAbsolutePath();
-        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + loadName + ".json")) {
+        try (FileReader reader = new FileReader("saves/" + loadName + ".json")) {
             // Save the JSON classes array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
@@ -1227,6 +1227,7 @@ public class UMLGUI extends JPanel implements ActionListener{
                         }
                         repaintPanel();
                         refresh();
+                        updateAllDropdowns();
                     }
                 }
             }
@@ -1386,14 +1387,12 @@ public class UMLGUI extends JPanel implements ActionListener{
     public void undo() {
         saveToMeme(false);
         loadFromMeme(true);
-        updateClassDropdowns();
-        updateFieldDropdowns();
+        updateAllDropdowns();
     }
 
     public void redo() {
         loadFromMeme(false);
-        updateClassDropdowns();
-        updateFieldDropdowns();
+        updateAllDropdowns();
     }
 
     /***********************************************************************************************************
