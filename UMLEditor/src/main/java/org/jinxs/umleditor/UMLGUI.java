@@ -1,6 +1,7 @@
 package org.jinxs.umleditor;
 
 import javax.swing.JOptionPane;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
@@ -13,6 +14,7 @@ import java.util.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.awt.*; 
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.IOException;
@@ -297,15 +299,16 @@ public class UMLGUI extends JPanel implements ActionListener{
         JMenu file = new JMenu("File"); 
         JMenuItem save = new JMenuItem("Save");
 		JMenuItem load = new JMenuItem("Load");
+        JMenuItem export = new JMenuItem("Export as Image");
         JMenuItem undo = new JMenuItem("Undo");
         JMenuItem redo = new JMenuItem("Redo");
         JMenuItem exit = new JMenuItem("Exit");
 
-        JMenuItem[] fileArray = {save,load,undo,redo,exit}; 
-        String[] labelText = {"Save","Load","Undo","Redo","Exit"};
+        JMenuItem[] fileArray = {save,load,export,undo,redo,exit}; 
+        String[] labelText = {"Save","Load","Export","Undo","Redo","Exit"};
              
 
-        for(int i = 0; i < 5; ++i)
+        for(int i = 0; i < 6; ++i)
 		{
 			file.add(fileArray[i]);
 			fileArray[i].setToolTipText(labelText[i]);
@@ -1068,7 +1071,7 @@ public class UMLGUI extends JPanel implements ActionListener{
             getFromProject(project);
             refresh();
         } 
-        // SAVE/LOAD COMMANDS
+        // FILE COMMANDS
         if (command.equals("Save")){
             String saveName = getText("Save Name: "); 
             saveWithLocations(saveName);
@@ -1078,7 +1081,10 @@ public class UMLGUI extends JPanel implements ActionListener{
             loadWithLocations(loadName);
             refresh();
         } 
-        // SAVE/LOAD COMMANDS
+        if (command.equals("Export as Image")){
+            String saveName = getText("Save Name: "); 
+            saveToImage(saveName);
+        } 
         if (command.equals("Undo")){
             undo();
             getFromProject(project);
@@ -1104,6 +1110,24 @@ public class UMLGUI extends JPanel implements ActionListener{
                 repaintPanel();
                 refresh();
             }
+        }
+    }
+
+    // Saves the content of the JFrame to a BufferedImage and outputs it to a png file
+    // with the specified file name
+    public void saveToImage(String fileName) {
+        Container content = window.getContentPane();
+        BufferedImage img = new BufferedImage(content.getWidth(), content.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = img.createGraphics();
+
+        content.printAll(g2d);
+
+        g2d.dispose();
+
+        try {
+            ImageIO.write(img, "png", new File(fileName + ".png"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 
