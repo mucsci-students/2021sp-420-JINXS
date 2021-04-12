@@ -295,7 +295,7 @@ public class UMLEditorTest {
         assertEquals("class1 should have one method named newName", editor.getClasses().get(0).getMethods().get(0).name, "newName");
     }
 
-     // PARAMETER TESTS: ADD, DELETE, RENAME
+    // PARAMETER TESTS: ADD, DELETE, RENAME
     // --------------------------------------------
 
      // Depends on addAttr working
@@ -364,4 +364,19 @@ public class UMLEditorTest {
 
         assertEquals("newMethod should have one param named one", editor.getClasses().get(0).getMethods().get(0).params.get(0).name, "one");
     }
+
+    // HELPER METHOD TESTS
+    // --------------------------------------------
+
+    @Test
+    public void classExistsTest() {
+        UMLEditor editor = new UMLEditor();
+
+        assertTrue("classExists should not find the class class1", editor.classExists("class1") == null);
+
+        editor.addClass("class1");
+
+        assertTrue("classExists should find the class class1", editor.classExists("class1") != null);
+    }
+
 }

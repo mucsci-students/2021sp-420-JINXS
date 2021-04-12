@@ -1,7 +1,7 @@
 package org.jinxs.umleditor;
 
 import java.util.ArrayList;
-
+import java.util.Iterator;
 // For writing out to a file when saving
 import java.io.FileWriter;
 import java.io.File;
@@ -408,18 +408,16 @@ public class UMLEditor {
 
     public UMLClass classExists(String className){
         UMLClass foundClass = null;
-        for (int i = 0; i < classes.size(); ++i) {
-            if (classes.get(i).name.equals(className)) {
-                foundClass = classes.get(i);
-                break;
+        Iterator<UMLClass> iter = classes.iterator();
+        while (iter.hasNext()) {
+            foundClass = iter.next();
+            if (foundClass.name.equals(className)) {
+                return foundClass;
             }
         }
 
-        if (foundClass == null){
-            System.out.println("Class \"" + className + "\" does not currently exist");
-        }
-
-        return foundClass;
+        System.out.println("Class \"" + className + "\" does not currently exist");
+        return null;
     }
 
 
