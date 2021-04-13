@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.awt.geom.*; 
 
 // Save and load imports
 // For writing out to a file when saving
@@ -42,6 +43,9 @@ import java.awt.event.MouseAdapter;
 
 
 
+
+
+
 public class UMLGUI extends JPanel implements ActionListener{
 
     private static JFrame window; 
@@ -60,6 +64,23 @@ public class UMLGUI extends JPanel implements ActionListener{
     // handleDrag global coordinates
     int x;
     int y;
+
+    //draw arrow globals
+    final static float THICKNESS = 3;
+    final static float DASH_ARRAY[] = {10};
+    final static BasicStroke SOLID_STROKE = new BasicStroke(THICKNESS);
+    final static BasicStroke DASHED_STROKE = new BasicStroke(THICKNESS, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, DASH_ARRAY, 0);
+
+    final static int CAP_MAJOR_LENGTH = 16;
+    final static int CAP_MINOR_LENGTH = 8;
+
+    private static JPanel panelFrom;
+    private static JPanel panelTo;
+    private static Point from = new Point();
+    private static Point to = new Point();
+    private static boolean isHorizontal;
+    private static boolean isReverse;
+
 
 
     // Constructs the GUI by building and adding the menus
@@ -98,17 +119,75 @@ public class UMLGUI extends JPanel implements ActionListener{
                     for(int j = 0; j < rels.size(); ++j){
                         String other = rels.get(j).get(0);
                         String scrDes = rels.get(j).get(1);
+                        String type = rels.get(j).get(2);
         
                         JPanel curr = findPanel(classes.get(i).name);
                         JPanel otherClass = findPanel(other);
 
+                        panelFrom = curr; 
+                        panelTo = otherClass; 
+
                         if(scrDes.equals("src")){
-                            g2d.drawLine(otherClass.getX()+10, otherClass.getY()+55
-                                        , curr.getX()+10, curr.getY()+55);
+                            calculateEndpoints(); 
+
+                             
+                            //g2d.setStroke(new BasicStroke(5));
+                            //Color color = Color.BLUE; 
+                         
+                            // g2d.drawLine(otherClass.getX() , otherClass.getY()+65
+                            //, curr.getX() + 40, curr.getY()+ 65);
+                            //drawArrowHead(g2d, otherClass.getY(), otherClass.getX(), color);
+
+                                g2d.setColor(Color.PINK);
+                                if (type.equals("realization"))
+                                {
+                                g2d.setStroke(DASHED_STROKE);
+                                }
+                                else
+                                {
+                                g2d.setStroke(SOLID_STROKE);
+                                }
+
+                                boolean isDiamond = (type.equals("aggregation") || type.equals("composition"));
+                                int capSize = isDiamond ? CAP_MAJOR_LENGTH * 2 : CAP_MAJOR_LENGTH;
+                                boolean shouldDrawCap;
+
+                                if (curr == otherClass)
+                                {
+                                    int offsetX = from.x + panelFrom.getWidth() / 2;
+                                    int offsetY = to.y - panelFrom.getHeight() / 2;
+                                    g2d.draw(new Line2D.Float(from.x, from.y + 50, offsetX, from.y));
+                                    g2d.draw(new Line2D.Float(offsetX, from.y + 50, offsetX, offsetY));
+                                    g2d.draw(new Line2D.Float(offsetX, offsetY, to.x, offsetY));
+                                    g2d.draw(new Line2D.Float(to.x, offsetY, to.x, to.y));
+                                    shouldDrawCap = (Math.abs(to.y - offsetY) > capSize);
+                                }
+                                else{
+                                    if (isHorizontal)
+                                    {
+                                        int midwayX = (from.x + to.x) / 2;
+                                        g2d.draw(new Line2D.Float(from.x, from.y  + 50, midwayX, from.y));
+                                        g2d.draw(new Line2D.Float(midwayX, from.y + 50, midwayX, to.y));
+                                        g2d.draw(new Line2D.Float(midwayX, to.y, to.x, to.y));
+                                        shouldDrawCap = (Math.abs(to.x - midwayX) > capSize);
+                                    }
+                                    else
+                                    {
+                                        int midwayY = (from.y + to.y) / 2;
+                                        g2d.draw(new Line2D.Float(from.x, from.y + 50, from.x, midwayY));
+                                        g2d.draw(new Line2D.Float(from.x, midwayY, to.x, midwayY));
+                                        g2d.draw(new Line2D.Float(to.x, midwayY, to.x, to.y));
+                                        shouldDrawCap = (Math.abs(to.y - midwayY) > capSize);
+                                    }
+                                }
+
+                                if (shouldDrawCap && !isInverse())
+                                {
+                                    g2d.setStroke(SOLID_STROKE);
+                                    drawCap(g2d, isDiamond, type);
+                                }
                         }
         
-                        // Save the type of the relationship
-                        String type = rels.get(j).get(2);
                     } 
                 }
             }
@@ -1473,9 +1552,173 @@ public class UMLGUI extends JPanel implements ActionListener{
         });
     }
 
+    /*
+    private static void drawArrowHead(Graphics2D g2d, int endY, int endX, Color color){
+
+        g2d.setPaint(color); 
+        Polygon arrowHead = new Polygon();
+        AffineTransform tx = new AffineTransform();
+        arrowHead.addPoint(0, 5);
+        arrowHead.addPoint(-5, -5);
+        arrowHead.addPoint(5, -5);
+            
+        tx.setToIdentity();
+        double angle = Math.atan2(endY, endX);
+        tx.translate(endX, endY);
+            
+        g2d.setTransform(tx);
+        g2d.fill(arrowHead);
+
+    }
+    */
+
+    private static void calculateEndpoints()
+    {        
+        if (panelFrom == panelTo)
+        {
+            from.x = panelFrom.getX() + panelFrom.getWidth();
+            from.y = panelFrom.getY() + (panelFrom.getHeight() / 2);
+            to.x = panelFrom.getX() + (panelFrom.getWidth() / 2);
+            to.y = panelFrom.getY();
+            return;
+        }
+
+        int xDist = panelTo.getX() - panelFrom.getX();
+        int yDist = panelTo.getY() - panelFrom.getY();
+
+        if(Math.abs(xDist) > Math.abs(yDist))
+        {
+            //Arrow mostly horizontal
+            if(xDist > 0)
+            {
+                //Left to right
+                from.x = panelFrom.getX() + panelFrom.getWidth();
+                to.x = panelTo.getX();
+            }
+            else
+            {
+                //Right to left
+                from.x = panelFrom.getX();
+                to.x = panelTo.getX() + panelTo.getWidth();
+
+            }
+            from.y = panelFrom.getY() + (panelFrom.getHeight() / 2);
+            to.y = panelTo.getY() + (panelTo.getHeight() / 2);
+        }
+        else
+        {
+            //Arrow mostly vertical
+            if(yDist > 0)
+            {
+                //Top to bottom 
+                from.y = panelFrom.getY() + panelFrom.getHeight();
+                to.y = panelTo.getY();
+            }
+            else
+            {
+                //Bottom to top
+                from.y = panelFrom.getY();
+                to.y = panelTo.getY() + panelTo.getHeight();
+            }
+            from.x = panelFrom.getX() + (panelFrom.getWidth() / 2);
+            to.x = panelTo.getX() + (panelTo.getWidth() / 2);
+        }
+    }
+
+    private static void drawCap(Graphics2D g2d, boolean isDiamond, String type)
+    {
+        Polygon cap = new Polygon();
+        cap.addPoint(to.x, to.y);
+        if (isHorizontal)
+        {
+            if (isReverse)
+            {
+                cap.addPoint(to.x + CAP_MAJOR_LENGTH, to.y - CAP_MINOR_LENGTH);
+                if (isDiamond)
+                {
+                    cap.addPoint(to.x + (CAP_MAJOR_LENGTH * 2), to.y);
+                }
+                cap.addPoint(to.x + CAP_MAJOR_LENGTH, to.y + CAP_MINOR_LENGTH);
+            }
+            else
+            {
+                cap.addPoint(to.x - CAP_MAJOR_LENGTH, to.y - CAP_MINOR_LENGTH);
+                if (isDiamond)
+                {
+                    cap.addPoint(to.x - (CAP_MAJOR_LENGTH * 2), to.y);
+                }
+                cap.addPoint(to.x - CAP_MAJOR_LENGTH, to.y + CAP_MINOR_LENGTH);
+            }
+        }
+        else
+        {
+            if (isReverse)
+            {
+                cap.addPoint(to.x + CAP_MINOR_LENGTH, to.y + CAP_MAJOR_LENGTH);
+                if (isDiamond)
+                {
+                    cap.addPoint(to.x, to.y + (CAP_MAJOR_LENGTH * 2));
+                }
+                cap.addPoint(to.x - CAP_MINOR_LENGTH, to.y + CAP_MAJOR_LENGTH);
+            }
+            else
+            {
+                cap.addPoint(to.x + CAP_MINOR_LENGTH, to.y - CAP_MAJOR_LENGTH);
+                if (isDiamond)
+                {
+                    cap.addPoint(to.x, to.y - (CAP_MAJOR_LENGTH * 2));
+                }
+                cap.addPoint(to.x - CAP_MINOR_LENGTH, to.y - CAP_MAJOR_LENGTH);
+            }
+        }
+        g2d.draw(cap);
+        if (!type.equals("composition"))
+        {
+            g2d.setColor(Color.PINK);
+        }
+        g2d.fill(cap);
+    }
+
+    private static boolean isInverse()
+    {
+        if (panelFrom == panelTo)
+        {
+            return false;
+        }
+        if (isHorizontal)
+        {
+            if (isReverse)
+            {
+                return from.x < to.x;
+            }
+            else
+            {
+                return from.x > to.x;
+            }
+        }
+        else
+        {
+            if (isReverse)
+            {
+                return from.y < to.y;
+            }
+            else
+            {
+                return from.y > to.y;
+            }
+        }
+    }
+    
+
 
 
     public static void main(String[] args) throws IOException{
+
+        try{
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        }catch(Exception e){
+            e.getMessage(); 
+        }
         new UMLGUI();
     }
 }
