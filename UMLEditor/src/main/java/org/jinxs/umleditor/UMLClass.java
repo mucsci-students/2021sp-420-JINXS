@@ -231,7 +231,7 @@ public class UMLClass {
             return false;
         }
 
-        for (int i = 1; i < targetMethod.params.size(); ++i){
+        for (int i = 0; i < targetMethod.params.size(); ++i){
             if (targetMethod.params.get(i).name.equals(paramName)){
                 System.out.println("Parameter already exists");
                 return false;

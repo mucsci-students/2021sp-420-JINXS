@@ -8,7 +8,7 @@ public class Main{
         }
         else if (args.length > 0) {
             if (args.length == 1 && args[0].equals("--cli")) {
-                UMLTerminal.build();
+                new UMLTerminal();
             }
             else {
                 System.out.print("Unrecognized argument(s): \"");

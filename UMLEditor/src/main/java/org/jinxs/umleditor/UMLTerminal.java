@@ -13,6 +13,9 @@ import java.util.Scanner;
 // For writing out to a file when saving
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 // For the JSON array of classes to be written to file
 import org.json.simple.JSONArray;
@@ -50,15 +53,17 @@ public class UMLTerminal{
     // applied when the project is saved again
     private static ArrayList<ArrayList<String>> classLocations = new ArrayList<ArrayList<String>>();
 
-    static UMLEditor project;
+    private UMLEditor project;
 
+    public UMLTerminal(){
+        project = new UMLEditor();
+    }
 
-    public static void build(){
+    public void build(){
         project = new UMLEditor();
 
         try{
-            TerminalBuilder builder = TerminalBuilder.builder();
-            terminal = builder.system(true).build();
+            terminal = TerminalBuilder.builder().system(true).build();
             reader = LineReaderBuilder.builder().terminal(terminal).build();
             boolean result = true;
 
@@ -81,7 +86,7 @@ public class UMLTerminal{
             
     }
 
-    public static boolean interpreter(ArrayList<String> commands){
+    public boolean interpreter(ArrayList<String> commands){
         
         if (commands == null){
             return false;
