@@ -384,8 +384,18 @@ public class UMLTerminal{
                     System.out.println("Too many Arguments for save command");
                 }
                 else{
-                    project.save(commands.get(1)); 
-                    restoreLoadCoords(commands.get(1));
+                    int lastSlash = -1;
+                    if (commands.get(1).contains("\\")) {
+                        lastSlash = commands.get(1).lastIndexOf("\\");
+                    } else if (commands.get(1).contains("/")) {
+                        lastSlash = commands.get(1).lastIndexOf("/");
+                    } else {
+                        project.save(commands.get(1), null);
+                        restoreLoadCoords(commands.get(1), null);
+                        break;
+                    }
+                    project.save(commands.get(1).substring(lastSlash + 1), commands.get(1).substring(0, lastSlash + 1));
+                    restoreLoadCoords(commands.get(1).substring(lastSlash + 1), commands.get(1).substring(0, lastSlash + 1));
                 }
             break;
 
@@ -398,8 +408,18 @@ public class UMLTerminal{
                     System.out.println("Too many Arguments for load command");
                 }
                 else{
-                    project.load(commands.get(1));
-                    storeLoadCoords(commands.get(1)); 
+                    int lastSlash = -1;
+                    if (commands.get(1).contains("\\")) {
+                        lastSlash = commands.get(1).lastIndexOf("\\");
+                    } else if (commands.get(1).contains("/")) {
+                        lastSlash = commands.get(1).lastIndexOf("/");
+                    } else {
+                        project.load(commands.get(1), null);
+                        storeLoadCoords(commands.get(1), null);
+                        break;
+                    }
+                    project.load(commands.get(1).substring(lastSlash + 1), commands.get(1).substring(0, lastSlash + 1));
+                    storeLoadCoords(commands.get(1).substring(lastSlash + 1), commands.get(1).substring(0, lastSlash + 1));
                 }
             break;
 
@@ -486,13 +506,18 @@ public class UMLTerminal{
 
     }
 
-    public static void storeLoadCoords (String fileName) {
+    public static void storeLoadCoords (String fileName, String filePath) {
         // Initiate the JSON parser
         JSONParser jPar = new JSONParser();
 
+        if (filePath != null) {
+            filePath += fileName + ".json";
+        } else {
+            filePath = "saves/" + fileName + ".json";
+        }
+
         // Open the file that was just loaded
-        String filePath = new File("").getAbsolutePath();
-        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
+        try (FileReader reader = new FileReader(filePath)) {
             // Save the JSON array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
@@ -522,14 +547,19 @@ public class UMLTerminal{
         }
     }
 
-    public static void restoreLoadCoords (String fileName) {
+    public static void restoreLoadCoords (String fileName, String filePath) {
         // Initiate the JSON parser
         JSONParser jPar = new JSONParser();
+
+        if (filePath != null) {
+            filePath += fileName + ".json";
+        } else {
+            filePath = "saves/" + fileName + ".json";
+        }
         
         // Attempt to read the filename in the "saves" directory specified by 
         // the user or catch resulting exceptions if/when that fails
-        String filePath = new File("").getAbsolutePath();
-        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
+        try (FileReader reader = new FileReader(filePath)) {
             // Save the JSON array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
@@ -554,7 +584,7 @@ public class UMLTerminal{
                     }
                 }
             }
-            try (FileWriter file = new FileWriter(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
+            try (FileWriter file = new FileWriter(filePath)) {
                 file.write(classList.toJSONString());
                 file.flush();
             } catch (IOException e) {

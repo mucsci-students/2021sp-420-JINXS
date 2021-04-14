@@ -1,6 +1,7 @@
 package org.jinxs.umleditor;
 
 import javax.swing.JOptionPane;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
@@ -9,10 +10,11 @@ import java.awt.FlowLayout;
 import java.awt.LayoutManager;
 import javax.swing.border.Border;
 import javax.swing.BorderFactory;
-import java.util.*; 
+import java.util.*;
 import java.awt.event.*;
 import java.io.IOException;
-import java.awt.*; 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.IOException;
@@ -296,15 +298,16 @@ public class UMLGUI implements ActionListener{
         JMenu file = new JMenu("File"); 
         JMenuItem save = new JMenuItem("Save");
 		JMenuItem load = new JMenuItem("Load");
+        JMenuItem export = new JMenuItem("Export as Image");
         JMenuItem undo = new JMenuItem("Undo");
         JMenuItem redo = new JMenuItem("Redo");
         JMenuItem exit = new JMenuItem("Exit");
 
-        JMenuItem[] fileArray = {save,load,undo,redo,exit}; 
-        String[] labelText = {"Save","Load","Undo","Redo","Exit"};
+        JMenuItem[] fileArray = {save,load,export,undo,redo,exit}; 
+        String[] labelText = {"Save","Load","Export","Undo","Redo","Exit"};
              
 
-        for(int i = 0; i < 5; ++i)
+        for(int i = 0; i < 6; ++i)
 		{
 			file.add(fileArray[i]);
 			fileArray[i].setToolTipText(labelText[i]);
@@ -1149,7 +1152,7 @@ public class UMLGUI implements ActionListener{
             getFromProject(project);
             refresh();
         } 
-        // SAVE/LOAD COMMANDS
+        // FILE COMMANDS
         if (command.equals("Save")){
             String saveName = getText("Save Name: "); 
             saveWithLocations(saveName);
@@ -1159,7 +1162,10 @@ public class UMLGUI implements ActionListener{
             loadWithLocations(loadName);
             refresh();
         } 
-        // SAVE/LOAD COMMANDS
+        if (command.equals("Export as Image")) {
+            String saveName = getText("Save Name: ");
+            saveToImage(saveName);
+        }
         if (command.equals("Undo")){
             undo();
             getFromProject(project);
@@ -1188,6 +1194,25 @@ public class UMLGUI implements ActionListener{
         }
     }
 
+    // Saves the content of the JFrame to a BufferedImage and outputs it to a png
+    // file
+    // with the specified file name
+    public void saveToImage(String fileName) {
+        Container content = window.getContentPane();
+        BufferedImage img = new BufferedImage(content.getWidth(), content.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = img.createGraphics();
+
+        content.printAll(g2d);
+
+        g2d.dispose();
+
+        try {
+            ImageIO.write(img, "png", new File(fileName + ".png"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     // Saves the x and y coordinates of each panel of the GUI 
     // and puts them in the classLocations ArrayList
     // The current locations saved in classLocations are cleared 
@@ -1205,7 +1230,7 @@ public class UMLGUI implements ActionListener{
 
     public void saveWithLocations (String saveName) {
         // Save all classes to a JSON file excluding their coordinates
-        project.save(saveName);
+        project.save(saveName, null);
 
         // Save the current locations of the panels so they can be
         // added to the JSON file that was just made
@@ -1216,8 +1241,8 @@ public class UMLGUI implements ActionListener{
         
         // Attempt to read the filename in the "saves" directory specified by 
         // the user or catch resulting exceptions if/when that fails
-        String filePath = new File("").getAbsolutePath();
-        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + saveName + ".json")) {
+        // String filePath = new File("").getAbsolutePath();
+        try (FileReader reader = new FileReader("saves/" + saveName + ".json")) {
             // Save the JSON array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
@@ -1239,7 +1264,7 @@ public class UMLGUI implements ActionListener{
                     }
                 }
             }
-            try (FileWriter file = new FileWriter(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + saveName + ".json")) {
+            try (FileWriter file = new FileWriter("saves/" + saveName + ".json")) {
                 file.write(classList.toJSONString());
                 file.flush();
             } catch (IOException e) {
@@ -1252,7 +1277,7 @@ public class UMLGUI implements ActionListener{
 
     public void loadWithLocations (String loadName) {
         // Load the UML classes into the GUI
-        project.load(loadName);
+        project.load(loadName, null);
         getFromProject(project);
         updateAllDropdowns();
 
@@ -1260,7 +1285,7 @@ public class UMLGUI implements ActionListener{
         JSONParser jPar = new JSONParser();
 
         String filePath = new File("").getAbsolutePath();
-        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + loadName + ".json")) {
+        try (FileReader reader = new FileReader("saves/" + loadName + ".json")) {
             // Save the JSON classes array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
@@ -1285,6 +1310,7 @@ public class UMLGUI implements ActionListener{
                         }
                         repaintPanel();
                         refresh();
+                        updateAllDropdowns();
                     }
                 }
             }
@@ -1448,14 +1474,12 @@ public class UMLGUI implements ActionListener{
     public void undo() {
         saveToMeme(false);
         loadFromMeme(true);
-        updateClassDropdowns();
-        updateFieldDropdowns();
+        updateAllDropdowns();
     }
 
     public void redo() {
         loadFromMeme(false);
-        updateClassDropdowns();
-        updateFieldDropdowns();
+        updateAllDropdowns();
     }
 
     /************************************************************
