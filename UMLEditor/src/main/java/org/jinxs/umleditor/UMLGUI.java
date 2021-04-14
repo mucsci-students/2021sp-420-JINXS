@@ -1,7 +1,6 @@
 package org.jinxs.umleditor;
 
 import javax.swing.JOptionPane;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
@@ -14,7 +13,6 @@ import java.util.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.awt.*; 
-import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.IOException;
@@ -42,8 +40,8 @@ import java.awt.event.MouseAdapter;
 
 
 
-public class UMLGUI extends JPanel implements ActionListener{
-
+public class UMLGUI implements ActionListener{
+ 
     private static JFrame window; 
     private static JMenuBar menu; 
 
@@ -56,7 +54,7 @@ public class UMLGUI extends JPanel implements ActionListener{
     // Undo/Redo momento variables
     private Memento undoMeme;
     private Memento redoMeme;
-    
+     
     // handleDrag global coordinates
     int x;
     int y;
@@ -82,37 +80,7 @@ public class UMLGUI extends JPanel implements ActionListener{
     // Creates the GUI window and adds each menu list to the menu bar
     public static void umlWindow(){
         // Gives the window a name
-        window = new JFrame("Graphical UML Editor"){
-            @Override
-            public void paint (Graphics g){
-        
-                super.paint(g); // paints background
-        
-                Graphics2D g2d = (Graphics2D) g;
-        
-                // Create a panel for each relationship in the project
-        
-                ArrayList<UMLClass> classes = project.getClasses(); 
-                for (int i = 0; i < classes.size(); ++i) {
-                    ArrayList<ArrayList<String>> rels = classes.get(i).getRels();
-                    for(int j = 0; j < rels.size(); ++j){
-                        String other = rels.get(j).get(0);
-                        String scrDes = rels.get(j).get(1);
-        
-                        JPanel curr = findPanel(classes.get(i).name);
-                        JPanel otherClass = findPanel(other);
-
-                        if(scrDes.equals("src")){
-                            g2d.drawLine(otherClass.getX()+10, otherClass.getY()+55
-                                        , curr.getX()+10, curr.getY()+55);
-                        }
-        
-                        // Save the type of the relationship
-                        String type = rels.get(j).get(2);
-                    } 
-                }
-            }
-        };
+        window = new JFrame("Graphical UML Editor");
 
         // The layout for the window is set to null to allow the user to move classes to
         // any desired location on the GUI
@@ -135,7 +103,6 @@ public class UMLGUI extends JPanel implements ActionListener{
 
         window.setVisible(true);   
     }
-
     
     // Builds the GUI view from the state of the underlying project/model
     public void getFromProject(UMLEditor project){
@@ -164,7 +131,7 @@ public class UMLGUI extends JPanel implements ActionListener{
             // Create the textarea that holds the name of the class
 		    JTextArea classTxt = new JTextArea(classes.get(i).name);
             classTxt.setEditable(false);
-            
+           
             // Set the initial size of the panel to just fit the class name
             panel.setSize((int)classTxt.getPreferredSize().getWidth(), 20);
 
@@ -178,9 +145,33 @@ public class UMLGUI extends JPanel implements ActionListener{
 
             // Add the textarea to the panel
             panel.add(classTxt);
-            
+
+            /* Old relationship builder: not needed once arrows are implemented
+            // Create a panel for each relationship in the project
+            ArrayList<ArrayList<String>> rels = classes.get(i).getRels();
+
+            for(int j = 0; j < rels.size(); ++j){
+                String dest = rels.get(j).get(0);
+
+                // Save the type of the relationship
+                String type = rels.get(j).get(2);
+
+                JTextArea relDest = new JTextArea("Class Destination: " + dest);
+                JTextArea relType = new JTextArea("Type: " + type);
+                relDest.setEditable(false);
+                relType.setEditable(false);
+
+                panel.add(relDest);
+                panel.add(relType); 
+
+		        Border bdRel = BorderFactory.createLineBorder(Color.RED);
+                relDest.setBorder(bdRel);
+                relType.setBorder(bdRel);
+            } 
+            */
+
             // Store the fields for the current class
-            ArrayList<String> fields = classes.get(i).getFields();
+            ArrayList<UMLField> fields = classes.get(i).getFields();
 
             // If fields exist in the project for the current class, add them to a textarea with 
             // each on their own line
@@ -191,13 +182,15 @@ public class UMLGUI extends JPanel implements ActionListener{
                     // Make the panel 20 pixels taller for each field
                     panel.setSize(panel.getWidth(), (panel.getHeight() + 20));
 
-                    String field = fields.get(j);
+                    String field = fields.get(j).name;
+                    String fType = fields.get(j).type;
+
                     // Fence-post problem: only add a new line character for each
                     // field beyond the first one
                     if (j != 0){
                         str += "\n"; 
                     } 
-                    str += field;
+                    str += fType + " " + field;
                 }
                 // Add all of the fields to  JTextArea
                 JTextArea fieldsText = new JTextArea(str);
@@ -215,7 +208,7 @@ public class UMLGUI extends JPanel implements ActionListener{
             }
 
             // Get and store the methods from the project
-            ArrayList<ArrayList<String>> methods = classes.get(i).getMethods();
+            ArrayList<UMLMethod> methods = classes.get(i).getMethods();
 
             // If methods exist in the project for this class, add them to a textarea with each on 
             // their own line 
@@ -227,7 +220,9 @@ public class UMLGUI extends JPanel implements ActionListener{
                     // Make the panel 20 pixels taller for each method
                     panel.setSize(panel.getWidth(), (panel.getHeight() + 20));
                     
-                    String methodName = methods.get(j).get(0);
+                    String methodName = methods.get(j).name;
+                    String methodType = methods.get(j).type;
+
                     // Fencepost problem: only add a newline before every method
                     // after the first one
                     if (j != 0) {
@@ -235,16 +230,19 @@ public class UMLGUI extends JPanel implements ActionListener{
                     }
 
                     // Put the fields for the current method in parentheses like an actual method
-                    methodString += methodName + "(";
+                    methodString += methodType + " " + methodName + "(";
 
-                    for(int k = 1; k < methods.get(j).size(); ++k){
-                        String param = methods.get(j).get(k);
+                    ArrayList<UMLParam> params = methods.get(j).params;
+
+                    for(int k = 0; k < params.size(); ++k){
+                        String param = params.get(k).name;
+                        String type = params.get(k).type;
                         // Fencepost problem: only add a comma if another param exists
                         // beyond the first
-                        if (k != 1) {
+                        if (k != 0) {
                             methodString += ", ";
                         }
-                        methodString += param;
+                        methodString += type + " " + param;
                     }
                     // Complete the param part of the string with a paren and semicolon like a real method
                     methodString += ");";
@@ -265,7 +263,6 @@ public class UMLGUI extends JPanel implements ActionListener{
             }
 
             panel.setSize(panel.getWidth() + 8, panel.getHeight() + 8);
-            
             
             // Put a black border around the entire class panel so its boundaries
             // are visible
@@ -299,16 +296,15 @@ public class UMLGUI extends JPanel implements ActionListener{
         JMenu file = new JMenu("File"); 
         JMenuItem save = new JMenuItem("Save");
 		JMenuItem load = new JMenuItem("Load");
-        JMenuItem export = new JMenuItem("Export as Image");
         JMenuItem undo = new JMenuItem("Undo");
         JMenuItem redo = new JMenuItem("Redo");
         JMenuItem exit = new JMenuItem("Exit");
 
-        JMenuItem[] fileArray = {save,load,export,undo,redo,exit}; 
-        String[] labelText = {"Save","Load","Export","Undo","Redo","Exit"};
+        JMenuItem[] fileArray = {save,load,undo,redo,exit}; 
+        String[] labelText = {"Save","Load","Undo","Redo","Exit"};
              
 
-        for(int i = 0; i < 6; ++i)
+        for(int i = 0; i < 5; ++i)
 		{
 			file.add(fileArray[i]);
 			fileArray[i].setToolTipText(labelText[i]);
@@ -372,6 +368,7 @@ public class UMLGUI extends JPanel implements ActionListener{
             menu.getMenu(3).remove(0);
             menu.getMenu(3).remove(0);
             menu.getMenu(3).remove(0);
+            menu.getMenu(3).remove(0);
         }
 
         ArrayList<UMLClass> currClasses = project.getClasses();
@@ -384,6 +381,7 @@ public class UMLGUI extends JPanel implements ActionListener{
         // If classes exist, add the option to add, delete, and rename fields
         JMenu addSubMenu = new JMenu("Add Field");
         JMenu deleteSubMenu = new JMenu("Delete Field");
+        JMenu retypeSubMenu = new JMenu("Retype Field");
         JMenu renameSubMenu = new JMenu("Rename Field");
 
         for (int i = 0; i < currClasses.size(); ++i) {
@@ -394,28 +392,37 @@ public class UMLGUI extends JPanel implements ActionListener{
 
             JMenu delClassesMenu = new JMenu(currClasses.get(i).name);
 
+            JMenu retypeClassesMenu = new JMenu(currClasses.get(i).name);
+
             JMenu renameClassesMenu = new JMenu(currClasses.get(i).name);
 
             // For each field in the current class, add the option to rename or delete it
             // from its class name dropdown
-            ArrayList<String> classFields = currClasses.get(i).getFields();
+            ArrayList<UMLField> classFields = currClasses.get(i).getFields();
             for (int j = 0; j < classFields.size(); ++j) {
-                delClassesMenu.add(new JMenuItem(classFields.get(j)));
-                renameClassesMenu.add(new JMenuItem(classFields.get(j)));
+                delClassesMenu.add(new JMenuItem(classFields.get(j).name));
+                retypeClassesMenu.add(new JMenuItem(classFields.get(j).name));
+                renameClassesMenu.add(new JMenuItem(classFields.get(j).name));
+
                 delClassesMenu.getItem(j).addActionListener(this);
+                retypeClassesMenu.getItem(j).addActionListener(this);
                 renameClassesMenu.getItem(j).addActionListener(this);
-                delClassesMenu.getItem(j).setActionCommand("DeleteField" + "*" + currClasses.get(i).name + "*" + classFields.get(j));
-                renameClassesMenu.getItem(j).setActionCommand("RenameField" + "*" + currClasses.get(i).name + "*" + classFields.get(j));
+
+                delClassesMenu.getItem(j).setActionCommand("DeleteField" + "*" + currClasses.get(i).name + "*" + classFields.get(j).name);
+                retypeClassesMenu.getItem(j).setActionCommand("RetypeField" + "*" + currClasses.get(i).name + "*" + classFields.get(j).name);
+                renameClassesMenu.getItem(j).setActionCommand("RenameField" + "*" + currClasses.get(i).name + "*" + classFields.get(j).name);
             }
             
             // Add the field dropdowns to each class dropdown
             deleteSubMenu.add(delClassesMenu);
+            retypeSubMenu.add(retypeClassesMenu);
             renameSubMenu.add(renameClassesMenu);
         }
 
         // Add the submenus to the top level dropdowns
         menu.getMenu(3).add(addSubMenu);
         menu.getMenu(3).add(deleteSubMenu);
+        menu.getMenu(3).add(retypeSubMenu);
         menu.getMenu(3).add(renameSubMenu);
     }
 
@@ -424,6 +431,7 @@ public class UMLGUI extends JPanel implements ActionListener{
     private void updateMethodDropdowns() {
         // If dropdowns exist, delete them to rebuild the menu
         if (menu.getMenu(4).getItemCount() > 0) {
+            menu.getMenu(4).remove(0);
             menu.getMenu(4).remove(0);
             menu.getMenu(4).remove(0);
             menu.getMenu(4).remove(0);
@@ -439,6 +447,7 @@ public class UMLGUI extends JPanel implements ActionListener{
         // If classes exist, add the option to add, delete, and rename methods
         JMenu addSubMenu = new JMenu("Add Method");
         JMenu deleteSubMenu = new JMenu("Delete Method");
+        JMenu retypeSubMenu = new JMenu("Retype Method");
         JMenu renameSubMenu = new JMenu("Rename Method");
 
         for (int i = 0; i < currClasses.size(); ++i) {
@@ -449,28 +458,37 @@ public class UMLGUI extends JPanel implements ActionListener{
 
             JMenu delClassesMenu = new JMenu(currClasses.get(i).name);
 
+            JMenu retypeClassesMenu = new JMenu(currClasses.get(i).name);
+
             JMenu renameClassesMenu = new JMenu(currClasses.get(i).name);
 
             // For each method in the current class, add the option to rename or delete it
             // from its class name dropdown
-            ArrayList<ArrayList<String>> classMethods = currClasses.get(i).getMethods();
+            ArrayList<UMLMethod> classMethods = currClasses.get(i).getMethods();
             for (int j = 0; j < classMethods.size(); ++j) {
-                delClassesMenu.add(new JMenuItem(classMethods.get(j).get(0)));
-                renameClassesMenu.add(new JMenuItem(classMethods.get(j).get(0)));
+                delClassesMenu.add(new JMenuItem(classMethods.get(j).name));
+                retypeClassesMenu.add(new JMenuItem(classMethods.get(j).name));
+                renameClassesMenu.add(new JMenuItem(classMethods.get(j).name));
+
                 delClassesMenu.getItem(j).addActionListener(this);
+                retypeClassesMenu.getItem(j).addActionListener(this);
                 renameClassesMenu.getItem(j).addActionListener(this);
-                delClassesMenu.getItem(j).setActionCommand("DeleteMethod" + "*" + currClasses.get(i).name + "*" + classMethods.get(j).get(0));
-                renameClassesMenu.getItem(j).setActionCommand("RenameMethod" + "*" + currClasses.get(i).name + "*" + classMethods.get(j).get(0));
+
+                delClassesMenu.getItem(j).setActionCommand("DeleteMethod" + "*" + currClasses.get(i).name + "*" + classMethods.get(j).name);
+                retypeClassesMenu.getItem(j).setActionCommand("RetypeMethod" + "*" + currClasses.get(i).name + "*" + classMethods.get(j).name);
+                renameClassesMenu.getItem(j).setActionCommand("RenameMethod" + "*" + currClasses.get(i).name + "*" + classMethods.get(j).name);
             }
             
             // Add the method dropdowns to each class dropdown
             deleteSubMenu.add(delClassesMenu);
+            retypeSubMenu.add(retypeClassesMenu);
             renameSubMenu.add(renameClassesMenu);
         }
 
         // Add the submenus to the top level dropdowns
         menu.getMenu(4).add(addSubMenu);
         menu.getMenu(4).add(deleteSubMenu);
+        menu.getMenu(4).add(retypeSubMenu);
         menu.getMenu(4).add(renameSubMenu);
     }
 
@@ -479,6 +497,7 @@ public class UMLGUI extends JPanel implements ActionListener{
     private void updateParameterDropdowns() {
         // If dropdowns exist, delete them to rebuild the menu
         if (menu.getMenu(5).getItemCount() > 0) {
+            menu.getMenu(5).remove(0);
             menu.getMenu(5).remove(0);
             menu.getMenu(5).remove(0);
             menu.getMenu(5).remove(0);
@@ -497,17 +516,19 @@ public class UMLGUI extends JPanel implements ActionListener{
         JMenu addSubMenu = new JMenu("Add Parameter");
         JMenu deleteSubMenu = new JMenu("Delete Parameter");
         JMenu deleteAllSubMenu = new JMenu("Delete All Parameters");
+        JMenu retypeSubMenu = new JMenu("Retype Parameter");
         JMenu renameSubMenu = new JMenu("Rename Parameter");
         JMenu changeAllSubMenu = new JMenu("Change All Parameters");
 
         for (int i = 0; i < currClasses.size(); ++i) {
 
-            ArrayList<ArrayList<String>> currMethods =  currClasses.get(i).getMethods();
+            ArrayList<UMLMethod> currMethods =  currClasses.get(i).getMethods();
 
             // Create a dropdown for each menu that has the class names
             JMenu addClassesMenu = new JMenu(currClasses.get(i).name);
             JMenu delClassesMenu = new JMenu(currClasses.get(i).name);
             JMenu delAllClassesMenu = new JMenu(currClasses.get(i).name);
+            JMenu retypeClassesMenu = new JMenu(currClasses.get(i).name);
             JMenu renameClassesMenu = new JMenu(currClasses.get(i).name);
             JMenu changeAllClassesMenu = new JMenu(currClasses.get(i).name);
 
@@ -515,45 +536,57 @@ public class UMLGUI extends JPanel implements ActionListener{
             // its class dropdown
             for (int j = 0; j < currMethods.size(); ++j) {
                 // For each method, add a dropdown to add a param to it
-                addClassesMenu.add(new JMenuItem(currMethods.get(j).get(0))); 
+                addClassesMenu.add(new JMenuItem(currMethods.get(j).name)); 
                 addClassesMenu.getItem(j).addActionListener(this);
-                addClassesMenu.getItem(j).setActionCommand("AddParameter" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).get(0));
+                addClassesMenu.getItem(j).setActionCommand("AddParameter" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).name);
 
                 // For each param in each method, add a dropdown to delete it
-                JMenu methodDelParams = new JMenu(currMethods.get(j).get(0));
-                for (int k = 1; k < currMethods.get(j).size(); ++k) {
-                    methodDelParams.add(new JMenuItem(currMethods.get(j).get(k)));
-                    methodDelParams.getItem(k-1).addActionListener(this);
-                    methodDelParams.getItem(k-1).setActionCommand("DeleteParameter" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).get(0) + "*" + currMethods.get(j).get(k));
+                ArrayList<UMLParam> currParams = currMethods.get(j).params;
+                JMenu methodDelParams = new JMenu(currMethods.get(j).name);
+                for (int k = 0; k < currParams.size(); ++k) {
+                    methodDelParams.add(new JMenuItem(currParams.get(k).name));
+                    methodDelParams.getItem(k).addActionListener(this);
+                    methodDelParams.getItem(k).setActionCommand("DeleteParameter" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).name + "*" + currParams.get(k).name);
                 }
 
                 delClassesMenu.add(methodDelParams); 
 
                 // For each method, add a dropdown to delete all parameters from it
-                delAllClassesMenu.add(new JMenuItem(currMethods.get(j).get(0))); 
+                delAllClassesMenu.add(new JMenuItem(currMethods.get(j).name)); 
                 delAllClassesMenu.getItem(j).addActionListener(this);
-                delAllClassesMenu.getItem(j).setActionCommand("DeleteAllParameters" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).get(0));
+                delAllClassesMenu.getItem(j).setActionCommand("DeleteAllParameters" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).name);
             
+                // For each param in each method, add a dropdown to retype it
+                JMenu methodRetypeParams = new JMenu(currMethods.get(j).name);
+                for (int k = 0; k < currParams.size(); ++k) {
+                    methodRetypeParams.add(new JMenuItem(currParams.get(k).name));
+                    methodRetypeParams.getItem(k).addActionListener(this);
+                    methodRetypeParams.getItem(k).setActionCommand("RetypeParameter" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).name + "*" + currParams.get(k).name);
+                }
+
+                retypeClassesMenu.add(methodRetypeParams);
+
                 // For each param in each method, add a dropdown to rename it
-                JMenu methodRenameParams = new JMenu(currMethods.get(j).get(0));
-                for (int k = 1; k < currMethods.get(j).size(); ++k) {
-                    methodRenameParams.add(new JMenuItem(currMethods.get(j).get(k)));
-                    methodRenameParams.getItem(k-1).addActionListener(this);
-                    methodRenameParams.getItem(k-1).setActionCommand("RenameParameter" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).get(0) + "*" + currMethods.get(j).get(k));
+                JMenu methodRenameParams = new JMenu(currMethods.get(j).name);
+                for (int k = 0; k < currParams.size(); ++k) {
+                    methodRenameParams.add(new JMenuItem(currParams.get(k).name));
+                    methodRenameParams.getItem(k).addActionListener(this);
+                    methodRenameParams.getItem(k).setActionCommand("RenameParameter" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).name + "*" + currParams.get(k).name);
                 }
 
                 renameClassesMenu.add(methodRenameParams); 
 
                 // For each method, add a dropdown to change all of its params
-                changeAllClassesMenu.add(new JMenuItem(currMethods.get(j).get(0))); 
+                changeAllClassesMenu.add(new JMenuItem(currMethods.get(j).name)); 
                 changeAllClassesMenu.getItem(j).addActionListener(this);
-                changeAllClassesMenu.getItem(j).setActionCommand("ChangeAllParameters" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).get(0));
+                changeAllClassesMenu.getItem(j).setActionCommand("ChangeAllParameters" + "*" + currClasses.get(i).name + "*" + currMethods.get(j).name);
             }
 
             // Add each class menu to its command submenu
             addSubMenu.add(addClassesMenu);
             deleteSubMenu.add(delClassesMenu);
             deleteAllSubMenu.add(delAllClassesMenu);
+            retypeSubMenu.add(retypeClassesMenu);
             renameSubMenu.add(renameClassesMenu);
             changeAllSubMenu.add(changeAllClassesMenu);
         }
@@ -562,6 +595,7 @@ public class UMLGUI extends JPanel implements ActionListener{
         menu.getMenu(5).add(addSubMenu);
         menu.getMenu(5).add(deleteSubMenu);
         menu.getMenu(5).add(deleteAllSubMenu);
+        menu.getMenu(5).add(retypeSubMenu);
         menu.getMenu(5).add(renameSubMenu);
         menu.getMenu(5).add(changeAllSubMenu);
     }
@@ -599,12 +633,12 @@ public class UMLGUI extends JPanel implements ActionListener{
             String currClassName = currClasses.get(i).name;
             JMenu currClassMenu = new JMenu(currClassName);
 
-            ArrayList<ArrayList<String>> currClassRels = currClasses.get(i).getRels();
+            ArrayList<UMLRel> currClassRels = currClasses.get(i).getRels();
             
             // Keep a list of classes that have a relationship with the current class
             ArrayList<String> relClasses = new ArrayList<String>();
             for (int j = 0; j < currClassRels.size(); ++j) {
-                relClasses.add(currClassRels.get(j).get(0));
+                relClasses.add(currClassRels.get(j).partner);
             }
 
             // Add all other classes that do not have a relationship with the current
@@ -629,12 +663,12 @@ public class UMLGUI extends JPanel implements ActionListener{
             String currClassName = currClasses.get(i).name;
             JMenu currClassMenu = new JMenu(currClassName);
 
-            ArrayList<ArrayList<String>> currClassRels = currClasses.get(i).getRels();
+            ArrayList<UMLRel> currClassRels = currClasses.get(i).getRels();
             
             // Keep a list of classes that have a relationship with the current class
             ArrayList<String> relClasses = new ArrayList<String>();
             for (int j = 0; j < currClassRels.size(); ++j) {
-                relClasses.add(currClassRels.get(j).get(0));
+                relClasses.add(currClassRels.get(j).partner);
             }
 
             // Add all other classes that do not have a relationship with the current
@@ -659,12 +693,12 @@ public class UMLGUI extends JPanel implements ActionListener{
             String currClassName = currClasses.get(i).name;
             JMenu currClassMenu = new JMenu(currClassName);
 
-            ArrayList<ArrayList<String>> currClassRels = currClasses.get(i).getRels();
+            ArrayList<UMLRel> currClassRels = currClasses.get(i).getRels();
             
             // Keep a list of classes that have a relationship with the current class
             ArrayList<String> relClasses = new ArrayList<String>();
             for (int j = 0; j < currClassRels.size(); ++j) {
-                relClasses.add(currClassRels.get(j).get(0));
+                relClasses.add(currClassRels.get(j).partner);
             }
 
             // Add all other classes that do not have a relationship with the current
@@ -689,12 +723,12 @@ public class UMLGUI extends JPanel implements ActionListener{
             String currClassName = currClasses.get(i).name;
             JMenu currClassMenu = new JMenu(currClassName);
 
-            ArrayList<ArrayList<String>> currClassRels = currClasses.get(i).getRels();
+            ArrayList<UMLRel> currClassRels = currClasses.get(i).getRels();
             
             // Keep a list of classes that have a relationship with the current class
             ArrayList<String> relClasses = new ArrayList<String>();
             for (int j = 0; j < currClassRels.size(); ++j) {
-                relClasses.add(currClassRels.get(j).get(0));
+                relClasses.add(currClassRels.get(j).partner);
             }
 
             // Add all other classes that do not have a relationship with the current
@@ -719,16 +753,16 @@ public class UMLGUI extends JPanel implements ActionListener{
         for (int i = 0; i < currClasses.size(); ++i) {
             String currClassName = currClasses.get(i).name;
 
-            ArrayList<ArrayList<String>> currClassRels = currClasses.get(i).getRels();
+            ArrayList<UMLRel> currClassRels = currClasses.get(i).getRels();
             
             // Keep a list of classes that have a relationship with the current class
             ArrayList<ArrayList<String>> relClassesDests = new ArrayList<ArrayList<String>>();
             for (int j = 0; j < currClassRels.size(); ++j) {
-                if (currClassRels.get(j).get(1).equals("src")) {
+                if (currClassRels.get(j).sOd.equals("src")) {
                     ArrayList<String> nameType = new ArrayList<String>(2);
 
-                    nameType.add(currClassRels.get(j).get(0));
-                    nameType.add(currClassRels.get(j).get(2));
+                    nameType.add(currClassRels.get(j).partner);
+                    nameType.add(currClassRels.get(j).type);
 
                     relClassesDests.add(nameType);
                 }
@@ -824,22 +858,22 @@ public class UMLGUI extends JPanel implements ActionListener{
 
     private String getText(String string)
 	{
-		String str = JOptionPane.showInputDialog(window, string, JOptionPane.PLAIN_MESSAGE);
+		String str = JOptionPane.showInputDialog(window, string, "");
 
 		return str;
 	}
     
     public void exitPrompt(ActionEvent e)
     { 
-        String ObjButtons[] = {"Yes","No"};
-        int PromptResult = JOptionPane.showOptionDialog(null, 
-            "Are you sure you want to exit?", "Exit GUI", 
-            JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, 
-            ObjButtons,ObjButtons[1]);
-        if(PromptResult==0)
-        {
-            System.exit(0);          
-        }
+      String ObjButtons[] = {"Yes","No"};
+      int PromptResult = JOptionPane.showOptionDialog(null, 
+          "Are you sure you want to exit?", "Exit GUI", 
+          JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, 
+          ObjButtons,ObjButtons[1]);
+      if(PromptResult==0)
+      {
+        System.exit(0);          
+      }
     }
 
     public void actionPerformed(ActionEvent e){
@@ -916,13 +950,14 @@ public class UMLGUI extends JPanel implements ActionListener{
         // FIELD COMMANDS
         if (args[0].equals("AddField")){
             String fieldToAdd = getText("Field Name: "); 
+            String fieldType = getText("Field Type: ");
             // If cancel is pressed when getting text from the user, the string will
             // be null, so check for it and exit the function if so (do nothing)
-            if (fieldToAdd == null) {
+            if (fieldToAdd == null || fieldType == null) {
                 return;
             }
             saveToMeme(true);
-            project.addAttr(args[1], fieldToAdd, "field");
+            project.addAttr(args[1], fieldToAdd, "field", fieldType);
             getFromProject(project);
             updateFieldDropdowns();
             refresh();
@@ -930,6 +965,19 @@ public class UMLGUI extends JPanel implements ActionListener{
         if (args[0].equals("DeleteField")){
             saveToMeme(true);
             project.delAttr(args[1], args[2], "field");
+            getFromProject(project);
+            updateFieldDropdowns();
+            refresh();
+        } 
+        if (args[0].equals("RetypeField")){
+            String newFieldType = getText("New Field Type: ");
+            // If cancel is pressed when getting text from the user, the string will
+            // be null, so check for it and exit the function if so (do nothing)
+            if (newFieldType == null) {
+                return;
+            }
+            saveToMeme(true);
+            project.changeFieldType(args[1], args[2], newFieldType);
             getFromProject(project);
             updateFieldDropdowns();
             refresh();
@@ -950,13 +998,14 @@ public class UMLGUI extends JPanel implements ActionListener{
         // METHOD COMMANDS
         if (args[0].equals("AddMethod")){
             String methodToAdd = getText("Method Name: "); 
+            String methodType = getText("Method Type: ");
             // If cancel is pressed when getting text from the user, the string will
             // be null, so check for it and exit the function if so (do nothing)
-            if (methodToAdd == null) {
+            if (methodToAdd == null || methodType == null) {
                 return;
             }
             saveToMeme(true);
-            project.addAttr(args[1], methodToAdd, "method");
+            project.addAttr(args[1], methodToAdd, "method", methodType);
             getFromProject(project);
             updateMethodDropdowns();
             updateParameterDropdowns();
@@ -967,6 +1016,20 @@ public class UMLGUI extends JPanel implements ActionListener{
             project.delAttr(args[1], args[2], "method");
             getFromProject(project);
             updateMethodDropdowns();
+            updateParameterDropdowns();
+            refresh();
+        } 
+        if (args[0].equals("RetypeMethod")){
+            String newMethodType = getText("New Method Type: "); 
+            // If cancel is pressed when getting text from the user, the string will
+            // be null, so check for it and exit the function if so (do nothing)
+            if (newMethodType == null) {
+                return;
+            }
+            saveToMeme(true);
+            project.changeMethodType(args[1], args[2], newMethodType);
+            updateMethodDropdowns();
+            getFromProject(project);
             updateParameterDropdowns();
             refresh();
         } 
@@ -986,16 +1049,15 @@ public class UMLGUI extends JPanel implements ActionListener{
         } 
         // PARAMETER COMMANDS
         if (args[0].equals("AddParameter")){
-            //String classToAdd = getText("Class: "); 
-            //String methodToAdd = getText("Method Name: "); 
-            String paramToAdd = getText("Parameter Name: "); 
+            String paramToAdd = getText("Parameter Name: ");
+            String paramType = getText("Parameter Type: ");
             // If cancel is pressed when getting text from the user, the string will
             // be null, so check for it and exit the function if so (do nothing)
-            if (paramToAdd == null) {
+            if (paramToAdd == null || paramType == null) {
                 return;
             }
             saveToMeme(true);
-            project.addParam(args[1], args[2], paramToAdd);
+            project.addParam(args[1], args[2], paramToAdd, paramType);
             getFromProject(project);
             updateParameterDropdowns();
             refresh();
@@ -1014,6 +1076,19 @@ public class UMLGUI extends JPanel implements ActionListener{
             updateParameterDropdowns();
             refresh();
         } 
+        if (args[0].equals("RetypeParameter")){
+            String newType = getText("New Parameter Type: ");
+            // If cancel is pressed when getting text from the user, the string will
+            // be null, so check for it and exit the function if so (do nothing)
+            if (newType == null) {
+                return;
+            }
+            saveToMeme(true);
+            project.changeParamType(args[1], args[2], args[3], newType);
+            getFromProject(project);
+            updateParameterDropdowns();
+            refresh();
+        } 
         if (args[0].equals("RenameParameter")){
             String newParam = getText("New Parameter Name: ");
             // If cancel is pressed when getting text from the user, the string will
@@ -1022,7 +1097,7 @@ public class UMLGUI extends JPanel implements ActionListener{
                 return;
             }
             saveToMeme(true);
-            project.changeParam(args[1], args[2], args[3], newParam);
+            project.changeParamName(args[1], args[2], args[3], newParam);
             getFromProject(project);
             updateParameterDropdowns();
             refresh();
@@ -1056,22 +1131,25 @@ public class UMLGUI extends JPanel implements ActionListener{
             }
 
             // Build an ArrayList of params to be passed to the controller
-            ArrayList<String> params = new ArrayList<String>(paramNum);
+            ArrayList<String> paramNames = new ArrayList<String>(paramNum);
+            ArrayList<String> paramTypes = new ArrayList<String>(paramNum);
             while (paramNum > 0){
                 String paramName = getText("New param name: ");
-                if (paramName == null) {
+                String paramType = getText("New param type: ");
+                if (paramName == null || paramType == null) {
                     return;
                 }
-                params.add(paramName);
+                paramNames.add(paramName);
+                paramTypes.add(paramType);
                 --paramNum;
             }
 
             saveToMeme(true);
-            project.changeAllParams(args[1], args[2], params);
+            project.changeAllParams(args[1], args[2], paramNames, paramTypes);
             getFromProject(project);
             refresh();
         } 
-        // FILE COMMANDS
+        // SAVE/LOAD COMMANDS
         if (command.equals("Save")){
             String saveName = getText("Save Name: "); 
             saveWithLocations(saveName);
@@ -1081,10 +1159,7 @@ public class UMLGUI extends JPanel implements ActionListener{
             loadWithLocations(loadName);
             refresh();
         } 
-        if (command.equals("Export as Image")){
-            String saveName = getText("Save Name: "); 
-            saveToImage(saveName);
-        } 
+        // SAVE/LOAD COMMANDS
         if (command.equals("Undo")){
             undo();
             getFromProject(project);
@@ -1113,24 +1188,6 @@ public class UMLGUI extends JPanel implements ActionListener{
         }
     }
 
-    // Saves the content of the JFrame to a BufferedImage and outputs it to a png file
-    // with the specified file name
-    public void saveToImage(String fileName) {
-        Container content = window.getContentPane();
-        BufferedImage img = new BufferedImage(content.getWidth(), content.getHeight(), BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2d = img.createGraphics();
-
-        content.printAll(g2d);
-
-        g2d.dispose();
-
-        try {
-            ImageIO.write(img, "png", new File(fileName + ".png"));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
     // Saves the x and y coordinates of each panel of the GUI 
     // and puts them in the classLocations ArrayList
     // The current locations saved in classLocations are cleared 
@@ -1148,7 +1205,7 @@ public class UMLGUI extends JPanel implements ActionListener{
 
     public void saveWithLocations (String saveName) {
         // Save all classes to a JSON file excluding their coordinates
-        project.save(saveName, null);
+        project.save(saveName);
 
         // Save the current locations of the panels so they can be
         // added to the JSON file that was just made
@@ -1159,9 +1216,8 @@ public class UMLGUI extends JPanel implements ActionListener{
         
         // Attempt to read the filename in the "saves" directory specified by 
         // the user or catch resulting exceptions if/when that fails
-        //String filePath = new File("").getAbsolutePath();
-        //System.out.print
-        try (FileReader reader = new FileReader("saves/" + saveName + ".json")) {
+        String filePath = new File("").getAbsolutePath();
+        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + saveName + ".json")) {
             // Save the JSON array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
@@ -1183,7 +1239,7 @@ public class UMLGUI extends JPanel implements ActionListener{
                     }
                 }
             }
-            try (FileWriter file = new FileWriter("saves/" + saveName + ".json")) {
+            try (FileWriter file = new FileWriter(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + saveName + ".json")) {
                 file.write(classList.toJSONString());
                 file.flush();
             } catch (IOException e) {
@@ -1196,13 +1252,15 @@ public class UMLGUI extends JPanel implements ActionListener{
 
     public void loadWithLocations (String loadName) {
         // Load the UML classes into the GUI
-        project.load(loadName, null);
+        project.load(loadName);
         getFromProject(project);
+        updateAllDropdowns();
 
         // Create a JSON parser
         JSONParser jPar = new JSONParser();
 
-        try (FileReader reader = new FileReader("saves/" + loadName + ".json")) {
+        String filePath = new File("").getAbsolutePath();
+        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + loadName + ".json")) {
             // Save the JSON classes array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
@@ -1227,7 +1285,6 @@ public class UMLGUI extends JPanel implements ActionListener{
                         }
                         repaintPanel();
                         refresh();
-                        updateAllDropdowns();
                     }
                 }
             }
@@ -1338,25 +1395,29 @@ public class UMLGUI extends JPanel implements ActionListener{
 
                 // Loop through the fields JSON array and add each field
                 for (int fieldNum = 0; fieldNum < fields.size(); ++fieldNum) {
-                    project.addAttr(className, (String) fields.get(fieldNum), "field");
+                    JSONObject field = (JSONObject) fields.get(fieldNum);
+                    project.addAttr(className, (String) field.get("name"), "field", (String) field.get("type"));
                 }
 
                 // Loop through the methods JSON array and add each method
                 for (int methodNum = 0; methodNum < methods.size(); ++methodNum) {
-                    JSONArray method = (JSONArray) methods.get(methodNum);
+                    JSONObject method = (JSONObject) methods.get(methodNum);
 
                     // Add the method to the class
-                    project.addAttr(className, (String) method.get(0), "method");
+                    project.addAttr(className, (String) method.get("name"), "method", (String) method.get("type"));
 
                     // Add all params for the method to the class
-                    for (int paramNum = 1; paramNum < method.size(); ++paramNum) {
-                        project.addParam(className, (String) method.get(0), (String) method.get(paramNum));
+                    JSONArray params = (JSONArray) method.get("params");
+                    for (int paramNum = 0; paramNum < params.size(); ++paramNum) {
+                        JSONObject param = (JSONObject) params.get(paramNum);
+                        project.addParam(className, (String) param.get("name"), (String) method.get(paramNum), (String) param.get("type"));
                     }
                 }
 
                 // Loop through the coordinates JSON array and set each location
                 for (int fieldNum = 0; fieldNum < fields.size(); ++fieldNum) {
-                    project.addAttr(className, (String) fields.get(fieldNum), "field");
+                    JSONObject field = (JSONObject) fields.get(fieldNum);
+                    project.addAttr(className, (String) field.get("name"), "field", (String) field.get("type"));
                 }
 
                 getFromProject(project);
@@ -1387,66 +1448,14 @@ public class UMLGUI extends JPanel implements ActionListener{
     public void undo() {
         saveToMeme(false);
         loadFromMeme(true);
-        updateAllDropdowns();
+        updateClassDropdowns();
+        updateFieldDropdowns();
     }
 
     public void redo() {
         loadFromMeme(false);
-        updateAllDropdowns();
-    }
-
-    /***********************************************************************************************************
-     * DRAW
-    ***********************************************************************************************************/
-    
-    public void paint (Graphics g){
-        
-        window.paint(g); // paints background
-
-        Graphics2D g2d = (Graphics2D) g;
-
-        // Create a panel for each relationship in the project
-
-        System.out.println("Draw:1382");
-
-        ArrayList<UMLClass> classes = project.getClasses(); 
-        for (int i = 0; i < classes.size(); ++i) {
-            ArrayList<ArrayList<String>> rels = classes.get(i).getRels();
-            System.out.println("Draw:1387 1st Loop");
-            for(int j = 0; j < rels.size(); ++j){
-                System.out.println("Draw:1389 2nd Loop");
-                String other = rels.get(j).get(0);
-                String scrDes = rels.get(j).get(1);
-
-                JPanel curr = findPanel(classes.get(i).name);
-                JPanel otherClass = findPanel(other);
-
-                System.out.println("Draw:1396 before If");
-                if(scrDes.equals("src")){
-                    g2d.drawLine(otherClass.getX(), otherClass.getY()
-                                , curr.getX(), curr.getY());
-                    System.out.println("Draw:1400 If Draw");
-                }else {
-                    g2d.drawLine(curr.getX(), curr.getY()
-                                , otherClass.getX(), otherClass.getY());
-                    System.out.println("Draw:1404 Else Draw");
-                }
-
-                System.out.println("Draw:1407 END");
-                // Save the type of the relationship
-                String type = rels.get(j).get(2);
-            } 
-        }
-    }
-
-    public static JPanel findPanel(String className){
-
-        for(int i = 0; i < panels.size(); ++i){
-            if (className.equals(panels.get(i).getName())){
-                return panels.get(i);
-            }
-        }
-        return null;
+        updateClassDropdowns();
+        updateFieldDropdowns();
     }
 
     /************************************************************
@@ -1468,14 +1477,13 @@ public class UMLGUI extends JPanel implements ActionListener{
             public void mouseDragged(MouseEvent me) {
                 me.translatePoint(me.getComponent().getLocation().x-x, me.getComponent().getLocation().y-y);
                 panel.setLocation(me.getX(), me.getY());
-                window.repaint();
             }
         });
     }
 
 
 
-    public static void main(String[] args) throws IOException{
-        new UMLGUI();
+   public static void main(String[] args) throws IOException{
+       new UMLGUI();
     }
 }
