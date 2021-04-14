@@ -1,7 +1,6 @@
 package org.jinxs.umleditor;
 
 import javax.swing.JOptionPane;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
@@ -14,7 +13,6 @@ import java.util.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.awt.*; 
-import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.IOException;
@@ -42,8 +40,8 @@ import java.awt.event.MouseAdapter;
 
 
 
-public class UMLGUI extends JPanel implements ActionListener{
-
+public class UMLGUI implements ActionListener{
+ 
     private static JFrame window; 
     private static JMenuBar menu; 
 
@@ -56,7 +54,7 @@ public class UMLGUI extends JPanel implements ActionListener{
     // Undo/Redo momento variables
     private Memento undoMeme;
     private Memento redoMeme;
-    
+     
     // handleDrag global coordinates
     int x;
     int y;
@@ -82,37 +80,7 @@ public class UMLGUI extends JPanel implements ActionListener{
     // Creates the GUI window and adds each menu list to the menu bar
     public static void umlWindow(){
         // Gives the window a name
-        window = new JFrame("Graphical UML Editor"){
-            @Override
-            public void paint (Graphics g){
-        
-                super.paint(g); // paints background
-        
-                Graphics2D g2d = (Graphics2D) g;
-        
-                // Create a panel for each relationship in the project
-        
-                ArrayList<UMLClass> classes = project.getClasses(); 
-                for (int i = 0; i < classes.size(); ++i) {
-                    ArrayList<ArrayList<String>> rels = classes.get(i).getRels();
-                    for(int j = 0; j < rels.size(); ++j){
-                        String other = rels.get(j).get(0);
-                        String scrDes = rels.get(j).get(1);
-        
-                        JPanel curr = findPanel(classes.get(i).name);
-                        JPanel otherClass = findPanel(other);
-
-                        if(scrDes.equals("src")){
-                            g2d.drawLine(otherClass.getX()+10, otherClass.getY()+55
-                                        , curr.getX()+10, curr.getY()+55);
-                        }
-        
-                        // Save the type of the relationship
-                        String type = rels.get(j).get(2);
-                    } 
-                }
-            }
-        };
+        window = new JFrame("Graphical UML Editor");
 
         // The layout for the window is set to null to allow the user to move classes to
         // any desired location on the GUI
@@ -163,7 +131,7 @@ public class UMLGUI extends JPanel implements ActionListener{
             // Create the textarea that holds the name of the class
 		    JTextArea classTxt = new JTextArea(classes.get(i).name);
             classTxt.setEditable(false);
-            
+           
             // Set the initial size of the panel to just fit the class name
             panel.setSize((int)classTxt.getPreferredSize().getWidth(), 20);
 
@@ -177,7 +145,31 @@ public class UMLGUI extends JPanel implements ActionListener{
 
             // Add the textarea to the panel
             panel.add(classTxt);
-            
+
+            /* Old relationship builder: not needed once arrows are implemented
+            // Create a panel for each relationship in the project
+            ArrayList<ArrayList<String>> rels = classes.get(i).getRels();
+
+            for(int j = 0; j < rels.size(); ++j){
+                String dest = rels.get(j).get(0);
+
+                // Save the type of the relationship
+                String type = rels.get(j).get(2);
+
+                JTextArea relDest = new JTextArea("Class Destination: " + dest);
+                JTextArea relType = new JTextArea("Type: " + type);
+                relDest.setEditable(false);
+                relType.setEditable(false);
+
+                panel.add(relDest);
+                panel.add(relType); 
+
+		        Border bdRel = BorderFactory.createLineBorder(Color.RED);
+                relDest.setBorder(bdRel);
+                relType.setBorder(bdRel);
+            } 
+            */
+
             // Store the fields for the current class
             ArrayList<UMLField> fields = classes.get(i).getFields();
 
@@ -272,7 +264,6 @@ public class UMLGUI extends JPanel implements ActionListener{
 
             panel.setSize(panel.getWidth() + 8, panel.getHeight() + 8);
             
-            
             // Put a black border around the entire class panel so its boundaries
             // are visible
             Border bdPanel = BorderFactory.createLineBorder(Color.BLACK, 4);
@@ -305,16 +296,15 @@ public class UMLGUI extends JPanel implements ActionListener{
         JMenu file = new JMenu("File"); 
         JMenuItem save = new JMenuItem("Save");
 		JMenuItem load = new JMenuItem("Load");
-        JMenuItem export = new JMenuItem("Export as Image");
         JMenuItem undo = new JMenuItem("Undo");
         JMenuItem redo = new JMenuItem("Redo");
         JMenuItem exit = new JMenuItem("Exit");
 
-        JMenuItem[] fileArray = {save,load,export,undo,redo,exit}; 
-        String[] labelText = {"Save","Load","Export","Undo","Redo","Exit"};
+        JMenuItem[] fileArray = {save,load,undo,redo,exit}; 
+        String[] labelText = {"Save","Load","Undo","Redo","Exit"};
              
 
-        for(int i = 0; i < 6; ++i)
+        for(int i = 0; i < 5; ++i)
 		{
 			file.add(fileArray[i]);
 			fileArray[i].setToolTipText(labelText[i]);
@@ -875,15 +865,15 @@ public class UMLGUI extends JPanel implements ActionListener{
     
     public void exitPrompt(ActionEvent e)
     { 
-        String ObjButtons[] = {"Yes","No"};
-        int PromptResult = JOptionPane.showOptionDialog(null, 
-            "Are you sure you want to exit?", "Exit GUI", 
-            JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, 
-            ObjButtons,ObjButtons[1]);
-        if(PromptResult==0)
-        {
-            System.exit(0);          
-        }
+      String ObjButtons[] = {"Yes","No"};
+      int PromptResult = JOptionPane.showOptionDialog(null, 
+          "Are you sure you want to exit?", "Exit GUI", 
+          JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, 
+          ObjButtons,ObjButtons[1]);
+      if(PromptResult==0)
+      {
+        System.exit(0);          
+      }
     }
 
     public void actionPerformed(ActionEvent e){
@@ -1159,7 +1149,7 @@ public class UMLGUI extends JPanel implements ActionListener{
             getFromProject(project);
             refresh();
         } 
-        // FILE COMMANDS
+        // SAVE/LOAD COMMANDS
         if (command.equals("Save")){
             String saveName = getText("Save Name: "); 
             saveWithLocations(saveName);
@@ -1169,10 +1159,7 @@ public class UMLGUI extends JPanel implements ActionListener{
             loadWithLocations(loadName);
             refresh();
         } 
-        if (command.equals("Export as Image")){
-            String saveName = getText("Save Name: "); 
-            saveToImage(saveName);
-        } 
+        // SAVE/LOAD COMMANDS
         if (command.equals("Undo")){
             undo();
             getFromProject(project);
@@ -1201,24 +1188,6 @@ public class UMLGUI extends JPanel implements ActionListener{
         }
     }
 
-    // Saves the content of the JFrame to a BufferedImage and outputs it to a png file
-    // with the specified file name
-    public void saveToImage(String fileName) {
-        Container content = window.getContentPane();
-        BufferedImage img = new BufferedImage(content.getWidth(), content.getHeight(), BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2d = img.createGraphics();
-
-        content.printAll(g2d);
-
-        g2d.dispose();
-
-        try {
-            ImageIO.write(img, "png", new File(fileName + ".png"));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
     // Saves the x and y coordinates of each panel of the GUI 
     // and puts them in the classLocations ArrayList
     // The current locations saved in classLocations are cleared 
@@ -1236,7 +1205,7 @@ public class UMLGUI extends JPanel implements ActionListener{
 
     public void saveWithLocations (String saveName) {
         // Save all classes to a JSON file excluding their coordinates
-        project.save(saveName, null);
+        project.save(saveName);
 
         // Save the current locations of the panels so they can be
         // added to the JSON file that was just made
@@ -1247,9 +1216,8 @@ public class UMLGUI extends JPanel implements ActionListener{
         
         // Attempt to read the filename in the "saves" directory specified by 
         // the user or catch resulting exceptions if/when that fails
-        //String filePath = new File("").getAbsolutePath();
-        //System.out.print
-        try (FileReader reader = new FileReader("saves/" + saveName + ".json")) {
+        String filePath = new File("").getAbsolutePath();
+        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + saveName + ".json")) {
             // Save the JSON array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
@@ -1271,7 +1239,7 @@ public class UMLGUI extends JPanel implements ActionListener{
                     }
                 }
             }
-            try (FileWriter file = new FileWriter("saves/" + saveName + ".json")) {
+            try (FileWriter file = new FileWriter(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + saveName + ".json")) {
                 file.write(classList.toJSONString());
                 file.flush();
             } catch (IOException e) {
@@ -1284,14 +1252,15 @@ public class UMLGUI extends JPanel implements ActionListener{
 
     public void loadWithLocations (String loadName) {
         // Load the UML classes into the GUI
-        project.load(loadName, null);
+        project.load(loadName);
         getFromProject(project);
         updateAllDropdowns();
 
         // Create a JSON parser
         JSONParser jPar = new JSONParser();
 
-        try (FileReader reader = new FileReader("saves/" + loadName + ".json")) {
+        String filePath = new File("").getAbsolutePath();
+        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + loadName + ".json")) {
             // Save the JSON classes array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
@@ -1316,7 +1285,6 @@ public class UMLGUI extends JPanel implements ActionListener{
                         }
                         repaintPanel();
                         refresh();
-                        updateAllDropdowns();
                     }
                 }
             }
@@ -1480,66 +1448,14 @@ public class UMLGUI extends JPanel implements ActionListener{
     public void undo() {
         saveToMeme(false);
         loadFromMeme(true);
-        updateAllDropdowns();
+        updateClassDropdowns();
+        updateFieldDropdowns();
     }
 
     public void redo() {
         loadFromMeme(false);
-        updateAllDropdowns();
-    }
-
-    /***********************************************************************************************************
-     * DRAW
-    ***********************************************************************************************************/
-    
-    public void paint (Graphics g){
-        
-        window.paint(g); // paints background
-
-        Graphics2D g2d = (Graphics2D) g;
-
-        // Create a panel for each relationship in the project
-
-        System.out.println("Draw:1382");
-
-        ArrayList<UMLClass> classes = project.getClasses(); 
-        for (int i = 0; i < classes.size(); ++i) {
-            ArrayList<ArrayList<String>> rels = classes.get(i).getRels();
-            System.out.println("Draw:1387 1st Loop");
-            for(int j = 0; j < rels.size(); ++j){
-                System.out.println("Draw:1389 2nd Loop");
-                String other = rels.get(j).get(0);
-                String scrDes = rels.get(j).get(1);
-
-                JPanel curr = findPanel(classes.get(i).name);
-                JPanel otherClass = findPanel(other);
-
-                System.out.println("Draw:1396 before If");
-                if(scrDes.equals("src")){
-                    g2d.drawLine(otherClass.getX(), otherClass.getY()
-                                , curr.getX(), curr.getY());
-                    System.out.println("Draw:1400 If Draw");
-                }else {
-                    g2d.drawLine(curr.getX(), curr.getY()
-                                , otherClass.getX(), otherClass.getY());
-                    System.out.println("Draw:1404 Else Draw");
-                }
-
-                System.out.println("Draw:1407 END");
-                // Save the type of the relationship
-                String type = rels.get(j).get(2);
-            } 
-        }
-    }
-
-    public static JPanel findPanel(String className){
-
-        for(int i = 0; i < panels.size(); ++i){
-            if (className.equals(panels.get(i).getName())){
-                return panels.get(i);
-            }
-        }
-        return null;
+        updateClassDropdowns();
+        updateFieldDropdowns();
     }
 
     /************************************************************
@@ -1561,14 +1477,13 @@ public class UMLGUI extends JPanel implements ActionListener{
             public void mouseDragged(MouseEvent me) {
                 me.translatePoint(me.getComponent().getLocation().x-x, me.getComponent().getLocation().y-y);
                 panel.setLocation(me.getX(), me.getY());
-                window.repaint();
             }
         });
     }
 
 
 
-    public static void main(String[] args) throws IOException{
-        new UMLGUI();
+   public static void main(String[] args) throws IOException{
+       new UMLGUI();
     }
 }

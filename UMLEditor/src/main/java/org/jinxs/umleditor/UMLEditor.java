@@ -503,7 +503,7 @@ public class UMLEditor {
         }
     }
 
-    public void save(String fileName, String filePath) {
+    public void save(String fileName) {
         // Create a JSON array to hold all of the classes
         JSONArray classJArray = new JSONArray();
 
@@ -515,14 +515,10 @@ public class UMLEditor {
 
         // Write out the JSON class array to the desired filename and put it in the "saves" directory
         // and catch IOExceptions if they occur (which will result in a stack trace)
+        String filePath = new File("").getAbsolutePath();
         // Make a "saves" directory in the umleditor to hold JSON save files
-        new File("saves").mkdirs();
-        if (filePath != null) {
-            filePath += fileName + ".json";
-        } else {
-            filePath = "saves/" + fileName + ".json";
-        }
-        try (FileWriter file = new FileWriter(filePath)) {
+        new File(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves").mkdirs();
+        try (FileWriter file = new FileWriter(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
             file.write(classJArray.toJSONString());
             file.flush();
         } catch (IOException e) {
@@ -552,20 +548,15 @@ public class UMLEditor {
         }
     }
 
-    public void load(String fileName, String filePath){
+    public void load(String fileName){
         classes.clear();
         // Initiate the JSON parser
         JSONParser jPar = new JSONParser();
-
-        if (filePath != null) {
-            filePath += fileName + ".json";
-        } else {
-            filePath = "saves/" + fileName + ".json";
-        }
         
         // Attempt to read the filename in the "saves" directory specified by 
         // the user or catch resulting exceptions if/when that fails
-        try (FileReader reader = new FileReader(filePath)) {
+        String filePath = new File("").getAbsolutePath();
+        try (FileReader reader = new FileReader(filePath + "/UMLEditor/src/main/java/org/jinxs/umleditor/saves/" + fileName + ".json")) {
             // Save the JSON array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
