@@ -149,7 +149,7 @@ public class UMLEditor {
 
         // Ensure a relationship between class1 and class2 does not already exist
         for (int i = 0; i < c1Rels.size(); ++i) {
-            if (c1Rels.get(i).partner.equals(class2)) {
+            if (c1Rels.get(i).partner.equals(class2) && c1Rels.get(i).sOd.equals("dest")) {
                 // Notify user of already existing relationship
                 System.out.println("Relationship between \"" + class1 + "\" and \"" + class2 + "\" already exists");
                 return;
@@ -159,8 +159,8 @@ public class UMLEditor {
         // Add the relationship to both class's rel lists
         // true = src, false = dest
         if (c1 != null && c2 != null) {
-            c1.addRel(class2, true, type);
-            c2.addRel(class1, false, type);
+            c1.addRel(class2, false, type);
+            c2.addRel(class1, true, type);
         }
     }
 
@@ -207,8 +207,8 @@ public class UMLEditor {
         }
 
         else {
-            c1.deleteRel(c2.name);
-            c2.deleteRel(c1.name);
+            c1.deleteRel(c2.name, "dest");
+            c2.deleteRel(c1.name, "src");
         }
     }
 
