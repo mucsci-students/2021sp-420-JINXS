@@ -24,11 +24,11 @@ rename
     param <class1, method1, param1, newParamName>       Renames the given parameter from the specified class
     allParams <class1, method1, type1, param1, ...>     Changes all the parameters from the specified class
 
-change
-    relType <class1, class2, newRelType>                Changes the type of relationship
-    fieldType <class1, field1, newDataType>             Changes the data type of a field
-    methodType <class1, method1, newReturnType>         Changes the return type of a method
-    paramType <class1, method1, param1, newDataType>    Changes the data type of a parameter
+retype
+    rel <class1, class2, newRelType>                Changes the type of relationship
+    field <class1, field1, newDataType>             Changes the data type of a field
+    method <class1, method1, newReturnType>         Changes the return type of a method
+    param <class1, method1, param1, newDataType>    Changes the data type of a parameter
 
 
 printList                   Prints the names of all existing classes
