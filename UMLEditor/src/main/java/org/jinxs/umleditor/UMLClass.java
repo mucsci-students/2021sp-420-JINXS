@@ -64,9 +64,9 @@ public class UMLClass {
     }
 
     // Delete a relationship given the name of the other class
-    public boolean deleteRel(String className) {
+    public boolean deleteRel(String className, String srcDest) {
         for (int i = 0; i < relationships.size(); ++i) {
-            if (relationships.get(i).partner.equals(className)) {
+            if (relationships.get(i).partner.equals(className) && relationships.get(i).sOd.equals(srcDest)) {
                 relationships.remove(i);
                 return true;
             }

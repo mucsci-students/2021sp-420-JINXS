@@ -83,18 +83,18 @@ public class UMLClassTest  {
         // Add and remove 1 relationship
         c.addRel("otherClass1", true, "inheritance");
         assertEquals("Relationships ArrayList has size 1", c.getRels().size(), 1);
-        assertTrue("Deleting first relationship succeeds", c.deleteRel("otherClass1"));
+        assertTrue("Deleting first relationship succeeds", c.deleteRel("otherClass1", "src"));
         assertTrue("Relationships ArrayList is empty", c.getRels().isEmpty());
 
         // Remove from the empty list
-        assertTrue("Removing from empty rel list returns false", !c.deleteRel("otherClass1"));
+        assertTrue("Removing from empty rel list returns false", !c.deleteRel("otherClass1", "src"));
         assertTrue("Relationships ArrayList is empty", c.getRels().isEmpty());
 
         // Add 2 rels and remove the 2nd
         c.addRel("otherClass1", true, "composition");
         c.addRel("otherClass2", false, "aggregation");
         assertEquals("Relationships ArrayList has size 2", c.getRels().size(), 2);
-        assertTrue("Deleting relationship when rels > 1 succeeds", c.deleteRel("otherClass2"));
+        assertTrue("Deleting relationship when rels > 1 succeeds", c.deleteRel("otherClass2", "dest"));
         assertEquals("Relationships ArrayList has size 1", c.getRels().size(), 1);
         assertEquals("First part of rel is the other class name", c.getRels().get(0).partner, "otherClass1");
         assertEquals("Second part of rel is \"src\"", c.getRels().get(0).sOd, "src");
@@ -102,15 +102,15 @@ public class UMLClassTest  {
 
         // Add 2 more rels and remove the 1st from the previous test
         c.addRel("otherClass3", false, "realization");
-        c.addRel("otherClass4", true, "inheritance");
+        c.addRel("otherClass4", false, "inheritance");
         assertEquals("Relationships ArrayList has size 3", c.getRels().size(), 3);
-        assertTrue("Deleting relationship when rels > 1 succeeds", c.deleteRel("otherClass1"));
+        assertTrue("Deleting relationship when rels > 1 succeeds", c.deleteRel("otherClass1", "src"));
         assertEquals("Relationships ArrayList has size 2", c.getRels().size(), 2);
         assertEquals("First part of rel is the other class name", c.getRels().get(0).partner, "otherClass3");
         assertEquals("Second part of rel is \"dest\"", c.getRels().get(0).sOd, "dest");
         assertEquals("Third part of rel is the type \"realization\"", c.getRels().get(0).type, "realization");
         assertEquals("First part of rel is the other class name", c.getRels().get(1).partner, "otherClass4");
-        assertEquals("Second part of rel is \"src\"", c.getRels().get(1).sOd, "src");
+        assertEquals("Second part of rel is \"dest\"", c.getRels().get(1).sOd, "dest");
         assertEquals("Third part of rel is the type \"inheritance\"", c.getRels().get(1).type, "inheritance");
 
         // Add 100 more rels and delete all but one
@@ -124,7 +124,7 @@ public class UMLClassTest  {
 
         // Delete all but the last relationship
         for (int i = 3; i < 104; ++i) {
-            assertTrue("Deleting relationship when rels > 100 succeeds", c.deleteRel("otherClass" + i));
+            assertTrue("Deleting relationship when rels > 100 succeeds", c.deleteRel("otherClass" + i, "dest"));
         }
         assertEquals("Relationships ArrayList has size 1", c.getRels().size(), 1);
         assertEquals("First part of rel is the other class name", c.getRels().get(0).partner, "otherClass104");
@@ -145,7 +145,7 @@ public class UMLClassTest  {
         assertEquals("Second part of rel is \"dest\"", c.getRels().get(0).sOd, "dest");
         assertEquals("Third part of rel is the type \"inheritance\"", c.getRels().get(0).type, "inheritance");
 
-        c.deleteRel("otherClass1");
+        c.deleteRel("otherClass1", "dest");
 
         // Change one relationship where c is the source
         c.addRel("otherClass2", true, "aggregation");
@@ -163,7 +163,7 @@ public class UMLClassTest  {
         assertEquals("Third part of rel is the type \"inheritance\"", c.getRels().get(0).type, "inheritance");
 
         // Attempt to rename when the rel list is empty
-        c.deleteRel("otherClass2");
+        c.deleteRel("otherClass2", "src");
         assertTrue("Calling changeRelType when rels is empty fails", !c.changeRelType("otherClass1", "composition"));
         assertEquals("Relationships ArrayList has size 0", c.getRels().size(), 0);
 
