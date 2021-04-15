@@ -64,14 +64,14 @@ public class UMLTerminal{
 
     public void build(){
         project = new UMLEditor();
-        comp = new UMLTabCompleter().update(project);
         try{
             terminal = TerminalBuilder.builder().system(true).build();
-            reader = LineReaderBuilder.builder().terminal(terminal).completer(comp).build();
             boolean result = true;
 
             while(result){
                 try {
+                    comp = new UMLTabCompleter().update(project);
+                    reader = LineReaderBuilder.builder().terminal(terminal).completer(comp).build();
                     String line = null;
                     line = reader.readLine("$ ", null, (MaskingCallback) null, null);
                     line = line.trim();
@@ -331,9 +331,9 @@ public class UMLTerminal{
                     break;
                 }
             break;
-            case "change":
+            case "retype":
                 switch(commands.get(1)) {
-                    case "relType":
+                    case "rel":
                         if (commands.size() < 5) {
                             System.out.println("Too few Arguments for change relType command");
                         } else if (commands.size() > 5) {
@@ -344,7 +344,7 @@ public class UMLTerminal{
                         }
                     break;
 
-                    case "fieldType":
+                    case "field":
                         if (commands.size() < 5) {
                             System.out.println("Too few Arguments for change fieldType command");
                         } else if (commands.size() > 5) {
@@ -355,7 +355,7 @@ public class UMLTerminal{
                         }
                     break;
 
-                    case "methodType":
+                    case "method":
                         if (commands.size() < 5) {
                             System.out.println("Too few Arguments for change fieldType command");
                         } else if (commands.size() > 5) {
@@ -366,7 +366,7 @@ public class UMLTerminal{
                         }
                     break;
 
-                    case "paramType":
+                    case "param":
                         if (commands.size() < 6) {
                             System.out.println("Too few Arguments for change fieldType command");
                         } else if (commands.size() > 6) {
