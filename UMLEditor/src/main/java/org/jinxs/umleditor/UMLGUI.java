@@ -124,17 +124,17 @@ public class UMLGUI implements ActionListener{
                         panelFrom = curr; 
                         panelTo = otherClass; 
 
-                        if(srcDes.equals("src")){
+                        if(srcDes.equals("dest")){
                             calculateEndpoints(); 
 
                                 g2d.setColor(Color.PINK);
-                                if (type.equals("realization"))
+                                if (type.equals("realization") || type.equals("composition"))
                                 {
-                                g2d.setStroke(DASHED_STROKE);
+                                    g2d.setStroke(DASHED_STROKE);
                                 }
                                 else
                                 {
-                                g2d.setStroke(SOLID_STROKE);
+                                    g2d.setStroke(SOLID_STROKE);
                                 }
 
                                 boolean isDiamond = (type.equals("aggregation") || type.equals("composition"));
@@ -715,7 +715,9 @@ public class UMLGUI implements ActionListener{
             // Keep a list of classes that have a relationship with the current class
             ArrayList<String> relClasses = new ArrayList<String>();
             for (int j = 0; j < currClassRels.size(); ++j) {
-                relClasses.add(currClassRels.get(j).partner);
+                if (currClassRels.get(j).sOd.equals("dest")) {
+                    relClasses.add(currClassRels.get(j).partner);
+                }
             }
 
             // Add all other classes that do not have a relationship with the current
@@ -745,7 +747,9 @@ public class UMLGUI implements ActionListener{
             // Keep a list of classes that have a relationship with the current class
             ArrayList<String> relClasses = new ArrayList<String>();
             for (int j = 0; j < currClassRels.size(); ++j) {
-                relClasses.add(currClassRels.get(j).partner);
+                if (currClassRels.get(j).sOd.equals("dest")) {
+                    relClasses.add(currClassRels.get(j).partner);
+                }
             }
 
             // Add all other classes that do not have a relationship with the current
@@ -775,7 +779,9 @@ public class UMLGUI implements ActionListener{
             // Keep a list of classes that have a relationship with the current class
             ArrayList<String> relClasses = new ArrayList<String>();
             for (int j = 0; j < currClassRels.size(); ++j) {
-                relClasses.add(currClassRels.get(j).partner);
+                if (currClassRels.get(j).sOd.equals("dest")) {
+                    relClasses.add(currClassRels.get(j).partner);
+                }
             }
 
             // Add all other classes that do not have a relationship with the current
@@ -805,7 +811,9 @@ public class UMLGUI implements ActionListener{
             // Keep a list of classes that have a relationship with the current class
             ArrayList<String> relClasses = new ArrayList<String>();
             for (int j = 0; j < currClassRels.size(); ++j) {
-                relClasses.add(currClassRels.get(j).partner);
+                if (currClassRels.get(j).sOd.equals("dest")) {
+                    relClasses.add(currClassRels.get(j).partner);
+                }
             }
 
             // Add all other classes that do not have a relationship with the current
@@ -835,7 +843,7 @@ public class UMLGUI implements ActionListener{
             // Keep a list of classes that have a relationship with the current class
             ArrayList<ArrayList<String>> relClassesDests = new ArrayList<ArrayList<String>>();
             for (int j = 0; j < currClassRels.size(); ++j) {
-                if (currClassRels.get(j).sOd.equals("src")) {
+                if (currClassRels.get(j).sOd.equals("dest")) {
                     ArrayList<String> nameType = new ArrayList<String>(2);
 
                     nameType.add(currClassRels.get(j).partner);
@@ -1228,6 +1236,9 @@ public class UMLGUI implements ActionListener{
         } 
         // FILE COMMANDS
         if (command.equals("Save")){
+            // Make an images folder to be the main home for exported pictures
+            new File("saves").mkdirs();
+
             // Provide the user with a file chooser
             JFileChooser chooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter(
