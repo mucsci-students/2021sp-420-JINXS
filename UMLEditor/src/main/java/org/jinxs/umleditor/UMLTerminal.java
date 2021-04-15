@@ -34,6 +34,7 @@ import org.jline.reader.LineReader.Option;
 import org.jline.reader.impl.DefaultParser;
 import org.jline.reader.impl.DefaultParser.Bracket;
 import org.jline.reader.impl.LineReaderImpl;
+import org.jline.reader.impl.completer.AggregateCompleter;
 import org.jline.reader.impl.completer.ArgumentCompleter;
 import org.jline.reader.impl.completer.StringsCompleter;
 import org.jline.terminal.*;
@@ -44,6 +45,7 @@ public class UMLTerminal{
 
     private static Terminal terminal;
     private static LineReader reader;
+    private AggregateCompleter comp;
 
     // fields that we will use
     static BufferedReader brHelpDoc; 
@@ -57,14 +59,15 @@ public class UMLTerminal{
 
     public UMLTerminal(){
         project = new UMLEditor();
+        comp = new UMLTabCompleter().update(project);
     }
 
     public void build(){
         project = new UMLEditor();
-
+        comp = new UMLTabCompleter().update(project);
         try{
             terminal = TerminalBuilder.builder().system(true).build();
-            reader = LineReaderBuilder.builder().terminal(terminal).build();
+            reader = LineReaderBuilder.builder().terminal(terminal).completer(comp).build();
             boolean result = true;
 
             while(result){
