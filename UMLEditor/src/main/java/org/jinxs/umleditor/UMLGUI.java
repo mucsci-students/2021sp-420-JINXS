@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.LayoutManager;
 import javax.swing.border.Border;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.BorderFactory;
 import java.util.*;
 import java.awt.event.*;
@@ -1227,17 +1228,80 @@ public class UMLGUI implements ActionListener{
         } 
         // FILE COMMANDS
         if (command.equals("Save")){
-            String saveName = getText("Save Name: "); 
-            saveWithLocations(saveName);
+            // Provide the user with a file chooser
+            JFileChooser chooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "JSON Save Files", "json");
+            chooser.setFileFilter(filter);
+            int returnVal = chooser.showOpenDialog(window);
+
+            if(returnVal == JFileChooser.APPROVE_OPTION) {
+                // Split up the selected file into its name and filepath
+                String fPath = chooser.getSelectedFile().getAbsolutePath();
+                int lastSlash = -1;
+                if (fPath.contains("\\")) {
+                    lastSlash = fPath.lastIndexOf("\\");
+                } else if (fPath.contains("/")) {
+                    lastSlash = fPath.lastIndexOf("/");
+                } else {
+                    saveWithLocations(fPath, null);
+                    return;
+                }
+
+                saveWithLocations(fPath.substring(lastSlash + 1), fPath.substring(0, lastSlash + 1));
+            }
         } 
         if (command.equals("Load")){
-            String loadName = getText("Name of save to load: "); 
-            loadWithLocations(loadName);
-            refresh();
+            // Provide the user with a file chooser
+            JFileChooser chooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "JSON Save Files", "json");
+            chooser.setFileFilter(filter);
+            int returnVal = chooser.showOpenDialog(window);
+
+            if(returnVal == JFileChooser.APPROVE_OPTION) {
+                // Split up the selected file into its name and filepath
+                String fPath = chooser.getSelectedFile().getAbsolutePath();
+                int lastSlash = -1;
+                if (fPath.contains("\\")) {
+                    lastSlash = fPath.lastIndexOf("\\");
+                } else if (fPath.contains("/")) {
+                    lastSlash = fPath.lastIndexOf("/");
+                } else {
+                    saveWithLocations(fPath, null);
+                    return;
+                }
+
+                loadWithLocations(fPath.substring(lastSlash + 1), fPath.substring(0, lastSlash + 1));
+                refresh();
+            }
         } 
         if (command.equals("Export as Image")) {
-            String saveName = getText("Save Name: ");
-            saveToImage(saveName);
+            // Make an images folder to be the main home for exported pictures
+            new File("images").mkdirs();
+
+            // Provide the user with a file chooser
+            JFileChooser chooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "PNG Images", "png");
+            chooser.setFileFilter(filter);
+            int returnVal = chooser.showOpenDialog(window);
+
+            if(returnVal == JFileChooser.APPROVE_OPTION) {
+                // Split up the selected file into its name and filepath
+                String fPath = chooser.getSelectedFile().getAbsolutePath();
+                int lastSlash = -1;
+                if (fPath.contains("\\")) {
+                    lastSlash = fPath.lastIndexOf("\\");
+                } else if (fPath.contains("/")) {
+                    lastSlash = fPath.lastIndexOf("/");
+                } else {
+                    saveWithLocations(fPath, null);
+                    return;
+                }
+                
+                saveToImage(fPath.substring(lastSlash + 1), fPath.substring(0, lastSlash + 1));
+            }
         }
         if (command.equals("Undo")){
             undo();
@@ -1270,7 +1334,8 @@ public class UMLGUI implements ActionListener{
     // Saves the content of the JFrame to a BufferedImage and outputs it to a png
     // file
     // with the specified file name
-    public void saveToImage(String fileName) {
+    public void saveToImage(String fileName, String filePath) {
+        // Save the content of te JFrame to a BufferedImage
         Container content = window.getContentPane();
         BufferedImage img = new BufferedImage(content.getWidth(), content.getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = img.createGraphics();
@@ -1279,8 +1344,9 @@ public class UMLGUI implements ActionListener{
 
         g2d.dispose();
 
+        // Save the image to a file
         try {
-            ImageIO.write(img, "png", new File(fileName + ".png"));
+            ImageIO.write(img, "png", new File(filePath + fileName + ".png"));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -1301,21 +1367,30 @@ public class UMLGUI implements ActionListener{
         }
     }
 
-    public void saveWithLocations (String saveName) {
-        // Save all classes to a JSON file excluding their coordinates
-        project.save(saveName, null);
-
+    public void saveWithLocations (String fileName, String filePath) {
         // Save the current locations of the panels so they can be
         // added to the JSON file that was just made
         saveLocations();
 
         // Make a new parser to read back through the JSON file
         JSONParser jPar = new JSONParser();
+
+        // Get rid of the .json extension
+        if (fileName.endsWith(".json")) {
+            fileName = fileName.substring(0, fileName.length() - 5);
+        }
+
+        // Save to the default location if no filePath is specified
+        if (filePath != null) {
+            project.save(fileName, filePath);
+        } else {
+            project.save(fileName, null);
+            filePath = "saves/" + fileName;
+        }
         
         // Attempt to read the filename in the "saves" directory specified by 
         // the user or catch resulting exceptions if/when that fails
-        // String filePath = new File("").getAbsolutePath();
-        try (FileReader reader = new FileReader("saves/" + saveName + ".json")) {
+        try (FileReader reader = new FileReader(filePath + fileName + ".json")) {
             // Save the JSON array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
@@ -1337,7 +1412,7 @@ public class UMLGUI implements ActionListener{
                     }
                 }
             }
-            try (FileWriter file = new FileWriter("saves/" + saveName + ".json")) {
+            try (FileWriter file = new FileWriter(filePath + fileName + ".json")) {
                 file.write(classList.toJSONString());
                 file.flush();
             } catch (IOException e) {
@@ -1348,17 +1423,27 @@ public class UMLGUI implements ActionListener{
         }
     }
 
-    public void loadWithLocations (String loadName) {
-        // Load the UML classes into the GUI
-        project.load(loadName, null);
+    public void loadWithLocations (String fileName, String filePath) {
+        // Get rid of the .json extension
+        if (fileName.endsWith(".json")) {
+            fileName = fileName.substring(0, fileName.length() - 5);
+        }
+
+        // Load from the default location if no filePath is specified
+        if (filePath != null) {
+            project.load(fileName, filePath);
+        } else {
+            project.load(fileName, null);
+            filePath = "saves/" + fileName;
+        }
+
         getFromProject(project);
         updateAllDropdowns();
 
         // Create a JSON parser
         JSONParser jPar = new JSONParser();
 
-        String filePath = new File("").getAbsolutePath();
-        try (FileReader reader = new FileReader("saves/" + loadName + ".json")) {
+        try (FileReader reader = new FileReader(filePath + fileName + ".json")) {
             // Save the JSON classes array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
