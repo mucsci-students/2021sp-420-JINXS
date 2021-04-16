@@ -111,7 +111,7 @@ public class UMLTerminalTest {
         terminal.interpreter(testString);
         testString.clear();
 
-        String expected = "Class name cannot start with a number\n";
+        String expected = "The class name \"1class\" is not valid\n";
 
         assertEquals("Adding a class starting with a number fails", expected, getOutput().replaceAll("\r", ""));
     }
@@ -129,7 +129,7 @@ public class UMLTerminalTest {
         terminal.interpreter(testString);
         testString.clear();
 
-        String expected = "The class name cannot contain special characters or spaces\n";
+        String expected = "The class name \"class^\" is not valid\n";
 
         assertEquals("Adding a class with a special character fails", expected, getOutput().replaceAll("\r", ""));
     }
