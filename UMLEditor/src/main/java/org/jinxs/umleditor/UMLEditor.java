@@ -73,10 +73,9 @@ public class UMLEditor {
         System.out.println("The requested class to delete does not exist");
     }
 
-    /*
-    * 
-    */
-    public void renameClass(String oldName, String newName) {
+    // Rename's a class with the oldName to the newName
+    // Returns true if successful, false if not
+    public boolean renameClass(String oldName, String newName) {
         // Ensure the class name does not contain special characters (except for '_')
         // By matching with a regex
         Pattern p = Pattern.compile("[^a-z0-9_ ]", Pattern.CASE_INSENSITIVE);
@@ -85,12 +84,28 @@ public class UMLEditor {
 
         if (containsSpecChars) {
             System.out.println("The class name cannot contain special characters or spaces");
-            return;
+            return false;
         }
 
-        UMLClass newNameClass = classExists(oldName);
-        if (newNameClass != null) {
-            newNameClass.name = newName;
+        // Check if the new name is already a class that exists
+        UMLClass classWithNewName = null;
+        Iterator<UMLClass> iter = classes.iterator();
+        while (iter.hasNext()) {
+            classWithNewName = iter.next();
+            if (classWithNewName.name.equals(newName)) {
+                System.out.println("Class with the name \"" + newName + "\" already exists");
+                return false;
+            }
+        }
+
+        // Find the class that is being renamed and make sure it exists
+        UMLClass classToRename = classExists(oldName);
+
+        if (classToRename == null) {
+            return false;
+        } else {
+            classToRename.name = newName;
+            return true;
         }
     }
     
@@ -435,7 +450,7 @@ public class UMLEditor {
         
         // Determines if our class is source prints out the relationships
         for(int i = 0; i < rels.size(); ++i){
-            if(rels.get(i).sOd.equals("src")){
+            if(rels.get(i).sOd.equals("dest")){
                 System.out.println("\t" + rels.get(i).partner + " - Type: " + rels.get(i).type);
             }
         }
@@ -443,16 +458,10 @@ public class UMLEditor {
     
         // Determines if our class is destination and prints out the relationships
         for(int i = 0; i < rels.size(); ++i){
-            if(rels.get(i).sOd.equals("dest")){
+            if(rels.get(i).sOd.equals("src")){
                 System.out.println("\t" + rels.get(i).partner + " - Type: " + rels.get(i).type);
             }
         }
-
-        // System.out.print("Relationship Type: ");
-        // // Print relations
-        // for(int i = 0; i < rels.size(); ++i){
-        //     System.out.println(rels.get(i).get(2));
-        // }
     }
 
     public void printClassContents(String className) {
@@ -508,8 +517,6 @@ public class UMLEditor {
 
         // Write out the JSON class array to the desired filename and put it in the "saves" directory
         // and catch IOExceptions if they occur (which will result in a stack trace)
-        // Make a "saves" directory in the umleditor to hold JSON save files
-        new File("saves").mkdirs();
         if (filePath != null) {
             filePath += fileName + ".json";
         } else {

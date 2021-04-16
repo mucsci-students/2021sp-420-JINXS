@@ -1001,20 +1001,22 @@ public class UMLGUI implements ActionListener{
                 return;
             }
             saveToMeme(true);
-            project.renameClass(args[1], newName);
-            
-            // Change the panel's name in the panels array so its
-            // location will stay the same when calling resetLocation
-            for (int i = 0; i < panels.size(); ++i) {
-                if (panels.get(i).getName().equals(args[1])) {
-                    panels.get(i).setName(newName);
-                    break;
+            if (project.renameClass(args[1], newName)) {
+                // Change the panel's name in the panels array so its
+                // location will stay the same when calling resetLocation
+                for (int i = 0; i < panels.size(); ++i) {
+                    if (panels.get(i).getName().equals(args[1])) {
+                        panels.get(i).setName(newName);
+                        break;
+                    }
                 }
-            }
 
-            getFromProject(project);
-            updateAllDropdowns();
-            refresh();
+                getFromProject(project);
+                updateAllDropdowns();
+                refresh();
+            } else {
+                removeLastSave();
+            }
         }
         // RELATIONSHIP COMMANDS
         if (args[0].equals("AddRelationship")){
@@ -1242,9 +1244,6 @@ public class UMLGUI implements ActionListener{
         } 
         // FILE COMMANDS
         if (command.equals("Save")){
-            // Make an images folder to be the main home for exported pictures
-            new File("saves").mkdirs();
-
             // Provide the user with a file chooser
             JFileChooser chooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter(
@@ -1294,9 +1293,6 @@ public class UMLGUI implements ActionListener{
             }
         } 
         if (command.equals("Export as Image")) {
-            // Make an images folder to be the main home for exported pictures
-            new File("images").mkdirs();
-
             // Provide the user with a file chooser
             JFileChooser chooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter(
@@ -1655,6 +1651,10 @@ public class UMLGUI implements ActionListener{
     public void redo() {
         loadFromMeme(false);
         updateAllDropdowns();
+    }
+
+    public void removeLastSave() {
+        undoMeme.loadState();
     }
 
     public static JPanel findPanel(String className){
