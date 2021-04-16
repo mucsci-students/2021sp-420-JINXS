@@ -176,11 +176,15 @@ public class UMLGUI implements ActionListener{
                                     }
                                 }
 
-                                if (shouldDrawCap && !isInverse())
+                                g2d.setStroke(SOLID_STROKE);
+                                drawCap(g2d, isDiamond, type);
+                                /*
+                                if (shouldDrawCap)
                                 {
                                     g2d.setStroke(SOLID_STROKE);
                                     drawCap(g2d, isDiamond, type);
                                 }
+                                */
                         }
         
                     } 
