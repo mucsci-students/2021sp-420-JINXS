@@ -794,11 +794,11 @@ public class UMLTerminalTest {
             "    param <class1, method1, param1, newParamName>       Renames the given parameter from the specified class\n" +
             "    allParams <class1, method1, type1, param1, ...>     Changes all the parameters from the specified class\n" +
             "\n" +
-            "change\n" +
-            "    relType <class1, class2, newRelType>                Changes the type of relationship\n" +
-            "    fieldType <class1, field1, newDataType>             Changes the data type of a field\n" +
-            "    methodType <class1, method1, newReturnType>         Changes the return type of a method\n" +
-            "    paramType <class1, method1, param1, newDataType>    Changes the data type of a parameter\n" +
+            "retype\n" +
+            "    rel <class1, class2, newRelType>                Changes the type of relationship\n" +
+            "    field <class1, field1, newDataType>             Changes the data type of a field\n" +
+            "    method <class1, method1, newReturnType>         Changes the return type of a method\n" +
+            "    param <class1, method1, param1, newDataType>    Changes the data type of a parameter\n" +
             "\n" +
             "\n" +
             "printList                   Prints the names of all existing classes\n" +

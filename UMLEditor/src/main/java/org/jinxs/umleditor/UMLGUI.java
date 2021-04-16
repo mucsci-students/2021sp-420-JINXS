@@ -81,6 +81,12 @@ public class UMLGUI implements ActionListener{
 
     // Constructs the GUI by building and adding the menus
     public UMLGUI() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            if (System.getProperty("os.name").equals("Mac OS X")) {
+                System.setProperty("apple.laf.useScreenMenuBar", "true");
+            }
+        } catch (Exception e) {}
         umlWindow();
         undoMeme = new Memento();
         redoMeme = new Memento();
