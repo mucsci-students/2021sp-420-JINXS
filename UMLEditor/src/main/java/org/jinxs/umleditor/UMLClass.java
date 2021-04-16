@@ -2,33 +2,19 @@ package org.jinxs.umleditor;
 
 import java.util.ArrayList;
 
-// For building a JSON object for the class
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 
 public class UMLClass {
+    
     // Name of this class
     public String name;
     // List of related classes
-    // "src" or "dest" defines whether className is the source or destination to
-    // this class, type defines the type of relationship between the classes
-    // {
-    // {"className1", "src/dest", "type"},
-    // {"className2", "src/dest", "type"},
-    // {"className3", "src/dest", "type"}
-    // }
     private ArrayList<UMLRel> relationships;
     // List of fields of this class
     private ArrayList<UMLField> fields;
     // List of methods of this class
-    // The first item of each method's arraylist contains its name, any succeding
-    // strings in the method's arraylist are the names of its parameters
-    // {
-    // {"methodName1", "param1", "param2", ...},
-    // {"methodName2", "param1", "param2", ...},
-    // {"methodName3", "param1", "param2", ...}
-    // }
     private ArrayList<UMLMethod> methods;
 
     // Constructs this new UMLClass given a class name
