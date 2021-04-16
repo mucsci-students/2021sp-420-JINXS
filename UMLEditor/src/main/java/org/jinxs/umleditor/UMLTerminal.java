@@ -3,43 +3,18 @@ package org.jinxs.umleditor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.io.FileReader;
-import java.io.FileNotFoundException;
-import java.util.StringTokenizer;
 import java.io.BufferedReader;
 import java.io.File;
-import java.util.Scanner;
-
-// Save and load imports
-// For writing out to a file when saving
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
 
-// For the JSON array of classes to be written to file
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-
-// For Jline functionality
-import org.jline.builtins.*;
-import org.jline.builtins.Completers.TreeCompleter;
-import org.jline.builtins.Options.HelpException;
-import org.jline.keymap.BindingReader;
-import org.jline.keymap.KeyMap;
 import org.jline.reader.*;
-import org.jline.reader.LineReader.Option;
-import org.jline.reader.impl.DefaultParser;
-import org.jline.reader.impl.DefaultParser.Bracket;
-import org.jline.reader.impl.LineReaderImpl;
 import org.jline.reader.impl.completer.AggregateCompleter;
-import org.jline.reader.impl.completer.ArgumentCompleter;
-import org.jline.reader.impl.completer.StringsCompleter;
 import org.jline.terminal.*;
-import org.jline.utils.*;
-import org.jline.utils.InfoCmp.Capability;
 
 public class UMLTerminal{
 
@@ -157,7 +132,9 @@ public class UMLTerminal{
                         }
                         else{
                             project.saveToMeme(true);
-                            project.addAttr(commands.get(2), commands.get(4), commands.get(1), commands.get(3));
+                            if (!project.addAttr(commands.get(2), commands.get(4), commands.get(1), commands.get(3))) {
+                                project.removeLastSave();
+                            }
                         }
                     break;
 
@@ -167,9 +144,13 @@ public class UMLTerminal{
                         }
                         else{
                             project.saveToMeme(true);
-                            project.addAttr(commands.get(2), commands.get(4),commands.get(1), commands.get(3));
-                            for(int i = 5; i < commands.size(); i += 2){
-                                project.addParam(commands.get(2), commands.get(4), commands.get(i + 1), commands.get(i));
+                            if (!project.addAttr(commands.get(2), commands.get(4),commands.get(1), commands.get(3))) {
+                                project.removeLastSave();
+                            }
+                            else {
+                                for(int i = 5; i < commands.size(); i += 2){
+                                    project.addParam(commands.get(2), commands.get(4), commands.get(i + 1), commands.get(i));
+                                }
                             }
                         }
                     break; 
@@ -278,7 +259,9 @@ public class UMLTerminal{
                         }
                         else{
                             project.saveToMeme(true);
-                            project.renameClass(commands.get(2),commands.get(3));
+                            if (!project.renameClass(commands.get(2),commands.get(3))) {
+                                project.removeLastSave();
+                            }
                         }
                     break;
 
@@ -291,7 +274,9 @@ public class UMLTerminal{
                         }
                         else{
                             project.saveToMeme(true);
-                            project.renameAttr(commands.get(2), commands.get(3), commands.get(4), commands.get(1));
+                            if (!project.renameAttr(commands.get(2), commands.get(3), commands.get(4), commands.get(1))) {
+                                project.removeLastSave();
+                            }
                         }
                     break;
 
@@ -303,7 +288,9 @@ public class UMLTerminal{
                             System.out.println("Too many Arguments for renameMethod command");
                         }
                         project.saveToMeme(true);
-                        project.renameAttr(commands.get(2), commands.get(3),commands.get(4),commands.get(1));
+                        if (!project.renameAttr(commands.get(2), commands.get(3),commands.get(4),commands.get(1))) {
+                            project.removeLastSave();
+                        }
                     break; 
                     
                     case "param":
@@ -311,7 +298,9 @@ public class UMLTerminal{
                             System.out.println("Too few Arguments for renameParam command");
                         }
                         project.saveToMeme(true);
-                        project.changeParamName(commands.get(2), commands.get(3), commands.get(4), commands.get(5));
+                        if (!project.changeParamName(commands.get(2), commands.get(3), commands.get(4), commands.get(5))) {
+                            project.removeLastSave();
+                        }
                     break; 
 
                     case "allParams":
@@ -325,7 +314,9 @@ public class UMLTerminal{
                             pTypes.add(commands.get(i));
                         }
                         project.saveToMeme(true);
-                        project.changeAllParams(commands.get(2), commands.get(3), params, pTypes);
+                        if (!project.changeAllParams(commands.get(2), commands.get(3), params, pTypes)) {
+                            project.removeLastSave();
+                        }
                     break; 
 
                     default:
@@ -353,7 +344,9 @@ public class UMLTerminal{
                             System.out.println("Too many Arguments for change fieldType command");
                         } else {
                             project.saveToMeme(true);
-                            project.changeFieldType(commands.get(2), commands.get(3), commands.get(4));
+                            if (!project.changeFieldType(commands.get(2), commands.get(3), commands.get(4))) {
+                                project.removeLastSave();
+                            }
                         }
                     break;
 
@@ -364,7 +357,9 @@ public class UMLTerminal{
                             System.out.println("Too many Arguments for change fieldType command");
                         } else {
                             project.saveToMeme(true);
-                            project.changeMethodType(commands.get(2), commands.get(3), commands.get(4));
+                            if (!project.changeMethodType(commands.get(2), commands.get(3), commands.get(4))) {
+                                project.removeLastSave();
+                            }
                         }
                     break;
 
@@ -375,7 +370,9 @@ public class UMLTerminal{
                             System.out.println("Too many Arguments for change fieldType command");
                         } else {
                             project.saveToMeme(true);
-                            project.changeParamType(commands.get(2), commands.get(3), commands.get(4), commands.get(5));
+                            if (!project.changeParamType(commands.get(2), commands.get(3), commands.get(4), commands.get(5))) {
+                                project.removeLastSave();
+                            }
                         }
                     break;
                 }
