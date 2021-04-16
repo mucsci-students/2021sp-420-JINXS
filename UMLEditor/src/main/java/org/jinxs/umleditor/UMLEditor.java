@@ -2,6 +2,7 @@ package org.jinxs.umleditor;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import javax.lang.model.SourceVersion;
 // For writing out to a file when saving
 import java.io.FileWriter;
 import java.io.File;
@@ -32,22 +33,11 @@ public class UMLEditor {
     }
 
     // Adds a class to the list of classes given a new class name that is not already in use
-    public void addClass(String className) {
+    public boolean addClass(String className) {
         // Ensure the class name does not start with a number
-        if (Character.isDigit(className.charAt(0))) {
-            System.out.println("Class name cannot start with a number");
-            return;
-        }
-
-        // Ensure the class name does not contain special characters (except for '_')
-        // By matching with a regex
-        Pattern p = Pattern.compile("[^a-z0-9_]", Pattern.CASE_INSENSITIVE);
-        Matcher m = p.matcher(className);
-        boolean containsSpecChars = m.find();
-
-        if (containsSpecChars) {
-            System.out.println("The class name cannot contain special characters or spaces");
-            return;
+        if (!validName(className)) {
+            System.out.println("The class name \"" + className + "\" is not valid");
+            return false;
         }
 
         classes.ensureCapacity(classes.size() + 1);
@@ -55,11 +45,11 @@ public class UMLEditor {
         for (int i = 0; i < classes.size(); ++i) {
             if (classes.get(i).name.equals(className)) {
                 System.out.println("The requested class name already exists");
-                return;
+                return false;
             }
         }
         // Add the new class to the list of classes
-        classes.add(new UMLClass(className));
+        return classes.add(new UMLClass(className));
     }
 
     // Deletes a class from the list of classes given a class name that exists
@@ -420,6 +410,9 @@ public class UMLEditor {
         return null;
     }
 
+    public boolean validName(String name) {
+        return SourceVersion.isName(name);
+    }
 
 
 
@@ -726,6 +719,10 @@ public class UMLEditor {
 
     public void redo() {
         loadFromMeme(false);
+    }
+
+    public void removeLastSave() {
+        undoMeme.loadState();
     }
 
     // No-op function to ensure that the UMLEditor did not encounter issues while being constructed

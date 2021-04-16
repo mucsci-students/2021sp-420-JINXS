@@ -129,7 +129,9 @@ public class UMLTerminal{
                         }
                         else{
                             project.saveToMeme(true);
-                            project.addClass(commands.get(2));
+                            if (!project.addClass(commands.get(2))) {
+                                project.removeLastSave();
+                            }
                         }
                     break;
 
