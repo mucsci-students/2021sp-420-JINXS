@@ -94,11 +94,41 @@ public class UMLEditorTest {
     @Test
     public void renameClassTest() {
         UMLEditor editor = new UMLEditor();
+
+        // Rename a simple class
         editor.addClass("className");
         editor.renameClass("className", "newName");
 
         assertEquals("Class list should contain one class", editor.getClasses().size(), 1);
         assertEquals("Class name should be newName", editor.getClasses().get(0).name, "newName");
+
+        // Rename a class that doesn't exist (should fail)
+        editor.renameClass("className", "class1");
+
+        assertEquals("Class list should contain one class", editor.getClasses().size(), 1);
+        assertEquals("Class name should be newName", editor.getClasses().get(0).name, "newName");
+
+        // Rename a class to a name that already exists (should fail)
+        editor.addClass("class1");
+        editor.renameClass("class1", "newName");
+
+        assertEquals("Class list should contain two classes", editor.getClasses().size(), 2);
+        assertEquals("First class should be newName", editor.getClasses().get(0).name, "newName");
+        assertEquals("Second class should be class1", editor.getClasses().get(1).name, "class1");
+
+        // Rename a class that doesn't exist to a name that already exists (should fail)
+        editor.renameClass("class2", "newNam1");
+
+        assertEquals("Class list should contain two classes", editor.getClasses().size(), 2);
+        assertEquals("First class should be newName", editor.getClasses().get(0).name, "newName");
+        assertEquals("Second class should be class1", editor.getClasses().get(1).name, "class1");
+
+        // Rename a class to an illegal name (should fail)
+        editor.renameClass("class1", "name#");
+
+        assertEquals("Class list should contain two classes", editor.getClasses().size(), 2);
+        assertEquals("First class should be newName", editor.getClasses().get(0).name, "newName");
+        assertEquals("Second class should be class1", editor.getClasses().get(1).name, "class1");
     }
 
     // RELATIONSHIP TESTS: ADD, DELETE, CHANGETYPE

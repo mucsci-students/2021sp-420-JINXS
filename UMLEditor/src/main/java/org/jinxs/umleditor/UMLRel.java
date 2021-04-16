@@ -3,6 +3,7 @@ package org.jinxs.umleditor;
 public class UMLRel {
 
     public String partner;
+    // Describes the status of the partner in relation to the class that holds this relationship
     public String sOd;
     public String type;
 
