@@ -603,10 +603,8 @@ public class UMLEditor {
 
                     // Add the relationship in the correct order based on whether the
                     // current class is the source or destination
-                    if (relStatus.equals("src")){
+                    if (relStatus.equals("dest")){
                         this.addRel(className, (String) relation.get("className"), relType);
-                    } else { // status == dest
-                        this.addRel((String) relation.get("className"), className, relType);
                     }
                 }
 
