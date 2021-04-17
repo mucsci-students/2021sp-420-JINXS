@@ -2,7 +2,7 @@ package org.jinxs.umleditor;
 
 import java.util.ArrayList;
 
-public class UMLMethod {
+public class UMLMethod implements UMLAttr{
     
     public String name;
     public String type;

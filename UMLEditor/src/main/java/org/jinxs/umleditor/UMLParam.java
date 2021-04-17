@@ -1,6 +1,6 @@
 package org.jinxs.umleditor;
 
-public class UMLParam {
+public class UMLParam implements UMLAttr{
     
     public String name;
     public String type;
