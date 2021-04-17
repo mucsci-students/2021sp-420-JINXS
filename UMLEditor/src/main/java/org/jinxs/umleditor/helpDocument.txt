@@ -15,7 +15,7 @@ delete
     field <class1>                                      Deletes the given field from the specified class
     method <class1>                                     Deletes the given method from the specified class
     param <class1, method1, param1>                     Deletes the given parameter from the specified class
-    allParams <class1,method1>                          Deletes all parameters from the specified class
+    allParams <class1, method1>                         Deletes all parameters from the specified class
 
 rename
     class <class1, newName>                             Renames a class to a new specified class name
@@ -31,12 +31,13 @@ retype
     param <class1, method1, param1, newDataType>    Changes the data type of a parameter
 
 
-printList                   Prints the names of all existing classes
-printContents <class1>      Prints the contents of a given class
-printRel <class1>           Prints the all the relationships between classes
-help                        Prints a help document with all viable commands
-quit                        Exits the the program
-save <fileName>             Saves the project into a JSON file
-load <fileName>             Loads a project from a JSON file
-undo                        Restores the previous state before the last command called
-redo                        Restores the state reversed by calling undo
+copy <className, newClassName>  Copies an existing class and names it to a new name
+printList                       Prints the names of all existing classes
+printContents <class1>          Prints the contents of a given class
+printRel <class1>               Prints the all the relationships between classes
+help                            Prints a help document with all viable commands
+quit                            Exits the the program
+save <fileName>                 Saves the project into a JSON file
+load <fileName>                 Loads a project from a JSON file
+undo                            Restores the previous state before the last command called
+redo                            Restores the state reversed by calling undo

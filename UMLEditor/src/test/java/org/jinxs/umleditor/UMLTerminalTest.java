@@ -785,7 +785,7 @@ public class UMLTerminalTest {
             "    field <class1>                                      Deletes the given field from the specified class\n" +
             "    method <class1>                                     Deletes the given method from the specified class\n" +
             "    param <class1, method1, param1>                     Deletes the given parameter from the specified class\n" +
-            "    allParams <class1,method1>                          Deletes all parameters from the specified class\n" +
+            "    allParams <class1, method1>                         Deletes all parameters from the specified class\n" +
             "\n" +
             "rename\n" +
             "    class <class1, newName>                             Renames a class to a new specified class name\n" +
@@ -801,15 +801,16 @@ public class UMLTerminalTest {
             "    param <class1, method1, param1, newDataType>    Changes the data type of a parameter\n" +
             "\n" +
             "\n" +
-            "printList                   Prints the names of all existing classes\n" +
-            "printContents <class1>      Prints the contents of a given class\n" +
-            "printRel <class1>           Prints the all the relationships between classes\n" +
-            "help                        Prints a help document with all viable commands\n" +
-            "quit                        Exits the the program\n" +
-            "save <fileName>             Saves the project into a JSON file\n" +
-            "load <fileName>             Loads a project from a JSON file\n" +
-            "undo                        Restores the previous state before the last command called\n" +
-            "redo                        Restores the state reversed by calling undo\n";
+            "copy <className, newClassName>  Copies an existing class and names it to a new name\n" +
+            "printList                       Prints the names of all existing classes\n" +
+            "printContents <class1>          Prints the contents of a given class\n" +
+            "printRel <class1>               Prints the all the relationships between classes\n" +
+            "help                            Prints a help document with all viable commands\n" +
+            "quit                            Exits the the program\n" +
+            "save <fileName>                 Saves the project into a JSON file\n" +
+            "load <fileName>                 Loads a project from a JSON file\n" +
+            "undo                            Restores the previous state before the last command called\n" +
+            "redo                            Restores the state reversed by calling undo\n";
 
         assertEquals("Help command prints the help doc", expected, getOutput().replaceAll("\r", ""));
     }
@@ -1002,17 +1003,17 @@ public class UMLTerminalTest {
         
         terminal.interpreter(testString);
         testString.clear();
- 
+
         testString.add("redo");
         
         terminal.interpreter(testString);
         testString.clear();
- 
+
         testString.add("redo");
         
         terminal.interpreter(testString);
         testString.clear();
- 
+
         testString.add("printList");
         
         terminal.interpreter(testString);
@@ -1021,5 +1022,27 @@ public class UMLTerminalTest {
         String expected = "class1\n";
 
         assertEquals("There should only be one class", expected, getOutput().replaceAll("\r", ""));
+    }
+
+    @Test
+    public void copyClassTest() {
+        ArrayList<String> testString = new ArrayList<String>();
+
+        UMLTerminal terminal = new UMLTerminal();
+
+        testString.add("add");
+        testString.add("class");
+        testString.add("class1");
+
+        terminal.interpreter(testString);
+        testString.clear();
+
+        testString.add("copy");
+        testString.add("class1");
+        testString.add("class2");
+
+        String expected = "";
+
+        assertEquals("Adding a simple relationship succeeds", expected, getOutput().replaceAll("\r", ""));
     }
 }

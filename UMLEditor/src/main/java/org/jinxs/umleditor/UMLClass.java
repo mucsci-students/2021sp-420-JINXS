@@ -26,6 +26,16 @@ public class UMLClass {
         methods = new ArrayList<UMLMethod>(defaultSize);
     }
 
+    // Copy constructor
+    // Constructs a new UMLClass given another UMLClass
+    public UMLClass(UMLClass copyBase, String newName) {
+        final int defaultSize = 100;
+        name = newName;
+        relationships = new ArrayList<UMLRel>(defaultSize);
+        fields = new ArrayList<UMLField>(copyBase.getFields());
+        methods = new ArrayList<UMLMethod>(copyBase.getMethods());
+    }
+
     // Returns the list of relationships
     public ArrayList<UMLRel> getRels() {
         return relationships;
