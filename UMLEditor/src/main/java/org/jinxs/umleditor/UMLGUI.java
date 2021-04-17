@@ -37,7 +37,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 // Mouse detection imports
-// Xavier & Nate
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseAdapter;
@@ -53,6 +52,7 @@ public class UMLGUI implements ActionListener{
 
     private static JPanel panel;
     private static ArrayList<JPanel> panels = new ArrayList<JPanel>();
+    private static ArrayList<RelArrow> relPanels = new ArrayList<RelArrow>();
     private static ArrayList<ArrayList<String>> classLocations = new ArrayList<ArrayList<String>>(); 
 
     // Undo/Redo momento variables
@@ -62,22 +62,6 @@ public class UMLGUI implements ActionListener{
     // handleDrag global coordinates
     int x;
     int y;
-
-     //draw arrow globals
-     final static float THICKNESS = 3;
-     final static float DASH_ARRAY[] = {10};
-     final static BasicStroke SOLID_STROKE = new BasicStroke(THICKNESS);
-     final static BasicStroke DASHED_STROKE = new BasicStroke(THICKNESS, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, DASH_ARRAY, 0);
- 
-     final static int CAP_MAJOR_LENGTH = 16;
-     final static int CAP_MINOR_LENGTH = 8;
- 
-     private static JPanel panelFrom;
-     private static JPanel panelTo;
-     private static Point from = new Point();
-     private static Point to = new Point();
-     private static boolean isHorizontal;
-     private static boolean isReverse;
 
     // Constructs the GUI by building and adding the menus
     public UMLGUI() {
@@ -106,91 +90,7 @@ public class UMLGUI implements ActionListener{
      // Creates the GUI window and adds each menu list to the menu bar
      public static void umlWindow(){
         // Gives the window a name
-        window = new JFrame("Graphical UML Editor"){
-            @Override
-            public void paint (Graphics g){
-        
-                super.paint(g); // paints background
-        
-                Graphics2D g2d = (Graphics2D) g;
-        
-                // Create a panel for each relationship in the project
-        
-                ArrayList<UMLClass> classes = project.getClasses(); 
-                for (int i = 0; i < classes.size(); ++i) {
-                    ArrayList<UMLRel> rels = classes.get(i).getRels();
-                    for(int j = 0; j < rels.size(); ++j){
-                        String partner = rels.get(j).partner; //needs first element of rels
-                        String srcDes = rels.get(j).sOd; //needs second element of rels
-                        String type = rels.get(j).type;  //needs third element of rels
-        
-                        JPanel curr = findPanel(classes.get(i).name);
-                        JPanel otherClass = findPanel(partner);
-
-                        panelFrom = curr; 
-                        panelTo = otherClass; 
-
-                        if(srcDes.equals("dest")){
-                            calculateEndpoints(); 
-
-                                g2d.setColor(Color.PINK);
-                                if (type.equals("realization") || type.equals("composition"))
-                                {
-                                    g2d.setStroke(DASHED_STROKE);
-                                }
-                                else
-                                {
-                                    g2d.setStroke(SOLID_STROKE);
-                                }
-
-                                boolean isDiamond = (type.equals("aggregation") || type.equals("composition"));
-                                int capSize = isDiamond ? CAP_MAJOR_LENGTH * 2 : CAP_MAJOR_LENGTH;
-                                boolean shouldDrawCap;
-
-                                if (curr == otherClass)
-                                {
-                                    int offsetX = from.x + panelFrom.getWidth() / 2;
-                                    int offsetY = to.y - panelFrom.getHeight() / 2;
-                                    g2d.draw(new Line2D.Float(from.x, from.y + 50, offsetX, from.y));
-                                    g2d.draw(new Line2D.Float(offsetX, from.y + 50, offsetX, offsetY));
-                                    g2d.draw(new Line2D.Float(offsetX, offsetY, to.x, offsetY));
-                                    g2d.draw(new Line2D.Float(to.x, offsetY, to.x, to.y));
-                                    shouldDrawCap = (Math.abs(to.y - offsetY) > capSize);
-                                }
-                                else{
-                                    if (isHorizontal)
-                                    {
-                                        int midwayX = (from.x + to.x) / 2;
-                                        g2d.draw(new Line2D.Float(from.x, from.y  + 50, midwayX, from.y));
-                                        g2d.draw(new Line2D.Float(midwayX, from.y + 50, midwayX, to.y));
-                                        g2d.draw(new Line2D.Float(midwayX, to.y, to.x, to.y));
-                                        shouldDrawCap = (Math.abs(to.x - midwayX) > capSize);
-                                    }
-                                    else
-                                    {
-                                        int midwayY = (from.y + to.y) / 2;
-                                        g2d.draw(new Line2D.Float(from.x, from.y + 50, from.x, midwayY));
-                                        g2d.draw(new Line2D.Float(from.x, midwayY, to.x, midwayY));
-                                        g2d.draw(new Line2D.Float(to.x, midwayY, to.x, to.y));
-                                        shouldDrawCap = (Math.abs(to.y - midwayY) > capSize);
-                                    }
-                                }
-
-                                g2d.setStroke(SOLID_STROKE);
-                                drawCap(g2d, isDiamond, type);
-                                /*
-                                if (shouldDrawCap)
-                                {
-                                    g2d.setStroke(SOLID_STROKE);
-                                    drawCap(g2d, isDiamond, type);
-                                }
-                                */
-                        }
-        
-                    } 
-                }
-            }
-        };
+        window = new JFrame("Graphical UML Editor");
 
         // The layout for the window is set to null to allow the user to move classes to
         // any desired location on the GUI
@@ -366,6 +266,47 @@ public class UMLGUI implements ActionListener{
 
             // Allow the panel to be draggable
             handleDrag(panel);
+        }
+        
+        // Once all class panels are added, rel arrow panels can be added
+        createRelArrows();
+    }
+
+    private static void createRelArrows () {
+        // Delete all relPanels on the GUI to redraw the current state of the project
+        // to the GUI
+        for(int i = 0; i < relPanels.size(); i++){
+            window.remove(relPanels.get(i));
+        }
+        relPanels.clear();
+
+        ArrayList<UMLClass> classes = project.getClasses(); 
+        for (int i = 0; i < classes.size(); ++i) {
+            ArrayList<UMLRel> rels = classes.get(i).getRels();
+            for(int j = 0; j < rels.size(); ++j){
+                String partner = rels.get(j).partner; //needs first element of rels
+                String srcDes = rels.get(j).sOd; //needs second element of rels
+                String type = rels.get(j).type;  //needs third element of rels
+
+                JPanel curr = findPanel(classes.get(i).name);
+                JPanel otherClass = findPanel(partner);
+
+                //panelFrom = curr; 
+                //panelTo = otherClass; 
+
+                if(srcDes.equals("dest")){
+                    RelArrow arrow = new RelArrow(curr, otherClass, type);
+                    arrow.setVisible(true);
+                    arrow.setOpaque(false);
+                    arrow.setLocation(0, 0);
+                    arrow.setSize(window.getSize());
+                    window.add(arrow);
+
+                    relPanels.add(arrow);
+
+                    refresh();
+                }
+            }
         }
     }
 
@@ -1674,7 +1615,6 @@ public class UMLGUI implements ActionListener{
     /************************************************************
     * handleDrag method makes the classes draggable by mouse
     * interaction
-    * Xavier & Nate
     ************************************************************/
     public void handleDrag(final JPanel panel){
         panel.addMouseListener(new MouseAdapter() {
@@ -1690,149 +1630,10 @@ public class UMLGUI implements ActionListener{
             public void mouseDragged(MouseEvent me) {
                 me.translatePoint(me.getComponent().getLocation().x-x, me.getComponent().getLocation().y-y);
                 panel.setLocation(me.getX(), me.getY());
-                window.repaint();
+                createRelArrows();
             }
         });
     }
-
-    private static void calculateEndpoints()
-    {        
-        if (panelFrom == panelTo)
-        {
-            from.x = panelFrom.getX() + panelFrom.getWidth();
-            from.y = panelFrom.getY() + (panelFrom.getHeight() / 2);
-            to.x = panelFrom.getX() + (panelFrom.getWidth() / 2);
-            to.y = panelFrom.getY();
-            return;
-        }
-
-        int xDist = panelTo.getX() - panelFrom.getX();
-        int yDist = panelTo.getY() - panelFrom.getY();
-
-        if(Math.abs(xDist) > Math.abs(yDist))
-        {
-            //Arrow mostly horizontal
-            if(xDist > 0)
-            {
-                //Left to right
-                from.x = panelFrom.getX() + panelFrom.getWidth();
-                to.x = panelTo.getX();
-            }
-            else
-            {
-                //Right to left
-                from.x = panelFrom.getX();
-                to.x = panelTo.getX() + panelTo.getWidth();
-
-            }
-            from.y = panelFrom.getY() + (panelFrom.getHeight() / 2);
-            to.y = panelTo.getY() + (panelTo.getHeight() / 2);
-        }
-        else
-        {
-            //Arrow mostly vertical
-            if(yDist > 0)
-            {
-                //Top to bottom 
-                from.y = panelFrom.getY() + panelFrom.getHeight();
-                to.y = panelTo.getY();
-            }
-            else
-            {
-                //Bottom to top
-                from.y = panelFrom.getY();
-                to.y = panelTo.getY() + panelTo.getHeight();
-            }
-            from.x = panelFrom.getX() + (panelFrom.getWidth() / 2);
-            to.x = panelTo.getX() + (panelTo.getWidth() / 2);
-        }
-    }
-
-    private static void drawCap(Graphics2D g2d, boolean isDiamond, String type)
-    {
-        Polygon cap = new Polygon();
-        cap.addPoint(to.x, to.y);
-        if (isHorizontal)
-        {
-            if (isReverse)
-            {
-                cap.addPoint(to.x + CAP_MAJOR_LENGTH, to.y - CAP_MINOR_LENGTH);
-                if (isDiamond)
-                {
-                    cap.addPoint(to.x + (CAP_MAJOR_LENGTH * 2), to.y);
-                }
-                cap.addPoint(to.x + CAP_MAJOR_LENGTH, to.y + CAP_MINOR_LENGTH);
-            }
-            else
-            {
-                cap.addPoint(to.x - CAP_MAJOR_LENGTH, to.y - CAP_MINOR_LENGTH);
-                if (isDiamond)
-                {
-                    cap.addPoint(to.x - (CAP_MAJOR_LENGTH * 2), to.y);
-                }
-                cap.addPoint(to.x - CAP_MAJOR_LENGTH, to.y + CAP_MINOR_LENGTH);
-            }
-        }
-        else
-        {
-            if (isReverse)
-            {
-                cap.addPoint(to.x + CAP_MINOR_LENGTH, to.y + CAP_MAJOR_LENGTH);
-                if (isDiamond)
-                {
-                    cap.addPoint(to.x, to.y + (CAP_MAJOR_LENGTH * 2));
-                }
-                cap.addPoint(to.x - CAP_MINOR_LENGTH, to.y + CAP_MAJOR_LENGTH);
-            }
-            else
-            {
-                cap.addPoint(to.x + CAP_MINOR_LENGTH, to.y - CAP_MAJOR_LENGTH);
-                if (isDiamond)
-                {
-                    cap.addPoint(to.x, to.y - (CAP_MAJOR_LENGTH * 2));
-                }
-                cap.addPoint(to.x - CAP_MINOR_LENGTH, to.y - CAP_MAJOR_LENGTH);
-            }
-        }
-        g2d.draw(cap);
-        if (!type.equals("composition"))
-        {
-            g2d.setColor(Color.PINK);
-        }
-        g2d.fill(cap);
-    }
-
-    private static boolean isInverse()
-    {
-        if (panelFrom == panelTo)
-        {
-            return false;
-        }
-        if (isHorizontal)
-        {
-            if (isReverse)
-            {
-                return from.x < to.x;
-            }
-            else
-            {
-                return from.x > to.x;
-            }
-        }
-        else
-        {
-            if (isReverse)
-            {
-                return from.y < to.y;
-            }
-            else
-            {
-                return from.y > to.y;
-            }
-        }
-    }
-
-
 
    public static void main(String[] args) throws IOException{   
     try{
