@@ -587,9 +587,9 @@ public class UMLEditor {
         // Write out the JSON class array to the desired filename and put it in the "saves" directory
         // and catch IOExceptions if they occur (which will result in a stack trace)
         if (filePath != null) {
-            filePath += fileName + ".json";
+            filePath += fileName;
         } else {
-            filePath = "saves/" + fileName + ".json";
+            filePath = fileName;
         }
         try (FileWriter file = new FileWriter(filePath)) {
             file.write(classJArray.toJSONString());
@@ -627,9 +627,9 @@ public class UMLEditor {
         JSONParser jPar = new JSONParser();
 
         if (filePath != null) {
-            filePath += fileName + ".json";
+            filePath += fileName;
         } else {
-            filePath = "saves/" + fileName + ".json";
+            filePath = fileName;
         }
         
         // Attempt to read the filename in the "saves" directory specified by 

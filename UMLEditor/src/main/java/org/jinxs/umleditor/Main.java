@@ -4,7 +4,7 @@ public class Main{
     public static void main(String[] args) {
         
         if (args.length == 0) {
-            UMLGUI gui = new UMLGUI();
+            new UMLGUI();
         }
         else if (args.length > 0) {
             if (args.length == 1 && args[0].equals("--cli")) {

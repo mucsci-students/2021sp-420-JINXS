@@ -1333,9 +1333,9 @@ public class UMLGUI implements ActionListener{
         // Make a new parser to read back through the JSON file
         JSONParser jPar = new JSONParser();
 
-        // Get rid of the .json extension
-        if (fileName.endsWith(".json")) {
-            fileName = fileName.substring(0, fileName.length() - 5);
+        // Add the .json extension
+        if (!fileName.endsWith(".json")) {
+            fileName += ".json";
         }
 
         // Save to the default location if no filePath is specified
@@ -1343,12 +1343,12 @@ public class UMLGUI implements ActionListener{
             project.save(fileName, filePath);
         } else {
             project.save(fileName, null);
-            filePath = "saves/" + fileName;
+            filePath = fileName;
         }
         
         // Attempt to read the filename in the "saves" directory specified by 
         // the user or catch resulting exceptions if/when that fails
-        try (FileReader reader = new FileReader(filePath + fileName + ".json")) {
+        try (FileReader reader = new FileReader(filePath + fileName)) {
             // Save the JSON array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
@@ -1370,7 +1370,7 @@ public class UMLGUI implements ActionListener{
                     }
                 }
             }
-            try (FileWriter file = new FileWriter(filePath + fileName + ".json")) {
+            try (FileWriter file = new FileWriter(filePath + fileName)) {
                 file.write(classList.toJSONString());
                 file.flush();
             } catch (IOException e) {
@@ -1382,9 +1382,9 @@ public class UMLGUI implements ActionListener{
     }
 
     public void loadWithLocations (String fileName, String filePath) {
-        // Get rid of the .json extension
-        if (fileName.endsWith(".json")) {
-            fileName = fileName.substring(0, fileName.length() - 5);
+        // Add the .json extension
+        if (!fileName.endsWith(".json")) {
+            fileName += ".json";
         }
 
         // Load from the default location if no filePath is specified
@@ -1392,7 +1392,7 @@ public class UMLGUI implements ActionListener{
             project.load(fileName, filePath);
         } else {
             project.load(fileName, null);
-            filePath = "saves/" + fileName;
+            filePath = fileName;
         }
 
         getFromProject(project);
@@ -1401,7 +1401,7 @@ public class UMLGUI implements ActionListener{
         // Create a JSON parser
         JSONParser jPar = new JSONParser();
 
-        try (FileReader reader = new FileReader(filePath + fileName + ".json")) {
+        try (FileReader reader = new FileReader(filePath + fileName)) {
             // Save the JSON classes array from the parser
             Object obj = jPar.parse(reader);
             JSONArray classList = (JSONArray) obj;
