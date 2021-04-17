@@ -1,6 +1,6 @@
 package org.jinxs.umleditor;
 
-public class UMLField {
+public class UMLField implements UMLAttr{
     
     public String name;
     public String type;
