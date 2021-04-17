@@ -7,6 +7,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -51,7 +53,14 @@ public class UMLTerminal{
                     String line = null;
                     line = reader.readLine("$ ", null, (MaskingCallback) null, null);
                     line = line.trim();
-                    ArrayList<String> commands = new ArrayList<String>(Arrays.asList(line.split(" ")));
+                    ArrayList<String> commands;
+                    if (line.startsWith("save") || line.startsWith("load")) {
+                        commands = new ArrayList<String>();
+                        commands.add(line.substring(0, 4));
+                        commands.add(line.substring(5));
+                    } else {
+                        commands = new ArrayList<String>(Arrays.asList(line.split(" ")));
+                    }
                     result = interpreter(commands);
                 }
                 catch (Exception e) {
@@ -396,43 +405,29 @@ public class UMLTerminal{
                     System.out.println("Too many Arguments for save command");
                 }
                 else{
-                    int lastSlash = -1;
-                    if (commands.get(1).contains("\\")) {
-                        lastSlash = commands.get(1).lastIndexOf("\\");
-                    } else if (commands.get(1).contains("/")) {
-                        lastSlash = commands.get(1).lastIndexOf("/");
-                    } else {
-                        project.save(commands.get(1), null);
-                        restoreLoadCoords(commands.get(1), null);
-                        break;
+                    String path = commands.get(1);
+                    if (!path.endsWith(".json")) {
+                        path += ".json";
                     }
-                    project.save(commands.get(1).substring(lastSlash + 1), commands.get(1).substring(0, lastSlash + 1));
-                    restoreLoadCoords(commands.get(1).substring(lastSlash + 1), commands.get(1).substring(0, lastSlash + 1));
+                    Path p = Paths.get(path);
+                    p = p.toAbsolutePath();
+
+                    project.save(p.getFileName().toString(), p.getParent().toString() + "/");
+                    restoreLoadCoords(p.getFileName().toString(), p.getParent().toString() + "/");
                 }
             break;
 
             //Loads a project from a named JSON file
             case "load":
-                if(commands.size() < 2){
-                    System.out.println("Too few Arguments for load command");
+                String path = commands.get(1);
+                if (!path.endsWith(".json")) {
+                    path += ".json";
                 }
-                else if(commands.size() > 2){
-                    System.out.println("Too many Arguments for load command");
-                }
-                else{
-                    int lastSlash = -1;
-                    if (commands.get(1).contains("\\")) {
-                        lastSlash = commands.get(1).lastIndexOf("\\");
-                    } else if (commands.get(1).contains("/")) {
-                        lastSlash = commands.get(1).lastIndexOf("/");
-                    } else {
-                        project.load(commands.get(1), null);
-                        storeLoadCoords(commands.get(1), null);
-                        break;
-                    }
-                    project.load(commands.get(1).substring(lastSlash + 1), commands.get(1).substring(0, lastSlash + 1));
-                    storeLoadCoords(commands.get(1).substring(lastSlash + 1), commands.get(1).substring(0, lastSlash + 1));
-                }
+                Path p = Paths.get(path);
+                p = p.toAbsolutePath();
+
+                project.load(p.getFileName().toString(), p.getParent().toString() + "/");
+                storeLoadCoords(p.getFileName().toString(), p.getParent().toString() + "/");
             break;
 
             //Prints all the classes in the project
@@ -536,9 +531,9 @@ public class UMLTerminal{
         JSONParser jPar = new JSONParser();
 
         if (filePath != null) {
-            filePath += fileName + ".json";
+            filePath += fileName;
         } else {
-            filePath = "saves/" + fileName + ".json";
+            filePath = fileName;
         }
 
         // Open the file that was just loaded
@@ -577,9 +572,9 @@ public class UMLTerminal{
         JSONParser jPar = new JSONParser();
 
         if (filePath != null) {
-            filePath += fileName + ".json";
+            filePath += fileName;
         } else {
-            filePath = "saves/" + fileName + ".json";
+            filePath = fileName;
         }
         
         // Attempt to read the filename in the "saves" directory specified by 
