@@ -15,6 +15,7 @@ import org.json.simple.parser.JSONParser;
 import org.jline.reader.*;
 import org.jline.reader.impl.completer.AggregateCompleter;
 import org.jline.terminal.*;
+import org.jline.utils.InfoCmp.Capability;
 
 public class UMLTerminal{
 
@@ -71,6 +72,15 @@ public class UMLTerminal{
         }
 
         switch (commands.get(0)) { 
+
+            // Continues to the next line without printing an error
+            case "":
+            break;
+
+            // Clears the terminal
+            case "clear":
+                terminal.puts(Capability.clear_screen);
+            break;
 
             //Exits the program
             case "quit":
@@ -473,6 +483,19 @@ public class UMLTerminal{
                     System.out.println("Too many Arguments for redo command");
                 } else {
                     project.redo();
+                }
+            break;
+
+            case "copy":
+                if (commands.size() < 3) {
+                    System.out.println("Too few Arguments for copy command");
+                } else if (commands.size() > 3) {
+                    System.out.println("Too many Arguments for copy command");
+                } else {
+                    project.saveToMeme(true);
+                    if (!project.copyClass(commands.get(1), commands.get(2))) {
+                        project.removeLastSave();
+                    }
                 }
             break;
 

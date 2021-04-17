@@ -409,4 +409,35 @@ public class UMLEditorTest {
         assertTrue("classExists should find the class class1", editor.classExists("class1") != null);
     }
 
+    @Test
+    public void copyEmtpyClassTest() {
+        UMLEditor editor = new UMLEditor();
+
+        editor.addClass("class1");
+        editor.copyClass("class1", "class2");
+
+        assertEquals("New class should be named class2", "class2", editor.getClasses().get(1).name);
+        assertEquals("class1 and class2 should have the same fields", editor.getClasses().get(0).getFields(), editor.getClasses().get(1).getFields());
+        assertEquals("class1 and class2 should have the same methods", editor.getClasses().get(0).getMethods(), editor.getClasses().get(1).getMethods());
+    }
+
+    @Test
+    public void copyComplicatedClassTest() {
+        UMLEditor editor = new UMLEditor();
+
+        editor.addClass("class1");
+        editor.addClass("class3");
+        editor.addRel("class1", "class3", "inheritance");
+        editor.addAttr("class1", "field1", "field", "int");
+        editor.addAttr("class1", "method1", "method", "int");
+        editor.addParam("class1", "method1", "param1", "int");
+        editor.copyClass("class1", "class2");
+
+        assertEquals("New class should be named class2", "class2", editor.getClasses().get(2).name);
+        assertEquals("class1 and class2 should have the same fields", editor.getClasses().get(0).getFields(), editor.getClasses().get(2).getFields());
+        assertEquals("class1 and class2 should have the same methods", editor.getClasses().get(0).getMethods(), editor.getClasses().get(2).getMethods());
+        assertEquals("class1 and class2 should have a relationship with class3", editor.getClasses().get(0).getRels().get(0).partner, editor.getClasses().get(2).getRels().get(0).partner);
+        assertEquals("class1 and class2 should have an inheritance relationship with class3", editor.getClasses().get(0).getRels().get(0).type, editor.getClasses().get(2).getRels().get(0).type);
+        assertEquals("class1 and class2 should both be the source in the relationship with class3", editor.getClasses().get(0).getRels().get(0).sOd, editor.getClasses().get(2).getRels().get(0).sOd);
+    }
 }

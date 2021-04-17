@@ -95,7 +95,37 @@ public class UMLEditor {
             return true;
         }
     }
-    
+
+    // Duplicates the requested class and gives it a new name
+    public boolean copyClass(String oldClass, String newClass) {
+        UMLClass copyBase = classExists(oldClass);
+        if (copyBase == null) {
+            System.out.println("The class \"" + oldClass + "\" cannot be copied since it doesn't exist");
+            return false;
+        }
+
+        // Check if the new name is already a class that exists
+        UMLClass classWithNewName = null;
+        Iterator<UMLClass> iter = classes.iterator();
+        while (iter.hasNext()) {
+            classWithNewName = iter.next();
+            if (classWithNewName.name.equals(newClass)) {
+                System.out.println("Class with the name \"" + newClass + "\" already exists");
+                return false;
+            }
+        }
+
+        classes.add(new UMLClass(copyBase, newClass));
+        for (UMLRel rel : copyBase.getRels()) {
+            if (rel.sOd.equals("src")) {
+                addRel(rel.partner, newClass, rel.type);
+            } else {
+                addRel(newClass, rel.partner, rel.type);
+            }
+            
+        }
+        return true;
+    }
 
     // Adds a relationship between class1 and class2 where class1 is the source
     // and class2 is the destination
