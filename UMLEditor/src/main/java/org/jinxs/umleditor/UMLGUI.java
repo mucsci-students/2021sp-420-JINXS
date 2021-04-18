@@ -3,33 +3,24 @@ package org.jinxs.umleditor;
 import javax.swing.JOptionPane;
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.GridLayout;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.LayoutManager;
-import javax.swing.border.Border;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.BorderFactory;
 import java.util.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.awt.geom.*; 
 
 // Save and load imports
 // For writing out to a file when saving
 import java.io.FileWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
+
+import org.jinxs.umleditor.Builder.ClassText;
+import org.jinxs.umleditor.Builder.FieldText;
+import org.jinxs.umleditor.Builder.GUIClassPanel;
+import org.jinxs.umleditor.Builder.GUIClassPanelBuilder;
+import org.jinxs.umleditor.Builder.MethodText;
 
 // For the JSON array of classes to be written to file
 import org.json.simple.JSONArray;
@@ -50,8 +41,8 @@ public class UMLGUI implements ActionListener{
 
     private static UMLEditor project = new UMLEditor(); 
 
-    private static JPanel panel;
-    private static ArrayList<JPanel> panels = new ArrayList<JPanel>();
+    private static GUIClassPanel panel;
+    private static ArrayList<GUIClassPanel> panels = new ArrayList<GUIClassPanel>();
     private static ArrayList<RelArrow> relPanels = new ArrayList<RelArrow>();
     private static ArrayList<ArrayList<String>> classLocations = new ArrayList<ArrayList<String>>(); 
 
@@ -130,130 +121,13 @@ public class UMLGUI implements ActionListener{
         // Create a panel for each class in the project
         ArrayList<UMLClass> classes = project.getClasses(); 
         for (int i = 0; i < classes.size(); ++i) {
-            panel = new JPanel();
+            UMLClass currClass = classes.get(i);
+            
+            panel = new GUIClassPanelBuilder(new ClassText(currClass), new FieldText(currClass), new MethodText(currClass)).getResult();
 
-            // Each panel uses a vertical box layout so that the class name comes first
-            // followed by the fields then methods in a vertical display
-            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            panel.setName(currClass.name);
 
             window.add(panel); 
-
-            // Create the textarea that holds the name of the class
-		    JTextArea classTxt = new JTextArea(classes.get(i).name);
-            classTxt.setEditable(false);
-           
-            // Set the initial size of the panel to just fit the class name
-            panel.setSize((int)classTxt.getPreferredSize().getWidth(), 20);
-
-            // Set the name of the panel to the name of the class it holds
-            // so it can be identified and its location can be saved later
-            panel.setName(classTxt.getText());
-
-            // Give the class name a green border
-		    Border bdClass = BorderFactory.createLineBorder(Color.GREEN);
-		    classTxt.setBorder(bdClass);
-
-            // Add the textarea to the panel
-            panel.add(classTxt);
-
-            // Store the fields for the current class
-            ArrayList<UMLField> fields = classes.get(i).getFields();
-
-            // If fields exist in the project for the current class, add them to a textarea with 
-            // each on their own line
-            // The size of the panel will also adjust its height and width to hold each new field
-            if(fields.size() > 0){
-                String str = ""; 
-                for(int j = 0; j < fields.size(); j++){
-                    // Make the panel 20 pixels taller for each field
-                    panel.setSize(panel.getWidth(), (panel.getHeight() + 20));
-
-                    String field = fields.get(j).name;
-                    String fType = fields.get(j).type;
-
-                    // Fence-post problem: only add a new line character for each
-                    // field beyond the first one
-                    if (j != 0){
-                        str += "\n"; 
-                    } 
-                    str += fType + " " + field;
-                }
-                // Add all of the fields to  JTextArea
-                JTextArea fieldsText = new JTextArea(str);
-                fieldsText.setEditable(false);
-
-                // Change the width of the panel if a field is longer than the current width
-                panel.setSize(Math.max((int)fieldsText.getPreferredSize().getWidth(), panel.getWidth()), panel.getHeight());
-
-                // Add the panel to the window
-                panel.add(fieldsText);
-
-                // Give the fields a blue border
-                Border bdField = BorderFactory.createLineBorder(Color.BLUE);
-                fieldsText.setBorder(bdField);
-            }
-
-            // Get and store the methods from the project
-            ArrayList<UMLMethod> methods = classes.get(i).getMethods();
-
-            // If methods exist in the project for this class, add them to a textarea with each on 
-            // their own line 
-            // The size of the panel will also adjust its height and width to hold each new method
-            if (methods.size() > 0) {
-                String methodString = "";
-
-                for(int j = 0; j < methods.size(); j++) {
-                    // Make the panel 20 pixels taller for each method
-                    panel.setSize(panel.getWidth(), (panel.getHeight() + 20));
-                    
-                    String methodName = methods.get(j).name;
-                    String methodType = methods.get(j).type;
-
-                    // Fencepost problem: only add a newline before every method
-                    // after the first one
-                    if (j != 0) {
-                        methodString += "\n";
-                    }
-
-                    // Put the fields for the current method in parentheses like an actual method
-                    methodString += methodType + " " + methodName + "(";
-
-                    ArrayList<UMLParam> params = methods.get(j).params;
-
-                    for(int k = 0; k < params.size(); ++k){
-                        String param = params.get(k).name;
-                        String type = params.get(k).type;
-                        // Fencepost problem: only add a comma if another param exists
-                        // beyond the first
-                        if (k != 0) {
-                            methodString += ", ";
-                        }
-                        methodString += type + " " + param;
-                    }
-                    // Complete the param part of the string with a paren and semicolon like a real method
-                    methodString += ");";
-                }
-                // Build a textarea from the methods string that was constructed
-                JTextArea methodText = new JTextArea(methodString);
-                methodText.setEditable(false);
-
-                // Update the panel's width if the length of a method exceeds the current width
-                panel.setSize(Math.max((int)methodText.getPreferredSize().getWidth(), panel.getWidth()), panel.getHeight());
-
-                // Add the methods textarea to the panel
-                panel.add(methodText);
-
-                // Give the methods/params an orange border
-                Border bdField = BorderFactory.createLineBorder(Color.ORANGE);
-                methodText.setBorder(bdField);
-            }
-
-            panel.setSize(panel.getWidth() + 8, panel.getHeight() + 8);
-            
-            // Put a black border around the entire class panel so its boundaries
-            // are visible
-            Border bdPanel = BorderFactory.createLineBorder(Color.BLACK, 4);
-            panel.setBorder(bdPanel);
 
             repaintPanel();
 
@@ -290,9 +164,6 @@ public class UMLGUI implements ActionListener{
 
                 JPanel curr = findPanel(classes.get(i).name);
                 JPanel otherClass = findPanel(partner);
-
-                //panelFrom = curr; 
-                //panelTo = otherClass; 
 
                 if(srcDes.equals("dest")){
                     RelArrow arrow = new RelArrow(curr, otherClass, type);
@@ -926,7 +797,8 @@ public class UMLGUI implements ActionListener{
             }
             saveToMeme(true);
             project.addClass(classToAdd);
-            getFromProject(project); 
+            getFromProject(project);
+            createRelArrows(); 
             updateAllDropdowns();
             refresh();
             return;
@@ -935,6 +807,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true);
             project.deleteClass(args[1]);
             getFromProject(project); 
+            createRelArrows();
             updateAllDropdowns();
             refresh(); 
         }
@@ -957,6 +830,7 @@ public class UMLGUI implements ActionListener{
                 }
 
                 getFromProject(project);
+                createRelArrows();
                 updateAllDropdowns();
                 refresh();
             } else {
@@ -968,6 +842,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true);
             project.addRel(args[1], args[2], args[3]);
             getFromProject(project);
+            createRelArrows();
             updateRelDropdowns();
             refresh();
         } 
@@ -975,6 +850,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true);
             project.changeRelType(args[1], args[2], args[3]);
             getFromProject(project);
+            createRelArrows();
             updateRelDropdowns();
             refresh();
         } 
@@ -982,6 +858,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true);
             project.delRel(args[1], args[2]);
             getFromProject(project);
+            createRelArrows();
             updateRelDropdowns();
             refresh();
         } 
@@ -997,6 +874,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true);
             project.addAttr(args[1], fieldToAdd, "field", fieldType);
             getFromProject(project);
+            createRelArrows();
             updateFieldDropdowns();
             refresh();
         } 
@@ -1004,6 +882,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true);
             project.delAttr(args[1], args[2], "field");
             getFromProject(project);
+            createRelArrows();
             updateFieldDropdowns();
             refresh();
         } 
@@ -1017,6 +896,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true);
             project.changeFieldType(args[1], args[2], newFieldType);
             getFromProject(project);
+            createRelArrows();
             updateFieldDropdowns();
             refresh();
         } 
@@ -1030,6 +910,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true);
             project.renameAttr(args[1], args[2], newField, "field");
             getFromProject(project);
+            createRelArrows();
             updateFieldDropdowns();
             refresh();
         } 
@@ -1045,6 +926,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true);
             project.addAttr(args[1], methodToAdd, "method", methodType);
             getFromProject(project);
+            createRelArrows();
             updateMethodDropdowns();
             updateParameterDropdowns();
             refresh();
@@ -1053,6 +935,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true);
             project.delAttr(args[1], args[2], "method");
             getFromProject(project);
+            createRelArrows();
             updateMethodDropdowns();
             updateParameterDropdowns();
             refresh();
@@ -1068,6 +951,7 @@ public class UMLGUI implements ActionListener{
             project.changeMethodType(args[1], args[2], newMethodType);
             updateMethodDropdowns();
             getFromProject(project);
+            createRelArrows();
             updateParameterDropdowns();
             refresh();
         } 
@@ -1082,6 +966,7 @@ public class UMLGUI implements ActionListener{
             project.renameAttr(args[1], args[2], newMethodName, "method");
             updateMethodDropdowns();
             getFromProject(project);
+            createRelArrows();
             updateParameterDropdowns();
             refresh();
         } 
@@ -1097,6 +982,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true);
             project.addParam(args[1], args[2], paramToAdd, paramType);
             getFromProject(project);
+            createRelArrows();
             updateParameterDropdowns();
             refresh();
         } 
@@ -1104,6 +990,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true); 
             project.deleteParam(args[1], args[2], args[3]);
             getFromProject(project);
+            createRelArrows();
             updateParameterDropdowns();
             refresh();
         } 
@@ -1111,6 +998,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true);
             project.deleteAllParams(args[1], args[2]);
             getFromProject(project);
+            createRelArrows();
             updateParameterDropdowns();
             refresh();
         } 
@@ -1124,6 +1012,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true);
             project.changeParamType(args[1], args[2], args[3], newType);
             getFromProject(project);
+            createRelArrows();
             updateParameterDropdowns();
             refresh();
         } 
@@ -1137,6 +1026,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true);
             project.changeParamName(args[1], args[2], args[3], newParam);
             getFromProject(project);
+            createRelArrows();
             updateParameterDropdowns();
             refresh();
         } 
@@ -1185,6 +1075,7 @@ public class UMLGUI implements ActionListener{
             saveToMeme(true);
             project.changeAllParams(args[1], args[2], paramNames, paramTypes);
             getFromProject(project);
+            createRelArrows();
             refresh();
         } 
         // FILE COMMANDS
@@ -1229,7 +1120,7 @@ public class UMLGUI implements ActionListener{
                 } else if (fPath.contains("/")) {
                     lastSlash = fPath.lastIndexOf("/");
                 } else {
-                    saveWithLocations(fPath, null);
+                    loadWithLocations(fPath, null);
                     return;
                 }
 
@@ -1254,7 +1145,7 @@ public class UMLGUI implements ActionListener{
                 } else if (fPath.contains("/")) {
                     lastSlash = fPath.lastIndexOf("/");
                 } else {
-                    saveWithLocations(fPath, null);
+                    saveToImage(fPath, null);
                     return;
                 }
                 
@@ -1264,11 +1155,13 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Undo")){
             undo();
             getFromProject(project);
+            createRelArrows();
             refresh();
         } 
         if (command.equals("Redo")){
             redo();
             getFromProject(project);
+            createRelArrows();
             refresh();
         } 
         if (command.equals("Exit")){
@@ -1424,6 +1317,7 @@ public class UMLGUI implements ActionListener{
                         } catch (Exception e) {
                             continue;
                         }
+                        createRelArrows();
                         repaintPanel();
                         refresh();
                         updateAllDropdowns();
@@ -1563,6 +1457,7 @@ public class UMLGUI implements ActionListener{
                 }
 
                 getFromProject(project);
+                createRelArrows();
 
                 // Loop through each panel that was loaded to the GUI to see if it
                 // has coordinates saved in the JSON file it was loaded from
