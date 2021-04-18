@@ -155,7 +155,7 @@ public class UMLClass {
         if (type.equals("field")){
             for (int i = 0; i < fields.size(); ++i) {
                 if (fields.get(i).name.equals(newName)) {
-                    System.out.println("field \"" + newName + "\" is already an field of class \"" + name + "\"");
+                    System.out.println("Field \"" + newName + "\" is already a field of class \"" + name + "\"");
                     return false;
                 }
             }
@@ -170,7 +170,7 @@ public class UMLClass {
         }else if (type.equals("method")){
             for (int i = 0; i < methods.size(); ++i) {
                 if (methods.get(i).name.equals(newName)) {
-                    System.out.println("Method \"" + newName + "\" is already an method of class \"" + name + "\"");
+                    System.out.println("Method \"" + newName + "\" is already a method of class \"" + name + "\"");
                     return false;
                 }
             }
