@@ -1,11 +1,7 @@
 package org.jinxs.umleditor;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
@@ -297,7 +293,7 @@ public class UMLTerminalTest {
         terminal.interpreter(testString);
         testString.clear();
 
-        String expected = "Class does not exsist\n";
+        String expected = "Class does not exist\n";
 
         assertEquals("Adding a duplicate relationship fails", expected, getOutput().replaceAll("\r", ""));
     }
@@ -363,7 +359,7 @@ public class UMLTerminalTest {
         terminal.interpreter(testString);
         testString.clear();
 
-        String expected = "Field \"field1\" is already a field of class \"class1\n";
+        String expected = "Field \"field1\" is already a field of class \"class1\"\n";
 
         assertEquals("Adding a duplicate field fails", expected, getOutput().replaceAll("\r", ""));
     }
@@ -450,7 +446,7 @@ public class UMLTerminalTest {
         terminal.interpreter(testString);
         testString.clear();
 
-        String expected ="Method \"method1\" is already a method of class \"class1\n";
+        String expected ="Method \"method1\" is already a method of class \"class1\"\n";
 
         assertEquals("Adding a duplicate method fails", expected, getOutput().replaceAll("\r", ""));
     }
@@ -684,7 +680,7 @@ public class UMLTerminalTest {
         terminal.interpreter(testString);
         testString.clear();
 
-        String expected = "Relationship between \"class1\" and \"class2\" does not exsist\n";
+        String expected = "Relationship between \"class1\" and \"class2\" does not exist\n";
 
         assertEquals("Deleting a nonexistant relationship does nothing", expected, getOutput().replaceAll("\r", ""));
     }
