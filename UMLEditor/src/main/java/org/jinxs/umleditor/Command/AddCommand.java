@@ -64,8 +64,10 @@ public class AddCommand extends CLICommand{
             if (args.size() < 4) {
                 System.out.println("Too few Arguments for addMethod command");
                 return false;
-            }
-            else{
+            } else if ((args.size() % 2) != 0) {
+                System.out.println("There should be an odd total number of arguments for the addMethod command");
+                return false;
+            } else {
                 project.saveToMeme(true);
                 if (!project.addAttr(args.get(1), args.get(3),args.get(0), args.get(2))) {
                     project.removeLastSave();
@@ -82,8 +84,10 @@ public class AddCommand extends CLICommand{
             if (args.size() < 4) {
                 System.out.println("Too few Arguments for addParam command");
                 return false;
-            }
-            else{
+            } else if ((args.size() % 2) != 1) {
+                System.out.println("There should be an even total number of arguments for the addParam command");
+                return false;
+            } else {
                 project.saveToMeme(true);
                 for(int i = 3; i < args.size(); i += 2){
                     project.addParam(args.get(1), args.get(2), args.get(i + 1), args.get(i)); 
