@@ -162,7 +162,7 @@ public class UMLEditor {
         }
 
         if (c1 == null || c2 == null){
-            System.out.println("Class does not exsist");
+            System.out.println("Class does not exist");
             return;
         }
 
@@ -224,7 +224,7 @@ public class UMLEditor {
         }
 
         if (found == false){
-            System.out.println("Relationship between \"" + class1 + "\" and \"" + class2 + "\" does not exsist");
+            System.out.println("Relationship between \"" + class1 + "\" and \"" + class2 + "\" does not exist");
             return;
         }
 
@@ -251,7 +251,7 @@ public class UMLEditor {
                 || newType.equals("realization")) {
 
         } else if (!(newType.equals(""))) {
-            System.out.println("Missing a Type, Please try again");
+            System.out.println("Missing a type, please try again");
             return;
         } else {
             System.out.println("Type is invalid");
@@ -306,9 +306,9 @@ public class UMLEditor {
         // Notify the user of the resuls of the attribute addition
         if (!attrAdded) {
             if (attrType.equals("field")){
-                System.out.println("Field \"" + attrName + "\" is already a field of class \"" + className);
+                System.out.println("Field \"" + attrName + "\" is already a field of class \"" + className + "\"");
             }else{
-                System.out.println("Method \"" + attrName + "\" is already a method of class \"" + className);
+                System.out.println("Method \"" + attrName + "\" is already a method of class \"" + className + "\"");
             }
             return false;
         }
@@ -353,7 +353,7 @@ public class UMLEditor {
         }
 
         if (!validName(newAttr)) {
-            System.out.println("The " + type + " name \"" + newAttr + "\" is not valid");
+            System.out.println("The name \"" + newAttr + "\" is not valid");
             return false;
         }
         
