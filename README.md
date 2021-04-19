@@ -2,7 +2,7 @@
 
 This is a command line based UML Editor.
 
-Design patterns used in this project can be found [here](https://docs.google.com/document/d/1hxUT51G07pBQSvu6s3pGFEkdWPJ4yEN7tVUG1QJKwqw/edit?usp=sharing) or in the patterns.txt file in the code.
+Design patterns used in this project can be found in the patterns.txt file in the code.
 
 ### Installation
 
@@ -57,11 +57,6 @@ $ editor
 ```
 Add the --cli argument to launch in the command-line interface instead of the graphical interface
 
-A list of all available commands to operate the editor in the command-line interface can be viewed with the following command (use the above command to run the editor first)
-```
-$ help
-```
-
 #### Windows
 
 Run the following command to run the editor
@@ -71,10 +66,18 @@ $ .editor.cmd
 ```
 Add the --cli argument to launch in the command-line interface instead of the graphical interface
 
-A list of all available commands to operate the editor in the command-line interface can be viewed with the following command (use the above command to run the editor first)
+#### User Guide
+
+A list of all available commands to operate the editor in the command-line interface can be viewed with the following command (use the above command to run the editor first based on your OS)
+
 ```
 $ help
 ```
+The GUI can be interacted with by using the menu bar at the top when launched. Once classes have been added to the window, their location can be changed by dragging and dropping them from their border colored in black. (Full dragability to come in the future). Class attributes like fields, methods, and parameters are displayed in the class boxes themselves. Relationships are represented by arrows between the class boxes with the arrow coming out of the source of the relationship pointing to the source at the end of the arrow head
+
+Work can effectively be saved and loaded between both UIs of the program
+
+Thanks for using our program!
 
 ### Authors
 * @natshenk
