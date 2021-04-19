@@ -23,6 +23,19 @@ public class UMLClassTest  {
         // so they cannot be tested here
     }
 
+    @Test
+    public void testCopyConstructor() {
+        UMLClass c1 = new UMLClass("c1");
+        c1.addField("field1", "int");
+        c1.addMethod("method1", "int");
+        c1.addParam("method1", "param1", "int");
+        UMLClass c2 = new UMLClass(c1, "c2");
+
+        assertEquals("c1 and c2 should have the same fields", c1.getFields(), c2.getFields());
+        assertEquals("c1 and c2 should have the same methods", c1.getMethods(), c2.getMethods());
+        assertEquals("c2 should both have no relationships", true, c2.getRels().isEmpty());
+    }
+
 
     // RELATIONSHIP TESTS: ADD, DELETE, GET
     // --------------------------------------------

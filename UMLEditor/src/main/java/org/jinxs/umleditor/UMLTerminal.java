@@ -3,42 +3,26 @@ package org.jinxs.umleditor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.io.FileReader;
-import java.io.FileNotFoundException;
-import java.util.StringTokenizer;
 import java.io.BufferedReader;
 import java.io.File;
-import java.util.Scanner;
-
-// Save and load imports
-// For writing out to a file when saving
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-// For the JSON array of classes to be written to file
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-
-
-// For Jline functionality
-import org.jline.builtins.*;
-import org.jline.builtins.Completers.TreeCompleter;
-import org.jline.builtins.Options.HelpException;
-import org.jline.keymap.BindingReader;
-import org.jline.keymap.KeyMap;
+import org.jinxs.umleditor.Command.AddCommand;
+import org.jinxs.umleditor.Command.CopyCommand;
+import org.jinxs.umleditor.Command.DeleteCommand;
+import org.jinxs.umleditor.Command.PrintContentsCommand;
+import org.jinxs.umleditor.Command.PrintRelCommand;
+import org.jinxs.umleditor.Command.RenameCommand;
+import org.jinxs.umleditor.Command.RetypeCommand;
 import org.jline.reader.*;
-import org.jline.reader.LineReader.Option;
-import org.jline.reader.impl.DefaultParser;
-import org.jline.reader.impl.DefaultParser.Bracket;
-import org.jline.reader.impl.LineReaderImpl;
 import org.jline.reader.impl.completer.AggregateCompleter;
-import org.jline.reader.impl.completer.ArgumentCompleter;
-import org.jline.reader.impl.completer.StringsCompleter;
 import org.jline.terminal.*;
-import org.jline.utils.*;
 import org.jline.utils.InfoCmp.Capability;
 
 public class UMLTerminal{
@@ -75,7 +59,14 @@ public class UMLTerminal{
                     String line = null;
                     line = reader.readLine("$ ", null, (MaskingCallback) null, null);
                     line = line.trim();
-                    ArrayList<String> commands = new ArrayList<String>(Arrays.asList(line.split(" ")));
+                    ArrayList<String> commands;
+                    if (line.startsWith("save") || line.startsWith("load")) {
+                        commands = new ArrayList<String>();
+                        commands.add(line.substring(0, 4));
+                        commands.add(line.substring(5));
+                    } else {
+                        commands = new ArrayList<String>(Arrays.asList(line.split(" ")));
+                    }
                     result = interpreter(commands);
                 }
                 catch (Exception e) {
@@ -97,10 +88,19 @@ public class UMLTerminal{
 
         switch (commands.get(0)) { 
 
+            // Continues to the next line without printing an error
+            case "":
+            break;
+
+            // Clears the terminal
+            case "clear":
+                terminal.puts(Capability.clear_screen);
+            break;
+
             //Exits the program
             case "quit":
                 try{
-                terminal.close();
+                    terminal.close();
                 }
                 catch(IOException e){
                     System.out.println("Terminal failed to close");
@@ -117,270 +117,35 @@ public class UMLTerminal{
                 }
             break;
 
-            //Add a class to the project
+            //Add an object to the project
             case "add":
-                switch(commands.get(1)){
-                    case "class":
-                        if (commands.size() < 3) {
-                            System.out.println("Too few Arguments for addClass command");
-                        }
-                        else if (commands.size() > 3) {
-                            System.out.println("Too many Arguments for addClass command");
-                        }
-                        else{
-                            project.saveToMeme(true);
-                            if (!project.addClass(commands.get(2))) {
-                                project.removeLastSave();
-                            }
-                        }
-                    break;
-
-                    case "rel":
-                        if (commands.size() < 5) {
-                            System.out.println("Too few Arguments for addRel command");
-                        }
-                        else if (commands.size() > 5) {
-                            System.out.println("Too many Arguments for addRel command");
-                        }
-                        else{
-                            project.saveToMeme(true);
-                            project.addRel(commands.get(2), commands.get(3), commands.get(4));
-                        }
-                    break; 
-
-                    case "field":
-                        if (commands.size() < 5) {
-                            System.out.println("Too few Arguments for addfield command");
-                        }
-                        else if (commands.size() > 5) {
-                            System.out.println("Too many Arguments for addfield command");
-                        }
-                        else{
-                            project.saveToMeme(true);
-                            project.addAttr(commands.get(2), commands.get(4), commands.get(1), commands.get(3));
-                        }
-                    break;
-
-                    case "method":
-                        if (commands.size() < 5) {
-                            System.out.println("Too few Arguments for addMethod command");
-                        }
-                        else{
-                            project.saveToMeme(true);
-                            project.addAttr(commands.get(2), commands.get(4),commands.get(1), commands.get(3));
-                            for(int i = 5; i < commands.size(); i += 2){
-                                project.addParam(commands.get(2), commands.get(4), commands.get(i + 1), commands.get(i));
-                            }
-                        }
-                    break; 
-                    
-                    case "param":
-                        if (commands.size() < 5) {
-                            System.out.println("Too few Arguments for addParam command");
-                        }
-                        else{
-                            project.saveToMeme(true);
-                            for(int i = 4; i < commands.size(); i += 2){
-                                project.addParam(commands.get(2), commands.get(3), commands.get(i + 1), commands.get(i)); 
-                            }
-                        }
-                    break; 
-
-                    default:
-                        System.out.println("Add + " + commands.get(1) + " is not a valid command"); 
-                    break;
-
-                }
+                commands.remove(0);
+                AddCommand add = new AddCommand(project, commands.get(0), commands);
+                add.execute();
             break;
 
-            //Deletes a class from the project
+            //Deletes an object from the project
             case "delete":
-                switch(commands.get(1)){
-                    case "class":
-                        if (commands.size() < 3) {
-                            System.out.println("Too few Arguments for deleteClass command");
-                        }
-                        else if (commands.size() > 3) {
-                            System.out.println("Too many Arguments for deleteClass command");
-                        }
-                        else{
-                            project.saveToMeme(true);
-                            project.deleteClass(commands.get(2));
-                        }
-                    break;
-
-                    case "rel":
-                        if (commands.size() < 4) {
-                            System.out.println("Too few Arguments for deleteRel command");
-                        }
-                        else if (commands.size() > 4) {
-                            System.out.println("Too many Arguments for deleteRel command");
-                        }
-                        else{
-                            project.saveToMeme(true);
-                            project.delRel(commands.get(2), commands.get(3));
-                        }
-                    break; 
-
-                    case "field":
-                        if (commands.size() < 4) {
-                            System.out.println("Too few Arguments for deletefield command");
-                        }
-                        else if (commands.size() > 4) {
-                            System.out.println("Too many Arguments for deletefield command");
-                        }
-                        else{
-                            project.saveToMeme(true);
-                            project.delAttr(commands.get(2), commands.get(3),commands.get(1));
-                        }
-                    break;
-
-                    case "method":
-                        if (commands.size() < 4) {
-                            System.out.println("Too few Arguments for deleteMethod command");
-                        }
-                        project.saveToMeme(true);
-                        project.delAttr(commands.get(2), commands.get(3),commands.get(1));
-                    break; 
-                    
-                    case "param":
-                        if (commands.size() < 5) {
-                            System.out.println("Too few Arguments for addParam command");
-                        }
-                        project.saveToMeme(true);
-                        project.deleteParam(commands.get(2), commands.get(3), commands.get(4));
-                    break; 
-
-                    case "allParams":
-                        if (commands.size() < 4) {
-                            System.out.println("Too few Arguments for deleteAllParams command");
-                        }
-                        project.saveToMeme(true);
-                        project.deleteAllParams(commands.get(2), commands.get(3));
-                    break; 
-
-                    default:
-                        System.out.println("Delete + " + commands.get(1) + " is not a valid command"); 
-                    break;
-
-                }
+                commands.remove(0);
+                DeleteCommand delete = new DeleteCommand(project, commands.get(0), commands);
+                delete.execute();
             break;
 
-            //Renames a class in the project to a new name
+            //Renames an object in the project to a new name
             case "rename":
-                switch(commands.get(1)){
-                    case "class":
-                        if (commands.size() < 4) {
-                            System.out.println("Too few Arguments for renameClass command");
-                        }
-                        else if (commands.size() > 4) {
-                            System.out.println("Too many Arguments for renameClass command");
-                        }
-                        else{
-                            project.saveToMeme(true);
-                            project.renameClass(commands.get(2),commands.get(3));
-                        }
-                    break;
-
-                    case "field":
-                        if (commands.size() < 5) {
-                            System.out.println("Too few Arguments for renamefield command");
-                        }
-                        else if (commands.size() > 5) {
-                            System.out.println("Too many Arguments for renamefield command");
-                        }
-                        else{
-                            project.saveToMeme(true);
-                            project.renameAttr(commands.get(2), commands.get(3), commands.get(4), commands.get(1));
-                        }
-                    break;
-
-                    case "method":
-                        if (commands.size() < 4) {
-                            System.out.println("Too few Arguments for renameMethod command");
-                        }
-                        else if (commands.size() > 5) {
-                            System.out.println("Too many Arguments for renameMethod command");
-                        }
-                        project.saveToMeme(true);
-                        project.renameAttr(commands.get(2), commands.get(3),commands.get(4),commands.get(1));
-                    break; 
-                    
-                    case "param":
-                        if (commands.size() < 6) {
-                            System.out.println("Too few Arguments for renameParam command");
-                        }
-                        project.saveToMeme(true);
-                        project.changeParamName(commands.get(2), commands.get(3), commands.get(4), commands.get(5));
-                    break; 
-
-                    case "allParams":
-                        if (commands.size() < 5) {
-                            System.out.println("Too few Arguments for renameAllParams command");
-                        }
-                        ArrayList<String> params = new ArrayList<String>();
-                        ArrayList<String> pTypes = new ArrayList<String>();
-                        for(int i = 4; i < commands.size(); i += 2){
-                            params.add(commands.get(i + 1));
-                            pTypes.add(commands.get(i));
-                        }
-                        project.saveToMeme(true);
-                        project.changeAllParams(commands.get(2), commands.get(3), params, pTypes);
-                    break; 
-
-                    default:
-                        System.out.println("Rename + " + commands.get(1) + " is not a valid command"); 
-                    break;
-                }
+                commands.remove(0);
+                RenameCommand rename = new RenameCommand(project, commands.get(0), commands);
+                rename.execute();
             break;
+
+            //Changes an object's type in the project
             case "retype":
-                switch(commands.get(1)) {
-                    case "rel":
-                        if (commands.size() < 5) {
-                            System.out.println("Too few Arguments for change relType command");
-                        } else if (commands.size() > 5) {
-                            System.out.println("Too many Arguments for change relType command");
-                        } else {
-                            project.saveToMeme(true);
-                            project.changeRelType(commands.get(2), commands.get(3), commands.get(4));
-                        }
-                    break;
-
-                    case "field":
-                        if (commands.size() < 5) {
-                            System.out.println("Too few Arguments for change fieldType command");
-                        } else if (commands.size() > 5) {
-                            System.out.println("Too many Arguments for change fieldType command");
-                        } else {
-                            project.saveToMeme(true);
-                            project.changeFieldType(commands.get(2), commands.get(3), commands.get(4));
-                        }
-                    break;
-
-                    case "method":
-                        if (commands.size() < 5) {
-                            System.out.println("Too few Arguments for change fieldType command");
-                        } else if (commands.size() > 5) {
-                            System.out.println("Too many Arguments for change fieldType command");
-                        } else {
-                            project.saveToMeme(true);
-                            project.changeMethodType(commands.get(2), commands.get(3), commands.get(4));
-                        }
-                    break;
-
-                    case "param":
-                        if (commands.size() < 6) {
-                            System.out.println("Too few Arguments for change fieldType command");
-                        } else if (commands.size() > 6) {
-                            System.out.println("Too many Arguments for change fieldType command");
-                        } else {
-                            project.saveToMeme(true);
-                            project.changeParamType(commands.get(2), commands.get(3), commands.get(4), commands.get(5));
-                        }
-                    break;
-                }
+                commands.remove(0);
+                RetypeCommand retype = new RetypeCommand(project, commands.get(0), commands);
+                retype.execute();
             break;
-                //Saves current project into a JSON named file
+
+            //Saves current project into a JSON named file
             case "save":
                 if(commands.size() < 2){
                     System.out.println("Too few Arguments for save command");
@@ -389,43 +154,29 @@ public class UMLTerminal{
                     System.out.println("Too many Arguments for save command");
                 }
                 else{
-                    int lastSlash = -1;
-                    if (commands.get(1).contains("\\")) {
-                        lastSlash = commands.get(1).lastIndexOf("\\");
-                    } else if (commands.get(1).contains("/")) {
-                        lastSlash = commands.get(1).lastIndexOf("/");
-                    } else {
-                        project.save(commands.get(1), null);
-                        restoreLoadCoords(commands.get(1), null);
-                        break;
+                    String path = commands.get(1);
+                    if (!path.endsWith(".json")) {
+                        path += ".json";
                     }
-                    project.save(commands.get(1).substring(lastSlash + 1), commands.get(1).substring(0, lastSlash + 1));
-                    restoreLoadCoords(commands.get(1).substring(lastSlash + 1), commands.get(1).substring(0, lastSlash + 1));
+                    Path p = Paths.get(path);
+                    p = p.toAbsolutePath();
+
+                    project.save(p.getFileName().toString(), p.getParent().toString() + "/");
+                    restoreLoadCoords(p.getFileName().toString(), p.getParent().toString() + "/");
                 }
             break;
 
             //Loads a project from a named JSON file
             case "load":
-                if(commands.size() < 2){
-                    System.out.println("Too few Arguments for load command");
+                String path = commands.get(1);
+                if (!path.endsWith(".json")) {
+                    path += ".json";
                 }
-                else if(commands.size() > 2){
-                    System.out.println("Too many Arguments for load command");
-                }
-                else{
-                    int lastSlash = -1;
-                    if (commands.get(1).contains("\\")) {
-                        lastSlash = commands.get(1).lastIndexOf("\\");
-                    } else if (commands.get(1).contains("/")) {
-                        lastSlash = commands.get(1).lastIndexOf("/");
-                    } else {
-                        project.load(commands.get(1), null);
-                        storeLoadCoords(commands.get(1), null);
-                        break;
-                    }
-                    project.load(commands.get(1).substring(lastSlash + 1), commands.get(1).substring(0, lastSlash + 1));
-                    storeLoadCoords(commands.get(1).substring(lastSlash + 1), commands.get(1).substring(0, lastSlash + 1));
-                }
+                Path p = Paths.get(path);
+                p = p.toAbsolutePath();
+
+                project.load(p.getFileName().toString(), p.getParent().toString() + "/");
+                storeLoadCoords(p.getFileName().toString(), p.getParent().toString() + "/");
             break;
 
             //Prints all the classes in the project
@@ -435,28 +186,16 @@ public class UMLTerminal{
 
             //Prints the contents of a given class (i.e Relationships and attributes)
             case "printContents":
-                if(commands.size() < 2){
-                    System.out.println("Too few Arguments for printClassContents command");
-                }
-                else if(commands.size() > 2){
-                    System.out.println("Too many Arguments for printClassContents command");
-                }
-                else{
-                    project.printClassContents(commands.get(1)); 
-                }
+                commands.remove(0);
+                PrintContentsCommand printContents = new PrintContentsCommand(project, commands.get(0), commands);
+                printContents.execute();
             break;
 
             //Prints the relationships of a given classes and labels the src and destination class
             case "printRel":
-                if(commands.size() < 2){
-                    System.out.println("Too few Arguments for printRel command");
-                }
-                else if(commands.size() > 2){
-                    System.out.println("Too many Arguments for printRel command");
-                }
-                else{
-                    project.printRel(commands.get(1)); 
-                }
+                commands.remove(0);
+                PrintRelCommand printRel = new PrintRelCommand(project, commands.get(0), commands);
+                printRel.execute();
             break;
 
             case "undo":
@@ -477,6 +216,12 @@ public class UMLTerminal{
                 } else {
                     project.redo();
                 }
+            break;
+
+            case "copy":
+                commands.remove(0);
+                CopyCommand copy = new CopyCommand(project, commands.get(0), commands);
+                copy.execute();
             break;
 
             //If command is not one of the specified commands above then we print an error message
@@ -516,9 +261,9 @@ public class UMLTerminal{
         JSONParser jPar = new JSONParser();
 
         if (filePath != null) {
-            filePath += fileName + ".json";
+            filePath += fileName;
         } else {
-            filePath = "saves/" + fileName + ".json";
+            filePath = fileName;
         }
 
         // Open the file that was just loaded
@@ -557,9 +302,9 @@ public class UMLTerminal{
         JSONParser jPar = new JSONParser();
 
         if (filePath != null) {
-            filePath += fileName + ".json";
+            filePath += fileName;
         } else {
-            filePath = "saves/" + fileName + ".json";
+            filePath = fileName;
         }
         
         // Attempt to read the filename in the "saves" directory specified by 

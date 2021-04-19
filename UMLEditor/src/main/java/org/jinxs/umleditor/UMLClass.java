@@ -2,33 +2,19 @@ package org.jinxs.umleditor;
 
 import java.util.ArrayList;
 
-// For building a JSON object for the class
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 
 public class UMLClass {
+    
     // Name of this class
     public String name;
     // List of related classes
-    // "src" or "dest" defines whether className is the source or destination to
-    // this class, type defines the type of relationship between the classes
-    // {
-    // {"className1", "src/dest", "type"},
-    // {"className2", "src/dest", "type"},
-    // {"className3", "src/dest", "type"}
-    // }
     private ArrayList<UMLRel> relationships;
     // List of fields of this class
     private ArrayList<UMLField> fields;
     // List of methods of this class
-    // The first item of each method's arraylist contains its name, any succeding
-    // strings in the method's arraylist are the names of its parameters
-    // {
-    // {"methodName1", "param1", "param2", ...},
-    // {"methodName2", "param1", "param2", ...},
-    // {"methodName3", "param1", "param2", ...}
-    // }
     private ArrayList<UMLMethod> methods;
 
     // Constructs this new UMLClass given a class name
@@ -38,6 +24,16 @@ public class UMLClass {
         relationships = new ArrayList<UMLRel>(defaultSize);
         fields = new ArrayList<UMLField>(defaultSize);
         methods = new ArrayList<UMLMethod>(defaultSize);
+    }
+
+    // Copy constructor
+    // Constructs a new UMLClass given another UMLClass
+    public UMLClass(UMLClass copyBase, String newName) {
+        final int defaultSize = 100;
+        name = newName;
+        relationships = new ArrayList<UMLRel>(defaultSize);
+        fields = new ArrayList<UMLField>(copyBase.getFields());
+        methods = new ArrayList<UMLMethod>(copyBase.getMethods());
     }
 
     // Returns the list of relationships
@@ -159,7 +155,7 @@ public class UMLClass {
         if (type.equals("field")){
             for (int i = 0; i < fields.size(); ++i) {
                 if (fields.get(i).name.equals(newName)) {
-                    System.out.println("field \"" + newName + "\" is already an field of class \"" + name + "\"");
+                    System.out.println("Field \"" + newName + "\" is already a field of class \"" + name + "\"");
                     return false;
                 }
             }
@@ -174,7 +170,7 @@ public class UMLClass {
         }else if (type.equals("method")){
             for (int i = 0; i < methods.size(); ++i) {
                 if (methods.get(i).name.equals(newName)) {
-                    System.out.println("Method \"" + newName + "\" is already an method of class \"" + name + "\"");
+                    System.out.println("Method \"" + newName + "\" is already a method of class \"" + name + "\"");
                     return false;
                 }
             }
@@ -287,6 +283,10 @@ public class UMLClass {
     }
 
     public boolean changeParamName(String methName, String oldName, String newName){
+        if (oldName.equals(newName)) {
+            System.out.println("Old parameter name and new parameter name are the same");
+            return false;
+        }
         UMLMethod targetMethod = null;
         for (int i = 0; i < methods.size(); ++i){
             if (methods.get(i).name.equals(methName)){
@@ -299,15 +299,24 @@ public class UMLClass {
             return false;
         }
 
+        UMLParam targetParam = null;
+
         for (int i = 0; i < targetMethod.params.size(); ++i){
             if (targetMethod.params.get(i).name.equals(oldName)){
-                targetMethod.params.get(i).name = newName;
-                return true;
+                targetParam = targetMethod.params.get(i);
+            } else if (targetMethod.params.get(i).name.equals(newName)) {
+                System.out.println("Parameter with the name \"" + newName + "\" for the method \"" + methName + "\" already exists");
+                return false;
             }
         }
 
-        System.out.println("Parameter does not exist");
-        return false;
+        if (targetParam == null) {
+            System.out.println("Parameter \"" + oldName + "\"does not exist");
+            return false;
+        }
+
+        targetParam.name = newName;
+        return true;
     }
 
     public boolean changeParamType(String methName, String pName, String newType) {

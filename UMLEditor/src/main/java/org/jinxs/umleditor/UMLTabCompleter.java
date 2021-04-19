@@ -52,7 +52,7 @@ public class UMLTabCompleter{
         Collection<Completer> comps = comp.getCompleters();
         comps = new ArrayList<>(comps);
 
-        ArrayList<String> classNames = new ArrayList();
+        ArrayList<String> classNames = new ArrayList<String>();
         ArrayList<UMLClass> classes = editor.getClasses();
 
         for(int i = 0; i < classes.size(); ++i){
@@ -79,6 +79,14 @@ public class UMLTabCompleter{
                 )
             );
 
+            comps.add(
+                new ArgumentCompleter(
+                    new StringsCompleter("copy"),
+                    new StringsCompleter(cName),
+                    new NullCompleter()
+                )
+            );
+
             for(int f = 0; f < cClass.getFields().size(); ++f){
                 comps.add(
                     new ArgumentCompleter(
@@ -89,7 +97,6 @@ public class UMLTabCompleter{
                         new NullCompleter()
                     )
                 );
-               
             }
 
             for(int m = 0; m < methods.size(); ++m){
@@ -97,6 +104,16 @@ public class UMLTabCompleter{
                     new ArgumentCompleter(
                         new StringsCompleter("delete", "rename", "retype"),
                         new StringsCompleter("method"),
+                        new StringsCompleter(cName),
+                        new StringsCompleter(methods.get(m).name),
+                        new NullCompleter()
+                    )
+                );
+
+                comps.add(
+                    new ArgumentCompleter(
+                        new StringsCompleter("add"),
+                        new StringsCompleter("param"),
                         new StringsCompleter(cName),
                         new StringsCompleter(methods.get(m).name),
                         new NullCompleter()

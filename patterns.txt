@@ -1,67 +1,76 @@
-﻿Sprint 3 User Stories
+﻿Sprint 4 Design Patterns
 Team JINXS
 CSCI 420 - Software Engineering, Spring 2021
 Jon, Ian B., Nate, Xavier, Simon
 
 
-1. Builder:
-   - Currently, the getFromProject method is a huge function that builds the GUI based on the various pieces of each class in the underlying model. 
-   File Name: UMLGUI.java  
-   Line #: 109 - 278
+1. MVC
+   - (Approved Sprint 3)
 
 
 2. Observer:
-   - handleDrag in the GUI notifies the dragged panel, global position variables, and memento every time a panel is dragged through a one-to-many dependency.
+   - handleDrag in the GUI notifies the dragged panel, global position variables, memento, and relationship arrows
+     every time a panel is dragged through a one-to-many dependency. (Approved Sprint 3)
    File Name: UMLGUI.java  
-   Line #: 1373 - 1389
+   Line #: 1514 - 1531
 
 
 3. Memento:
-   - Exists in its own file and has implementation for the GUI and the command line. Used for undo and redo.
+   - Exists in its own file and has implementation for the GUI and the command line. Used for undo and redo. (Approved Sprint 3)
    File Name: Memento.java  
-   Line #: 1 - 35
+   Line #: 1 - 36
 
 
-4. State:
-   - Dropdowns change their behavior based on the state of the underlying model in the GUI.
-   File Name: UMLGUI.java 
-   Line #: 359 - 410
+4. Iterator:
+   - Iterator implemented on list of UMLClasses in 3 separate methods.
+   File Name: UMLEditor.java 
+   Line #: 79 - 86, 109 - 116, and 485 - 491
 
 
-5. Interpreter:
-   - Load interprets JSON and turns it into Java-digestible data structures based on the data the JSON holds
-   File Name: UMLEditor.java
-   Line #: 526 - 601
+5. Adapter:
+   - The terminal/CLI uses the Arrays.asList() method to convert a String array to a list so that an ArrayList can be
+     constructed from the resulting collection (list). Noted as an adapter by refactoring.guru Java code examples.
+   File Name: UMLTerminal.java
+   Line #: 68
 
 
-6. Mediator:
-   - The editor/controller handles relationships that the UML classes don’t handle themselves. The classes don’t explicitly reference other class objects, but the editor defines and handles the relationships between the actual UML class objects.
-   File Name: UMLEditor.java
-   Line #: 110 - 243
+6. Composite:
+   - Java Swing: The GUI uses Swing which is a composite structure. The JFrame contains JPanels which contain JTextAreas, and each
+     can be treated as their own individual object including their children. Noted as composite by refactoring.guru Java code examples.
+   File Name: UMLGUI.java
 
 
-7. Facade:
-   - The dropdowns provide a facade for dealing with commands from the editor. Each dropdown from the editor simplifies a command or piece of a command that is provided to the model.
-   File Name: UMLGUI.java 
-   Line #: 321-803
+7. Builder:
+   - The UMLTabCompleter builds tab completion objects piece by piece and it utilized by our UMLTerminal.
+   File Name: UMLTabCompleter.java
 
 
-8. Command:
-   - The dropdowns save all of the information about the request into a String which is interpreted by the actionevent method
-   File Name: UMLGUI.java 
-   Line #: 321-803, specifically lines like 452, 453, 525, 532 and others where all necessary information is put into a command String
+8. Prototype:
+   - Our UMLClass model implements a copy constructor to create an identical new class but with a different name. This
+     is then used as an available command in the CLI.
+   File Name: UMLClass.java
+   Line #: 29 - 37
 
 
-9. Proxy:
-   - The CLI and GUI act as proxies for using the UMLEditor interface with controlled and intelligent access to the parts of the model
-   File Names: UMLGUI.java and UMLInterface.java
+9. Decorator:
+   - Graphics2D objects are wrapped in JPanels to give them increased functionality and to allow for correct
+     custom painting of Swing objects based on Oracle documentation by overriding the JPanels' painComponent method.
+   File Name: RelArrow.java
 
 
-10. Composite:
-   - Applies to how the GUI dropdowns are structured: Editor has classes, classes have fields, methods, and relationships, and those components have individual instances
-   File Name: UMLGUI.java 
-   Line #: 321-803
+10. Bridge:
+   - UMLField, UMLMethod, and UMLParam all extend the UMLAttr interface which defines how they all relate on an abstraction
+     level while the classes themselves do the implementation on their own.
+   File Names: UMLField.java, UMLMethod.java, UMLParam.java, and UMLAttr.java
 
 
-11. MVC:
-   - Our UMLClass file acts as the model, the UMLEditor file acts as the controller, and the UMLGUI/UMLInterface files act as views.
+11. Command:
+   - The CLI implements its own command object that turns most of the CLI commands into their own stand-alone
+     objects that contain all of the necessary info about the command. The command object also takes care of
+     execution of each command in its own class. All command classes extend the CLICommand class implementation.
+   Directory containing the pattern files: Command
+
+12. Builder:
+   - The GUI uses a builder to construct each panel (class box) that will be displayed. The GUIClassPanelBuilder
+     implements the Builder interface and constructs GUIClassPanels in steps from their TextArea pieces.
+   Directory containing the pattern files: Builder

@@ -3,22 +3,13 @@ package org.jinxs.umleditor;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.lang.model.SourceVersion;
-// For writing out to a file when saving
 import java.io.FileWriter;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-// For the JSON array of classes to be written to file
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-
-// import jdk.internal.joptsimple.internal.Classes;
-// import jdk.tools.jaotc.collect.ClassSearch;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 public class UMLEditor {
     
@@ -78,12 +69,8 @@ public class UMLEditor {
     public boolean renameClass(String oldName, String newName) {
         // Ensure the class name does not contain special characters (except for '_')
         // By matching with a regex
-        Pattern p = Pattern.compile("[^a-z0-9_ ]", Pattern.CASE_INSENSITIVE);
-        Matcher m = p.matcher(newName);
-        boolean containsSpecChars = m.find();
-
-        if (containsSpecChars) {
-            System.out.println("The class name cannot contain special characters or spaces");
+        if (!validName(newName)) {
+            System.out.println("The class name \"" + newName + "\" is not valid");
             return false;
         }
 
@@ -108,7 +95,37 @@ public class UMLEditor {
             return true;
         }
     }
-    
+
+    // Duplicates the requested class and gives it a new name
+    public boolean copyClass(String oldClass, String newClass) {
+        UMLClass copyBase = classExists(oldClass);
+        if (copyBase == null) {
+            System.out.println("The class \"" + oldClass + "\" cannot be copied since it doesn't exist");
+            return false;
+        }
+
+        // Check if the new name is already a class that exists
+        UMLClass classWithNewName = null;
+        Iterator<UMLClass> iter = classes.iterator();
+        while (iter.hasNext()) {
+            classWithNewName = iter.next();
+            if (classWithNewName.name.equals(newClass)) {
+                System.out.println("Class with the name \"" + newClass + "\" already exists");
+                return false;
+            }
+        }
+
+        classes.add(new UMLClass(copyBase, newClass));
+        for (UMLRel rel : copyBase.getRels()) {
+            if (rel.sOd.equals("src")) {
+                addRel(rel.partner, newClass, rel.type);
+            } else {
+                addRel(newClass, rel.partner, rel.type);
+            }
+            
+        }
+        return true;
+    }
 
     // Adds a relationship between class1 and class2 where class1 is the source
     // and class2 is the destination
@@ -118,7 +135,7 @@ public class UMLEditor {
             System.out.println("Class names must be different");
             return;
         }
-        /*******************Place holder type check*******************/
+
         if (type.equals("inheritance") || type.equals("aggregation") || type.equals("composition") ||
             type.equals("realization")){
 
@@ -145,7 +162,7 @@ public class UMLEditor {
         }
 
         if (c1 == null || c2 == null){
-            System.out.println("Class does not exsist");
+            System.out.println("Class does not exist");
             return;
         }
 
@@ -207,7 +224,7 @@ public class UMLEditor {
         }
 
         if (found == false){
-            System.out.println("Relationship between \"" + class1 + "\" and \"" + class2 + "\" does not exsist");
+            System.out.println("Relationship between \"" + class1 + "\" and \"" + class2 + "\" does not exist");
             return;
         }
 
@@ -234,7 +251,7 @@ public class UMLEditor {
                 || newType.equals("realization")) {
 
         } else if (!(newType.equals(""))) {
-            System.out.println("Missing a Type, Please try again");
+            System.out.println("Missing a type, please try again");
             return;
         } else {
             System.out.println("Type is invalid");
@@ -256,14 +273,26 @@ public class UMLEditor {
     * - classExists = boolean to check and see if the class already exist
     * - attrAdded = boolean that checks if the attribute was added succesfully
     ********************************************************************************/
-    public void addAttr(String className, String attrName, String attrType, String type) {
+    public boolean addAttr(String className, String attrName, String attrType, String type) {
+        if (!attrType.equals("field") && !attrType.equals("method")) {
+            return false;
+        }
         
         boolean attrAdded = false;
 
         UMLClass currClass = classExists(className);
 
         if (currClass == null) {
-            return;
+            return false;
+        }
+
+        if (!validName(attrName)) {
+            System.out.println("The " + attrType + " name \"" + attrName + "\" is not valid");
+            return false;
+        }
+        if (!validName(type)) {
+            System.out.println("The " + attrType + " type \"" + type + "\" is not valid");
+            return false;
         }
 
         // True if added succesfully, false if duplicate
@@ -275,15 +304,15 @@ public class UMLEditor {
         }
 
         // Notify the user of the resuls of the attribute addition
-
         if (!attrAdded) {
             if (attrType.equals("field")){
-                System.out.println("Field \"" + attrName + "\" is already a field of class \"" + className);
+                System.out.println("Field \"" + attrName + "\" is already a field of class \"" + className + "\"");
             }else{
-                System.out.println("Method \"" + attrName + "\" is already a method of class \"" + className);
+                System.out.println("Method \"" + attrName + "\" is already a method of class \"" + className + "\"");
             }
-            
+            return false;
         }
+        return true;
     }
 
 /*****************************************************************************************
@@ -316,53 +345,67 @@ public class UMLEditor {
     }
     
     // Renames an attribute (oldAttr) of the given className to newAttr
-    public void renameAttr(String className, String oldAttr, String newAttr, String type) {
+    public boolean renameAttr(String className, String oldAttr, String newAttr, String type) {
         // Ensure the new attribute name is different than the one being renamed
         if (oldAttr.equals(newAttr)) {
             System.out.println("The new attribute name must be different than the one being changed");
-            return;
+            return false;
+        }
+
+        if (!validName(newAttr)) {
+            System.out.println("The name \"" + newAttr + "\" is not valid");
+            return false;
         }
         
-        // Find the class that will have an attribute renamed
-        for (int i = 0; i < classes.size(); ++i) {
-          // If the class exists, attempt to rename the provided attribute name to the new name
-            if (classes.get(i).name.equals(className)) {
-            classes.get(i).renameAttr(oldAttr, newAttr, type);
-            // else the class function renameAttr will notify the user if the new attribute was a duplicate
-            // or if the old attribute was not found
-            return;
-            }
+        UMLClass classToRename = classExists(className);
+
+        if (classToRename == null) {
+            return false;
         }
-    
-        // If the for loop cycles all the way through without returning, the class does not exist
-        System.out.println("Class \"" + className + "\" does not currently exist");
+
+        return classToRename.renameAttr(oldAttr, newAttr, type);
     }
 
-    public void changeFieldType(String className, String fieldName, String newType) {
+    public boolean changeFieldType(String className, String fieldName, String newType) {
         UMLClass foundClass = classExists(className);
         if (foundClass == null) {
-            return;
+            return false;
         }
 
-        foundClass.changeFieldType(fieldName, newType);
+        if (!validName(newType)) {
+            System.out.println("The type \"" + newType + "\" is not valid");
+            return false;
+        }
+
+        return foundClass.changeFieldType(fieldName, newType);
     }
 
-    public void changeMethodType(String className, String methodName, String newType) {
+    public boolean changeMethodType(String className, String methodName, String newType) {
         UMLClass foundClass = classExists(className);
         if (foundClass == null) {
-            return;
+            return false;
         }
 
-        foundClass.changeMethodType(methodName, newType);
+        if (!validName(newType)) {
+            System.out.println("The type \"" + newType + "\" is not valid");
+            return false;
+        }
+
+        return foundClass.changeMethodType(methodName, newType);
     }
 
-    public void addParam(String className, String methName, String paramName, String paramType){
+    public boolean addParam(String className, String methName, String paramName, String paramType){
         UMLClass foundClass = classExists(className);
         if (foundClass == null){
-            return;
+            return false;
         }
 
-        foundClass.addParam(methName, paramName, paramType);
+        if (!validName(paramType)) {
+            System.out.println("The type \"" + paramType + "\" is not valid");
+            return false;
+        }
+
+        return foundClass.addParam(methName, paramName, paramType);
     }
 
     public void deleteParam(String className, String methName, String paramName){
@@ -383,35 +426,61 @@ public class UMLEditor {
         foundClass.deleteAllParams(methName);
     }
 
-    public void changeParamName(String className, String methName, String paramName, String newParamName){
+    public boolean changeParamName(String className, String methName, String paramName, String newParamName){
         UMLClass foundClass = classExists(className);
         if (foundClass == null){
-            return;
+            return false;
         }
 
-        foundClass.changeParamName(methName, paramName, newParamName);
+        if (!validName(newParamName)) {
+            System.out.println("The param name \"" + newParamName + "\" is not valid");
+            return false;
+        }
+
+        return foundClass.changeParamName(methName, paramName, newParamName);
     }
 
-    public void changeParamType(String className, String methName, String paramName, String newType) {
+    public boolean changeParamType(String className, String methName, String paramName, String newType) {
         UMLClass foundClass = classExists(className);
         if (foundClass == null) {
-            return;
+            return false;
         }
 
-        foundClass.changeParamType(methName, paramName, newType);
+        if (!validName(newType)) {
+            System.out.println("The type \"" + newType + "\" is not valid");
+            return false;
+        }
+
+        return foundClass.changeParamType(methName, paramName, newType);
     }
 
-    public void changeAllParams(String className, String methName, ArrayList<String> params, ArrayList<String> paramTypes){
+    public boolean changeAllParams(String className, String methName, ArrayList<String> params, ArrayList<String> paramTypes){
         UMLClass foundClass = classExists(className);
         if (foundClass == null){
-            return;
+            return false;
         }
-        if (!foundClass.changeAllParams(methName, params, paramTypes)) {
-            System.out.println("There should be the same amount of parameter names as types");
+
+        for (String name : params) {
+            if (!validName(name)) {
+                System.out.println("The param name \"" + name + "\" is not valid");
+                return false;
+            }
         }
+        for (String type : paramTypes) {
+            if (!validName(type)) {
+                System.out.println("The param name \"" + type + "\" is not valid");
+                return false;
+            }
+        }
+
+        return foundClass.changeAllParams(methName, params, paramTypes);
     }
 
     public UMLClass classExists(String className){
+        if (!validName(className)) {
+            System.out.println("The class name \"" + className + "\" is not valid");
+            return null;
+        }
         UMLClass foundClass = null;
         Iterator<UMLClass> iter = classes.iterator();
         while (iter.hasNext()) {
@@ -426,7 +495,7 @@ public class UMLEditor {
     }
 
     public boolean validName(String name) {
-        return SourceVersion.isName(name);
+        return SourceVersion.isIdentifier(name);
     }
 
 
@@ -518,9 +587,9 @@ public class UMLEditor {
         // Write out the JSON class array to the desired filename and put it in the "saves" directory
         // and catch IOExceptions if they occur (which will result in a stack trace)
         if (filePath != null) {
-            filePath += fileName + ".json";
+            filePath += fileName;
         } else {
-            filePath = "saves/" + fileName + ".json";
+            filePath = fileName;
         }
         try (FileWriter file = new FileWriter(filePath)) {
             file.write(classJArray.toJSONString());
@@ -558,9 +627,9 @@ public class UMLEditor {
         JSONParser jPar = new JSONParser();
 
         if (filePath != null) {
-            filePath += fileName + ".json";
+            filePath += fileName;
         } else {
-            filePath = "saves/" + fileName + ".json";
+            filePath = fileName;
         }
         
         // Attempt to read the filename in the "saves" directory specified by 
