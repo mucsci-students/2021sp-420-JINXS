@@ -66,27 +66,6 @@ public class MementoTest {
     }
 
     @Test
-    public void maxOutMeme() {
-        Memento meme = new Memento();
-        meme.saveState("test1");
-        meme.saveState("test2");
-        meme.saveState("test3");
-        meme.saveState("test4");
-        meme.saveState("test5");
-        meme.saveState("test6");
-        meme.saveState("test7");
-        meme.saveState("test8");
-        meme.saveState("test9");
-        meme.saveState("test10");
-
-        assertEquals("Meme should contain ten states", 10, meme.numStates());
-
-        meme.saveState("test11");
-
-        assertEquals("Meme should still contain ten states", 10, meme.numStates());
-    }
-
-    @Test
     public void removeOldestStateFromMeme() {
         Memento meme = new Memento();
         meme.saveState("test1");

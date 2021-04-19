@@ -1,46 +1,47 @@
-Command/shortcut	          	                 Description
--------------------------	                     --------------
+Command/shortcut	          	                        Description
+-------------------------	                            --------------
 add
-    class <class1>                               Creates a new UML class
-    rel <class1, class2, type>                   Adds a relationship between the two given classes
+    class <class1>                                      Creates a new UML class
+    rel <class1, class2, relType>                       Adds a relationship between the two given classes
     valid relationship types:
-    "inheritance"
-    "realization"
-    "aggregation"
-    "composition"
-    field <class1, field1>                       Adds a field to a given class
-    method  <class1, method1>                    Adds a method to a given class
-    param <class1, method1, param1>              Adds a parameter to a given method
+    "inheritance", "realization", "aggregation", "composition"
+    field <class1, dataType, field1>                    Adds a field to a given class
+    method <class1, returnType, method1>                Adds a method to a given class
+    param <class1, method1, dataType, param1>           Adds a parameter to a given method
+
 delete
-    class <class1>                               Deletes the specified class
-    rel  <class1, class2>                        Deletes a relationship between the two given classes
-    field  <class1>                              Deletes the given field from the specified class
-    method  <class1>                             Deletes the given method from the specified class
-    param <class1,method1, param1>               Deletes the given parameter from the specified class
-    allParams <class1,method1>                   Deletes all parameters from the specified class
+    class <class1>                                      Deletes the specified class
+    rel <class1, class2>                                Deletes a relationship between the two given classes
+    field <class1>                                      Deletes the given field from the specified class
+    method <class1>                                     Deletes the given method from the specified class
+    param <class1, method1, param1>                     Deletes the given parameter from the specified class
+    allParams <class1, method1>                         Deletes all parameters from the specified class
 
 rename
-    class <class1, newName>                      Renames a class to a new specified class name
-    relType <class1, class2, newType>            Changes the type of relationship
-    field <class1, field1, newfieldName>         Renames the given field name from the specified class
-    method <class1, method1, newMethodName>      Renames the given field name from the specified class
-    param <class1,method1, param1, newParamName> Renames the given parameter from the specified class
-    allParams <class1, method1, params>          Changes all the parameters from the specified class
+    class <class1, newName>                             Renames a class to a new specified class name
+    field <class1, field1, newfieldName>                Renames the given field name from the specified class
+    method <class1, method1, newMethodName>             Renames the given field name from the specified class
+    param <class1, method1, param1, newParamName>       Renames the given parameter from the specified class
+    allParams <class1, method1, type1, param1, ...>     Changes all the parameters from the specified class
 
-printList                                        Prints the names of all existing classes
+retype
+    rel <class1, class2, newRelType>                Changes the type of relationship
+    field <class1, field1, newDataType>             Changes the data type of a field
+    method <class1, method1, newReturnType>         Changes the return type of a method
+    param <class1, method1, param1, newDataType>    Changes the data type of a parameter
 
-printContents <class1>                           Prints the contents of a given class
 
-printRel  <class1>                               Prints the all the relationships between classes
-
-help                                             Prints a help document with all viable commands
-
-quit                                             Exits the the program
-
-save  <fileName>                                 Saves the project into a JSON file
-
-load  <fileName>                                 Loads a project from a JSON file
-
-undo                                             Restores the previous state before the last command called
-
-redo                                             Restores the state reversed by calling undo
+copy <className, newClassName>  Copies an existing class and names it to a new name
+printList                       Prints the names of all existing classes
+printContents <class1>          Prints the contents of a given class
+printRel <class1>               Prints the all the relationships between classes
+help                            Prints a help document with all viable commands
+quit                            Exits the the program
+save
+    <fileName>                  Saves the project into a JSON file in the editor folder
+    <filePath>                  Saves the project into a JSON file at the specified relative or absolute path
+load
+    <fileName>                  Loads a project from a JSON file in the top-level of the editor folder
+    <filePath>                  Loads a project from a JSON file at the specified relative or absolute path
+undo                            Restores the previous state before the last command called
+redo                            Restores the state reversed by calling undo

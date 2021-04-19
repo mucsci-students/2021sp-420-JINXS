@@ -94,11 +94,41 @@ public class UMLEditorTest {
     @Test
     public void renameClassTest() {
         UMLEditor editor = new UMLEditor();
+
+        // Rename a simple class
         editor.addClass("className");
         editor.renameClass("className", "newName");
 
         assertEquals("Class list should contain one class", editor.getClasses().size(), 1);
         assertEquals("Class name should be newName", editor.getClasses().get(0).name, "newName");
+
+        // Rename a class that doesn't exist (should fail)
+        editor.renameClass("className", "class1");
+
+        assertEquals("Class list should contain one class", editor.getClasses().size(), 1);
+        assertEquals("Class name should be newName", editor.getClasses().get(0).name, "newName");
+
+        // Rename a class to a name that already exists (should fail)
+        editor.addClass("class1");
+        editor.renameClass("class1", "newName");
+
+        assertEquals("Class list should contain two classes", editor.getClasses().size(), 2);
+        assertEquals("First class should be newName", editor.getClasses().get(0).name, "newName");
+        assertEquals("Second class should be class1", editor.getClasses().get(1).name, "class1");
+
+        // Rename a class that doesn't exist to a name that already exists (should fail)
+        editor.renameClass("class2", "newNam1");
+
+        assertEquals("Class list should contain two classes", editor.getClasses().size(), 2);
+        assertEquals("First class should be newName", editor.getClasses().get(0).name, "newName");
+        assertEquals("Second class should be class1", editor.getClasses().get(1).name, "class1");
+
+        // Rename a class to an illegal name (should fail)
+        editor.renameClass("class1", "name#");
+
+        assertEquals("Class list should contain two classes", editor.getClasses().size(), 2);
+        assertEquals("First class should be newName", editor.getClasses().get(0).name, "newName");
+        assertEquals("Second class should be class1", editor.getClasses().get(1).name, "class1");
     }
 
     // RELATIONSHIP TESTS: ADD, DELETE, CHANGETYPE
@@ -129,7 +159,7 @@ public class UMLEditorTest {
 
         assertEquals("class1 should have one relationship", editor.getClasses().get(0).getRels().size(), 1);
         assertEquals("class2 should have one relationship", editor.getClasses().get(1).getRels().size(), 1);
-        assertEquals("Relationship types should be the same for both classes", editor.getClasses().get(0).getRels().get(0).get(2), editor.getClasses().get(1).getRels().get(0).get(2));
+        assertEquals("Relationship types should be the same for both classes", editor.getClasses().get(0).getRels().get(0).type, editor.getClasses().get(1).getRels().get(0).type);
     }
 
     // Depends on addRel working
@@ -142,7 +172,7 @@ public class UMLEditorTest {
 
         assertEquals("class1 should have one relationship", editor.getClasses().get(0).getRels().size(), 1);
         assertEquals("class2 should have one relationship", editor.getClasses().get(1).getRels().size(), 1);
-        assertEquals("Relationship types should be the same for both classes", editor.getClasses().get(0).getRels().get(0).get(2), editor.getClasses().get(1).getRels().get(0).get(2));
+        assertEquals("Relationship types should be the same for both classes", editor.getClasses().get(0).getRels().get(0).type, editor.getClasses().get(1).getRels().get(0).type);
 
         editor.delRel("class1", "class2");
 
@@ -161,7 +191,7 @@ public class UMLEditorTest {
 
         assertEquals("class1 should have one relationship", editor.getClasses().get(0).getRels().size(), 1);
         assertEquals("class2 should have one relationship", editor.getClasses().get(1).getRels().size(), 1);
-        assertEquals("Relationship types should be the same for both classes", editor.getClasses().get(0).getRels().get(0).get(2), editor.getClasses().get(1).getRels().get(0).get(2));
+        assertEquals("Relationship types should be the same for both classes", editor.getClasses().get(0).getRels().get(0).type, editor.getClasses().get(1).getRels().get(0).type);
     }
 
     // Depends on changeRelType working
@@ -173,8 +203,8 @@ public class UMLEditorTest {
         editor.addRel("class1", "class2", "realization");
         editor.changeRelType("class1", "class2", "invalidType");
 
-        assertEquals("Relationship type for both classes should remain unchanged", editor.getClasses().get(0).getRels().get(0).get(2), "realization");
-        assertEquals("Relationship for both classes should still be realization", editor.getClasses().get(0).getRels().get(0).get(2), editor.getClasses().get(1).getRels().get(0).get(2));
+        assertEquals("Relationship type for both classes should remain unchanged", editor.getClasses().get(0).getRels().get(0).type, "realization");
+        assertEquals("Relationship for both classes should still be realization", editor.getClasses().get(0).getRels().get(0).type, editor.getClasses().get(1).getRels().get(0).type);
     }
 
     // FIELD TESTS: ADD, DELETE, RENAME
@@ -183,10 +213,10 @@ public class UMLEditorTest {
     public void addFieldAttrTest() {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
-        editor.addAttr("class1", "newField", "field");
+        editor.addAttr("class1", "newField", "field", "int");
 
         assertEquals("class1 should have one field", editor.getClasses().get(0).getFields().size(), 1);
-        assertEquals("Field named newField should have been added to class1", editor.getClasses().get(0).getFields().get(0), "newField");
+        assertEquals("Field named newField should have been added to class1", editor.getClasses().get(0).getFields().get(0).name, "newField");
     }
 
     // Depends on addAttr working
@@ -194,7 +224,7 @@ public class UMLEditorTest {
     public void delFieldAttrTest() {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
-        editor.addAttr("class1", "field1", "field");
+        editor.addAttr("class1", "field1", "field", "int");
         editor.delAttr("class1", "field1", "field");
 
         assertTrue("class1 should have zero fields", editor.getClasses().get(0).getFields().isEmpty());
@@ -204,8 +234,8 @@ public class UMLEditorTest {
     public void addAndDeleteManyFieldAttrsTest() {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
-        editor.addAttr("class1", "field1", "field");
-        editor.addAttr("class1", "field2", "field");
+        editor.addAttr("class1", "field1", "field", "int");
+        editor.addAttr("class1", "field2", "field", "int");
 
         assertEquals("class1 should have two fields", editor.getClasses().get(0).getFields().size(), 2);
 
@@ -223,10 +253,10 @@ public class UMLEditorTest {
     public void renameFieldAttrTest() {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
-        editor.addAttr("class1", "field1", "field");
+        editor.addAttr("class1", "field1", "field", "int");
         editor.renameAttr("class1", "field1", "field2", "field");
 
-        assertEquals("class1 should have one field named field2", editor.getClasses().get(0).getFields().get(0), "field2");
+        assertEquals("class1 should have one field named field2", editor.getClasses().get(0).getFields().get(0).name, "field2");
     }
 
     // METHOD TESTS: ADD, DELETE, RENAME
@@ -236,10 +266,10 @@ public class UMLEditorTest {
     public void addMethodAttrTest() {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
-        editor.addAttr("class1", "newMethod", "method");
+        editor.addAttr("class1", "newMethod", "method", "int");
 
         assertEquals("class1 should have one method", editor.getClasses().get(0).getMethods().size(), 1);
-        assertEquals("Method named newMethod should have been added to class1", editor.getClasses().get(0).getMethods().get(0).get(0), "newMethod");
+        assertEquals("Method named newMethod should have been added to class1", editor.getClasses().get(0).getMethods().get(0).name, "newMethod");
     }
     
     // Depends on addAttr working
@@ -247,7 +277,7 @@ public class UMLEditorTest {
     public void delMethodAttrTest() {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
-        editor.addAttr("class1", "newMethod", "method");
+        editor.addAttr("class1", "newMethod", "method", "int");
         editor.delAttr("class1", "newMethod", "method");
 
         assertTrue("class1 should have zero methods", editor.getClasses().get(0).getMethods().isEmpty());
@@ -258,8 +288,8 @@ public class UMLEditorTest {
     public void delMethodWithParamsTest() {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
-        editor.addAttr("class1", "newMethod", "method");
-        editor.addParam("class1", "newMethod", "param1");
+        editor.addAttr("class1", "newMethod", "method", "int");
+        editor.addParam("class1", "newMethod", "param1", "int");
         editor.delAttr("class1", "newMethod", "method");
 
         assertTrue("class1 should have zero methods", editor.getClasses().get(0).getMethods().isEmpty());
@@ -270,8 +300,8 @@ public class UMLEditorTest {
     public void addAndDeleteManyMethodAttrsTest() {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
-        editor.addAttr("class1", "method1", "method");
-        editor.addAttr("class1", "method2", "method");
+        editor.addAttr("class1", "method1", "method", "int");
+        editor.addAttr("class1", "method2", "method", "int");
 
         assertEquals("class1 should have two methods", editor.getClasses().get(0).getMethods().size(), 2);
 
@@ -289,13 +319,13 @@ public class UMLEditorTest {
     public void renameMethodAttrTest() {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
-        editor.addAttr("class1", "newMethod", "method");
+        editor.addAttr("class1", "newMethod", "method", "int");
         editor.renameAttr("class1", "newMethod", "newName", "method");
 
-        assertEquals("class1 should have one method named newName", editor.getClasses().get(0).getMethods().get(0).get(0), "newName");
+        assertEquals("class1 should have one method named newName", editor.getClasses().get(0).getMethods().get(0).name, "newName");
     }
 
-     // PARAMETER TESTS: ADD, DELETE, RENAME
+    // PARAMETER TESTS: ADD, DELETE, RENAME
     // --------------------------------------------
 
      // Depends on addAttr working
@@ -303,19 +333,11 @@ public class UMLEditorTest {
     public void addParamTest() {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
-        editor.addAttr("class1", "newMethod", "method");
-        editor.addParam("class1", "newMethod", "param1");
+        editor.addAttr("class1", "newMethod", "method", "int");
+        editor.addParam("class1", "newMethod", "param1", "int");
 
         assertEquals("newMethod should have one parameter", editor.getClasses().get(0).getMethods().size(), 1);
-        assertEquals("Parameter named param1 should have been added to newMethod", editor.getClasses().get(0).getMethods().get(0).get(1), "param1");
-    }
-
-    boolean deleteParamCheck(ArrayList<String> method){
-        if (method.size() != 1){
-            return false;
-        }
-
-        return true;
+        assertEquals("Parameter named param1 should have been added to newMethod", editor.getClasses().get(0).getMethods().get(0).params.get(0).name, "param1");
     }
 
     // Depends on addAttr working
@@ -323,11 +345,11 @@ public class UMLEditorTest {
     public void delParamTest() {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
-        editor.addAttr("class1", "newMethod", "method");
-        editor.addParam("class1", "newMethod", "param1");
+        editor.addAttr("class1", "newMethod", "method", "int");
+        editor.addParam("class1", "newMethod", "param1", "int");
         editor.deleteParam("class1", "newMethod", "param1");
 
-        assertTrue("newMethod should have zero parameters",  deleteParamCheck(editor.getClasses().get(0).getMethods().get(0)));
+        assertTrue("newMethod should have zero parameters", editor.getClasses().get(0).getMethods().get(0).params.isEmpty());
     }
 
     // Depends on addAttr working
@@ -335,13 +357,13 @@ public class UMLEditorTest {
     public void delAllParamsTest() {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
-        editor.addAttr("class1", "newMethod", "method");
-        editor.addParam("class1", "newMethod", "param1");
-        editor.addParam("class1", "newMethod", "param2");
-        editor.addParam("class1", "newMethod", "param3");
+        editor.addAttr("class1", "newMethod", "method", "int");
+        editor.addParam("class1", "newMethod", "param1", "int");
+        editor.addParam("class1", "newMethod", "param2", "int");
+        editor.addParam("class1", "newMethod", "param3", "int");
         editor.deleteAllParams("class1", "newMethod");
 
-        assertTrue("newMethod should have zero parameters",  deleteParamCheck(editor.getClasses().get(0).getMethods().get(0)));
+        assertTrue("newMethod should have zero parameters",  editor.getClasses().get(0).getMethods().get(0).params.isEmpty());
     }
 
     // Depends on addAttr working
@@ -349,11 +371,11 @@ public class UMLEditorTest {
     public void changeParamTest() {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
-        editor.addAttr("class1", "newMethod", "method");
-        editor.addParam("class1", "newMethod", "param1");
-        editor.changeParam("class1", "newMethod", "param1", "newName");
+        editor.addAttr("class1", "newMethod", "method", "int");
+        editor.addParam("class1", "newMethod", "param1", "int");
+        editor.changeParamName("class1", "newMethod", "param1", "newName");
 
-        assertEquals("newMethod should have one param named newName", editor.getClasses().get(0).getMethods().get(0).get(1), "newName");
+        assertEquals("newMethod should have one param named newName", editor.getClasses().get(0).getMethods().get(0).params.get(0).name, "newName");
     }
 
     // Depends on addAttr working
@@ -361,15 +383,61 @@ public class UMLEditorTest {
     public void changeAllParamsTest() {
         UMLEditor editor = new UMLEditor();
         editor.addClass("class1");
-        editor.addAttr("class1", "newMethod", "method");
-        editor.addParam("class1", "newMethod", "param1");
-        editor.addParam("class1", "newMethod", "param2");
+        editor.addAttr("class1", "newMethod", "method", "int");
+        editor.addParam("class1", "newMethod", "param1", "int");
+        editor.addParam("class1", "newMethod", "param2", "int");
         ArrayList<String> str = new ArrayList<String>();
         str.add("one");
         str.add("two");
-        str.add("Three");
-        editor.changeAllParams("class1", "newMethod", str);
+        str.add("three");
+        editor.changeAllParams("class1", "newMethod", str, str);
 
-        assertEquals("newMethod should have one param named one", editor.getClasses().get(0).getMethods().get(0).get(1), "one");
+        assertEquals("newMethod should have one param named one", editor.getClasses().get(0).getMethods().get(0).params.get(0).name, "one");
+    }
+
+    // HELPER METHOD TESTS
+    // --------------------------------------------
+
+    @Test
+    public void classExistsTest() {
+        UMLEditor editor = new UMLEditor();
+
+        assertTrue("classExists should not find the class class1", editor.classExists("class1") == null);
+
+        editor.addClass("class1");
+
+        assertTrue("classExists should find the class class1", editor.classExists("class1") != null);
+    }
+
+    @Test
+    public void copyEmtpyClassTest() {
+        UMLEditor editor = new UMLEditor();
+
+        editor.addClass("class1");
+        editor.copyClass("class1", "class2");
+
+        assertEquals("New class should be named class2", "class2", editor.getClasses().get(1).name);
+        assertEquals("class1 and class2 should have the same fields", editor.getClasses().get(0).getFields(), editor.getClasses().get(1).getFields());
+        assertEquals("class1 and class2 should have the same methods", editor.getClasses().get(0).getMethods(), editor.getClasses().get(1).getMethods());
+    }
+
+    @Test
+    public void copyComplicatedClassTest() {
+        UMLEditor editor = new UMLEditor();
+
+        editor.addClass("class1");
+        editor.addClass("class3");
+        editor.addRel("class1", "class3", "inheritance");
+        editor.addAttr("class1", "field1", "field", "int");
+        editor.addAttr("class1", "method1", "method", "int");
+        editor.addParam("class1", "method1", "param1", "int");
+        editor.copyClass("class1", "class2");
+
+        assertEquals("New class should be named class2", "class2", editor.getClasses().get(2).name);
+        assertEquals("class1 and class2 should have the same fields", editor.getClasses().get(0).getFields(), editor.getClasses().get(2).getFields());
+        assertEquals("class1 and class2 should have the same methods", editor.getClasses().get(0).getMethods(), editor.getClasses().get(2).getMethods());
+        assertEquals("class1 and class2 should have a relationship with class3", editor.getClasses().get(0).getRels().get(0).partner, editor.getClasses().get(2).getRels().get(0).partner);
+        assertEquals("class1 and class2 should have an inheritance relationship with class3", editor.getClasses().get(0).getRels().get(0).type, editor.getClasses().get(2).getRels().get(0).type);
+        assertEquals("class1 and class2 should both be the source in the relationship with class3", editor.getClasses().get(0).getRels().get(0).sOd, editor.getClasses().get(2).getRels().get(0).sOd);
     }
 }
