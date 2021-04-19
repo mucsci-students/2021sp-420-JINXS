@@ -1,6 +1,9 @@
 package org.jinxs.umleditor;
 
 import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -482,30 +485,234 @@ public class UMLClassTest  {
         assertEquals("Last method is correct after renaming when methods > 100", c.getMethods().get(106).name, "coolerAttr");
     }
 
+    /*****************************************************************************
+    *   Testing: addParam(String methName, String paramName, ParamType)
+    *   
+    *   Methods:
+    *   - for loop (search targetMethod)
+    *   - if statement (If targeMethod is null; does not exist)
+    *   - for loop / if statement (search targetMethod param list for duplicats)
+    *   - if statement (If paramName or paramType are null; blank)
+    *****************************************************************************/
     @Test
     public void addParamTest() {
         UMLClass c = new UMLClass("className");
-        c.addMethod("method", "int");
+        c.addMethod("method", "String");
+        c.addMethod("method1", "Int");
+        
+        // Test for loop to find target Method
+        for(int i = 2; i < 10; i++){
+            c.addMethod("method"+i, "Int");
+        }
+        c.addParam("method8", "28", "Int");
+        assertEquals("Paramter 1 in method8 should be 28 ", c.getMethods().get(8).params.get(0).name, "28");
+        
+        // Test to see if addParam can add 100 parameters to a single method
+        for(int i = 0; i < 100; i++){
+            c.addParam("method", "Param"+i, "String");
+            if(i == 10){
+                assertEquals("Method Parameter size should be 11", c.getMethods().get(0).params.size(), 11);
+            }
+            if(i == 20){
+                assertEquals("Method Parameter size should be 21", c.getMethods().get(0).params.size(), 21);
+            }
+            if(i == 50){
+                assertEquals("Method Parameter size should be 51", c.getMethods().get(0).params.size(), 51);
+            }
+            if(i == 100){
+                assertEquals("Method Parameter size should be 100", c.getMethods().get(0).params.size(), 100);
+            }
+        }
+
+        // Test: if targetMethod is null
+        assertEquals("Should be false ", c.addParam("method23", "Param1", "String"), false);
+        // Test: if targetMethod.params already exist
+        assertEquals("Should be false ", c.addParam("method", "Param10", "String"), false);
+        // Test: if targetMethod param name and/or type are null
+        assertEquals("Should be false ", c.addParam("method", "", ""), false);
+        assertEquals("Should be false ", c.addParam("method", "Param101", ""), false);
     }
 
+        /*****************************************************************************
+    *   Testing: deleteParam(String methName, String paramName)
+    *   
+    *   Methods:
+    *   - for loop (search targetMethod)
+    *   - if statement (If targeMethod is null; does not exist)
+    *   - for loop / if statement (search targetmethod for paramName and delete if found)
+    **********************************************************************************/
     @Test
     public void deleteParamTest() {
         UMLClass c = new UMLClass("className");
+        c.addMethod("method0", "String");
+        c.addParam("method0", "Param1", "String");
+        
+        // Test: Searching for targetMethod, found
+        for(int i = 1; i < 10; i++){
+            c.addMethod("method"+i, "String");
+        }
+        c.addParam("method8", "28", "String");
+        assertEquals("Paramter 1 in method8 should be 28 ", c.getMethods().get(8).params.get(0).name, "28");
+
+        // Test: Seraching for targetMethod, not found or does not exist
+        assertEquals("Should be false", c.deleteParam("method11", "Param1"), false);
+        // Test: Seraching for and deleteing a parameter
+        assertEquals("Should delete paramName in targetMethod ", c.deleteParam("method8", "28"), true);
+        // Test: Try to delete the same parameter
+        assertEquals("Should not beable to delete empty paramter", c.deleteParam("method8", "28"), false);
     }
 
+        /*****************************************************************************
+    *   Testing: deleteAllParams(String methName)
+    *   
+    *   Methods:
+    *   - for loop (search for targetMethod)
+    *   - if statement (If targeMethod is null; does not exist)
+    *   - delete all parameters inside of the targeMethod
+    **********************************************************************************/
     @Test
     public void deleteAllParamsTest() {
         UMLClass c = new UMLClass("className");
+
+        // Testing: Searching for targetMethod
+        for(int i = 1; i < 10; i++){
+            c.addMethod("method"+i, "String");
+            for(int j = 0; j < 10; j++){
+                c.addParam("method"+i, "Param"+j, "String");
+            }
+        }
+        assertEquals("Should find the targetMethod", c.getMethods().get(8).params.get(5).name, "Param5");
+        
+        // Testing: Searching for targetMethod, not found/exist will return false
+        assertEquals("Should not find the targetMethod and return false ", c.deleteAllParams("methName"), false);
+
+        // Testing: Deletes all methods and checks to make sure the size is 0
+        assertEquals("Should delete all Params in Method 3 ", c.deleteAllParams("method3"), true);
+        assertEquals("Should be no params in method3", c.getMethods().get(2).params.size(), 0);
     }
 
+    /************************************************************************************
+    *   Testing: changeParamName(String methName, String paramName)
+    *   
+    *   Methods:
+    *   - for loop (search targetMethod)
+    *   - if statement (If targeMethod is null; does not exist)
+    *   - for loop / if statement (search targetmethod for paramName and rename if found)
+    *************************************************************************************/
     @Test
     public void changeParamTest() {
         UMLClass c = new UMLClass("className");
+
+        // Testing: Searching for targetMethod
+        for(int i = 0; i < 10; i++){
+            c.addMethod("method"+i, "String");
+            for(int j = 0; j < 10; j++){
+                c.addParam("method"+i, "Param"+j, "String");
+                assertEquals("Should be Param"+j, c.getMethods().get(i).params.get(j).name, "Param"+j);
+            }
+            assertEquals("Should be method"+i, c.getMethods().get(i).name, "method"+i);
+        }
+
+        // Testing: Searching for targetMethod, not found/exist will return false
+        assertEquals("targetMethod should not exist so will return false ", c.changeParamName("method13", "Param1", "Param11"), false);
+
+        // Testing: Finding and changing the Parameters old name to the new name
+        for(int i = 0; i < c.getMethods().size(); i++){
+            for(int j = 0; j < c.getMethods().get(i).params.size(); j++){
+                c.changeParamName("method"+i, "Param"+j, "Param"+(10+j));
+                assertEquals("Old Param should be changed to Param"+(j+10), c.getMethods().get(i).params.get(j).name, "Param"+(j+10));
+            }
+        }
+
+        // Testing: Param30 does not exist, should return false
+        assertEquals("Param30 should not exist so will return false", c.changeParamName("method1", "Param1", "Param30"), false);
+
     }
 
+    /************************************************************************************
+    *   Testing: changeParamType(String methName, String pName, String newType)
+    *   
+    *   Methods:
+    *   - for loop (search targetMethod)
+    *   - if statement (If targeMethod is null; does not exist)
+    *   - for loop / if statement (search targetmethod for paramName and rename if found)
+    *************************************************************************************/
+    @Test
+    public void changeParamTypeTest(){
+        UMLClass c = new UMLClass("className");
+
+        // Testing: Searching for targetMethod
+        for(int i = 0; i < 10; i++){
+            c.addMethod("method"+i, "String");
+            for(int j = 0; j < 10; j++){
+                c.addParam("method"+i, "Param"+j, "String");
+                assertEquals("Should be Param"+j, c.getMethods().get(i).params.get(j).name, "Param"+j);
+            }
+            assertEquals("Should be method"+i, c.getMethods().get(i).name, "method"+i);
+        }
+
+        // Testing: Searching for targetMethod, not found/exist will return false
+        assertEquals("targetMethod should not exist so will return false ", c.changeParamName("method13", "Param1", "Param11"), false);
+
+        // Testing: Finding and changing the Parameters old type to the new type
+        for(int i = 0; i < c.getMethods().size(); i++){
+            for(int j = 0; j < c.getMethods().get(i).params.size(); j++){
+                c.changeParamType("method"+i, "Param"+j, "Char");
+                assertEquals("Old Param type should be changed to char", c.getMethods().get(i).params.get(j).type, "Char");
+            }
+        }
+
+        // Testing: Param30 does not exist, should return false
+        assertEquals("Param30 should not exist so will return false", c.changeParamType("method30", "Param1", "Char"), false);
+    }
+
+    /************************************************************************************
+    *   Testing: changeAllParams(String methName, ArrayList<String> pName, ArrayList<String> pType)
+    *   
+    *   Methods:
+    *   - for loop (search targetMethod)
+    *   - if statement (If targeMethod is null; does not exist)
+    *   - if statement (If pName and pType are not the same size, then retrun false)
+    *   - for loop (delete all parameters and types inside of the targeMethod and add pNames/pTypes)
+    *************************************************************************************/
     @Test
     public void changeAllParamsTest() {
         UMLClass c = new UMLClass("className");
+
+        // Create/fill pNames and pTypes
+        ArrayList<String> pNames = new ArrayList<String>();
+        ArrayList<String> pTypes = new ArrayList<String>();
+        pTypes.add("String");
+        pNames.add("method1");
+        pTypes.add("String");
+        pNames.add("method2");
+        pTypes.add("String");
+        pNames.add("method3");
+        pTypes.add("String");
+        pNames.add("method4");
+        pTypes.add("String");
+        pNames.add("method5");
+
+        // Testing: Searching for targetMethod
+        for(int i = 0; i < 5; i++){
+            c.addMethod("method"+i, "String");
+            for(int j = 0; j < 5; j++){
+                c.addParam("method"+i, "Param"+j, "String");
+                assertEquals("Param should be Param"+j, c.getMethods().get(i).params.get(j).name, "Param"+j);
+            }
+            assertEquals("targetMethod should be method"+i, c.getMethods().get(i).name, "method"+i);
+        }
+
+        // Testing: Searching for targetMethod, not found/exist will return false
+        assertEquals("targetMethod should be false and return false", c.changeAllParams("method30", pNames, pTypes), false);
+
+        // Testing: pTypes is larger than pNames, retun false
+        pTypes.add("String");
+        assertEquals("If there are not the same number of Params and Types then return false ", c.changeAllParams("method1", pNames, pTypes), false);
+
+        // Testing: All preConditions are meet so all old params are deleted and replaced with pNames/pTypes
+        pNames.add("method6");
+        assertEquals("The new Params and types should replace the old ones ", c.changeAllParams("method2", pNames, pTypes), true);
     }
 
     @Test
