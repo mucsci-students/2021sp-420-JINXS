@@ -803,8 +803,12 @@ public class UMLTerminalTest {
             "printRel <class1>               Prints the all the relationships between classes\n" +
             "help                            Prints a help document with all viable commands\n" +
             "quit                            Exits the the program\n" +
-            "save <fileName>                 Saves the project into a JSON file\n" +
-            "load <fileName>                 Loads a project from a JSON file\n" +
+            "save\n" +
+            "    <fileName>                  Saves the project into a JSON file in the editor folder\n" +
+            "    <filePath>                  Saves the project into a JSON file at the specified relative or absolute path\n" +
+            "load\n" +
+            "    <fileName>                  Loads a project from a JSON file in the top-level of the editor folder\n" +
+            "    <filePath>                  Loads a project from a JSON file at the specified relative or absolute path\n" +
             "undo                            Restores the previous state before the last command called\n" +
             "redo                            Restores the state reversed by calling undo\n";
 
