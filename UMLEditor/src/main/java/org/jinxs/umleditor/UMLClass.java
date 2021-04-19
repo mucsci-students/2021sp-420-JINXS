@@ -283,6 +283,10 @@ public class UMLClass {
     }
 
     public boolean changeParamName(String methName, String oldName, String newName){
+        if (oldName.equals(newName)) {
+            System.out.println("Old parameter name and new parameter name are the same");
+            return false;
+        }
         UMLMethod targetMethod = null;
         for (int i = 0; i < methods.size(); ++i){
             if (methods.get(i).name.equals(methName)){
@@ -295,15 +299,24 @@ public class UMLClass {
             return false;
         }
 
+        UMLParam targetParam = null;
+
         for (int i = 0; i < targetMethod.params.size(); ++i){
             if (targetMethod.params.get(i).name.equals(oldName)){
-                targetMethod.params.get(i).name = newName;
-                return true;
+                targetParam = targetMethod.params.get(i);
+            } else if (targetMethod.params.get(i).name.equals(newName)) {
+                System.out.println("Parameter with the name \"" + newName + "\" for the method \"" + methName + "\" already exists");
+                return false;
             }
         }
 
-        System.out.println("Parameter does not exist");
-        return false;
+        if (targetParam == null) {
+            System.out.println("Parameter \"" + oldName + "\"does not exist");
+            return false;
+        }
+
+        targetParam.name = newName;
+        return true;
     }
 
     public boolean changeParamType(String methName, String pName, String newType) {

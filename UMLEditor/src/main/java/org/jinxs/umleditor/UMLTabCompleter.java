@@ -110,6 +110,16 @@ public class UMLTabCompleter{
                     )
                 );
 
+                comps.add(
+                    new ArgumentCompleter(
+                        new StringsCompleter("add"),
+                        new StringsCompleter("param"),
+                        new StringsCompleter(cName),
+                        new StringsCompleter(methods.get(m).name),
+                        new NullCompleter()
+                    )
+                );
+
                 for(int p = 0; p < methods.get(m).params.size(); ++p){
                     comps.add(
                         new ArgumentCompleter(
