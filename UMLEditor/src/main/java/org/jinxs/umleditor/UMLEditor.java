@@ -400,6 +400,11 @@ public class UMLEditor {
             return false;
         }
 
+        if (!validName(paramName)) {
+            System.out.println("The name \"" + paramName + "\" is not valid");
+            return false;
+        }
+
         if (!validName(paramType)) {
             System.out.println("The type \"" + paramType + "\" is not valid");
             return false;
@@ -775,7 +780,7 @@ public class UMLEditor {
 
                     // Add all params for the method to the class
                     JSONArray params = (JSONArray) method.get("params");
-                    for (int paramNum = 1; paramNum < method.size(); ++paramNum) {
+                    for (int paramNum = 0; paramNum < params.size(); ++paramNum) {
                         this.addParam(className, (String) method.get("name"),
                                 (String) ((JSONObject) params.get(paramNum)).get("name"),
                                 (String) ((JSONObject) params.get(paramNum)).get("type"));
