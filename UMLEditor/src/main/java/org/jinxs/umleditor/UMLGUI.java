@@ -236,7 +236,7 @@ public class UMLGUI implements ActionListener{
 
         // If there are no classes, no dropdowns need to be added
         if (currClasses.size() == 0) {
-           return;
+            return;
         }
 
         // If classes exist, add the option to delete and rename classes
@@ -274,7 +274,7 @@ public class UMLGUI implements ActionListener{
 
         // If there are no classes, no dropdowns need to be added
         if (currClasses.size() == 0) {
-           return;
+            return;
         }
 
         // If classes exist, add the option to add, delete, and rename fields
@@ -340,7 +340,7 @@ public class UMLGUI implements ActionListener{
 
         // If there are no classes, no dropdowns need to be added
         if (currClasses.size() == 0) {
-           return;
+            return;
         }
 
         // If classes exist, add the option to add, delete, and rename methods
@@ -408,7 +408,7 @@ public class UMLGUI implements ActionListener{
 
         // If there are no classes, no dropdowns need to be added
         if (currClasses.size() == 0) {
-           return;
+            return;
         }
 
         // If classes exist, add the parameter options
