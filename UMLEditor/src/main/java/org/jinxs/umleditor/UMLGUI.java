@@ -1082,6 +1082,8 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Save")){
             // Provide the user with a file chooser
             JFileChooser chooser = new JFileChooser();
+            chooser.setApproveButtonText("Save");
+            chooser.setDialogTitle("Save Project State");
             FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "JSON Save Files", "json");
             chooser.setFileFilter(filter);
@@ -1106,6 +1108,7 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Load")){
             // Provide the user with a file chooser
             JFileChooser chooser = new JFileChooser();
+            chooser.setDialogTitle("Load Project State");
             FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "JSON Save Files", "json");
             chooser.setFileFilter(filter);
@@ -1131,6 +1134,8 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Export as Image")) {
             // Provide the user with a file chooser
             JFileChooser chooser = new JFileChooser();
+            chooser.setApproveButtonText("Save");
+            chooser.setDialogTitle("Save Project Image");
             FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "PNG Images", "png");
             chooser.setFileFilter(filter);
