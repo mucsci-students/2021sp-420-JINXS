@@ -1,6 +1,6 @@
 # CSCI 420 (Spring 2021) JINXS UML Editor
 
-This is a command line based UML Editor.
+This is a UML Editor which can be used to create UML diagrams. The program is operable in both command-line and graphical interfaces.
 
 Design patterns used in this project can be found in the patterns.txt file in the code.
 
@@ -73,7 +73,7 @@ A list of all available commands to operate the editor in the command-line inter
 ```
 $ help
 ```
-The GUI can be interacted with by using the menu bar at the top when launched. Once classes have been added to the window, their location can be changed by dragging and dropping them from their border colored in black. (Full dragability to come in the future). Class attributes like fields, methods, and parameters are displayed in the class boxes themselves. Relationships are represented by arrows between the class boxes with the arrow coming out of the source of the relationship pointing to the source at the end of the arrow head
+The GUI can be interacted with by using the menu bar at the top when launched. Once classes have been added to the window, their location can be changed by dragging and dropping them from their border colored in black. Class attributes like fields, methods, and parameters are displayed in the class boxes themselves. Relationships are represented by arrows between the class boxes with the arrow coming out of the source of the relationship pointing to the destination at the end of the arrow head
 
 Work can effectively be saved and loaded between both UIs of the program
 
