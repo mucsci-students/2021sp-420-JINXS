@@ -1427,7 +1427,7 @@ public class UMLGUI implements ActionListener{
 
                     // Add the relationship in the correct order based on whether the
                     // current class is the source or destination
-                    if (relStatus.equals("src")) {
+                    if (relStatus.equals("dest")) {
                         project.addRel(className, (String) relation.get("className"), relType);
                     } else { // status == dest
                         project.addRel((String) relation.get("className"), className, relType);
