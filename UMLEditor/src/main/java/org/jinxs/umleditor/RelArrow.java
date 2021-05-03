@@ -125,9 +125,9 @@ public class RelArrow extends JPanel{
             }
         }
         g2d.draw(cap);
-        g2d.setColor(Color.PINK);
+        g2d.setColor(Color.BLUE);
         if (relType.equals("realization") || relType.equals("composition")) {
-            g2d.setColor(Color.CYAN);
+            g2d.setColor(Color.BLACK);
         }
         if (relType.equals("aggregation") || relType.equals("inheritance"))
             g2d.fill(cap);
@@ -141,10 +141,10 @@ public class RelArrow extends JPanel{
 
         Graphics2D g2d = (Graphics2D) g;
         
-        g2d.setColor(Color.PINK);
+        g2d.setColor(Color.BLUE);
         if (relType.equals("realization") || relType.equals("composition")) {
             g2d.setStroke(DASHED_STROKE);
-            g2d.setColor(Color.CYAN);
+            g2d.setColor(Color.BLACK);
         }
         else {
             g2d.setStroke(SOLID_STROKE);
