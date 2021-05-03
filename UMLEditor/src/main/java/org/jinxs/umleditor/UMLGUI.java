@@ -253,7 +253,7 @@ public class UMLGUI implements ActionListener{
 
         // If there are no classes, no dropdowns need to be added
         if (currClasses.size() == 0) {
-           return;
+            return;
         }
 
         // If classes exist, add the option to delete and rename classes
@@ -291,7 +291,7 @@ public class UMLGUI implements ActionListener{
 
         // If there are no classes, no dropdowns need to be added
         if (currClasses.size() == 0) {
-           return;
+            return;
         }
 
         // If classes exist, add the option to add, delete, and rename fields
@@ -357,7 +357,7 @@ public class UMLGUI implements ActionListener{
 
         // If there are no classes, no dropdowns need to be added
         if (currClasses.size() == 0) {
-           return;
+            return;
         }
 
         // If classes exist, add the option to add, delete, and rename methods
@@ -425,7 +425,7 @@ public class UMLGUI implements ActionListener{
 
         // If there are no classes, no dropdowns need to be added
         if (currClasses.size() == 0) {
-           return;
+            return;
         }
 
         // If classes exist, add the parameter options
@@ -1445,7 +1445,7 @@ public class UMLGUI implements ActionListener{
 
                     // Add the relationship in the correct order based on whether the
                     // current class is the source or destination
-                    if (relStatus.equals("src")) {
+                    if (relStatus.equals("dest")) {
                         project.addRel(className, (String) relation.get("className"), relType);
                     } else { // status == dest
                         project.addRel((String) relation.get("className"), className, relType);
