@@ -1,18 +1,21 @@
 package org.jinxs.umleditor;
 
 import javax.swing.JOptionPane;
+import javax.swing.event.MouseInputListener;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.util.*;
 import java.awt.event.*;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 // Save and load imports
 // For writing out to a file when saving
 import java.io.FileWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 
@@ -35,7 +38,7 @@ import java.awt.event.MouseAdapter;
 
 
 public class UMLGUI implements ActionListener{
- 
+
     private static JFrame window; 
     private static JMenuBar menu; 
 
@@ -44,18 +47,23 @@ public class UMLGUI implements ActionListener{
     private static GUIClassPanel panel;
     private static ArrayList<GUIClassPanel> panels = new ArrayList<GUIClassPanel>();
     private static ArrayList<RelArrow> relPanels = new ArrayList<RelArrow>();
-    private static ArrayList<ArrayList<String>> classLocations = new ArrayList<ArrayList<String>>(); 
+    private static ArrayList<ArrayList<String>> classLocations = new ArrayList<ArrayList<String>>();
+
+    private static PrintStream stdOut = System.out;
+    private static ByteArrayOutputStream guiOut;
 
     // Undo/Redo momento variables
     private Memento undoMeme;
     private Memento redoMeme;
-     
+    
     // handleDrag global coordinates
     int x;
     int y;
 
     // Constructs the GUI by building and adding the menus
     public UMLGUI() {
+        guiOut = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(guiOut, false));
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             if (System.getProperty("os.name").equals("Mac OS X")) {
@@ -79,7 +87,7 @@ public class UMLGUI implements ActionListener{
 
     // Creates the GUI window and adds each menu list to the menu bar
      // Creates the GUI window and adds each menu list to the menu bar
-     public static void umlWindow(){
+    public static void umlWindow(){
         // Gives the window a name
         window = new JFrame("Graphical UML Editor");
 
@@ -105,6 +113,15 @@ public class UMLGUI implements ActionListener{
         window.setVisible(true);
     }
     
+    public void udpateOutput() {
+        String newOutput = guiOut.toString();
+        if (newOutput.equals("")) {
+            return;
+        }
+        JOptionPane.showMessageDialog(window, newOutput, "Error", JOptionPane.ERROR_MESSAGE);
+        guiOut.reset();
+    }
+
     // Builds the GUI view from the state of the underlying project/model
     public void getFromProject(UMLEditor project){
         // Save the locations of each panel so they can be moved back
@@ -772,15 +789,16 @@ public class UMLGUI implements ActionListener{
     
     public void exitPrompt(ActionEvent e)
     { 
-      String ObjButtons[] = {"Yes","No"};
-      int PromptResult = JOptionPane.showOptionDialog(null, 
-          "Are you sure you want to exit?", "Exit GUI", 
-          JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, 
-          ObjButtons,ObjButtons[1]);
-      if(PromptResult==0)
-      {
-        System.exit(0);          
-      }
+        String ObjButtons[] = {"Yes","No"};
+        int PromptResult = JOptionPane.showOptionDialog(null, 
+            "Are you sure you want to exit?", "Exit GUI", 
+            JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, 
+            ObjButtons,ObjButtons[1]);
+        if (PromptResult==0)
+        {
+            System.setOut(stdOut);
+            System.exit(0);
+        }
     }
 
     public void actionPerformed(ActionEvent e){
@@ -801,7 +819,6 @@ public class UMLGUI implements ActionListener{
             createRelArrows(); 
             updateAllDropdowns();
             refresh();
-            return;
         }
         if(args[0].equals("DeleteClass")){
             saveToMeme(true);
@@ -1172,6 +1189,7 @@ public class UMLGUI implements ActionListener{
         if (command.equals("Exit")){
             exitPrompt(e); 
         }
+        udpateOutput();
     }
 
     // Moves the specified panel to the location associated with it
@@ -1535,12 +1553,12 @@ public class UMLGUI implements ActionListener{
         });
     }
 
-   public static void main(String[] args) throws IOException{   
+    public static void main(String[] args) throws IOException{   
     try{
         UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
     }catch(Exception e){
         e.getMessage(); 
     }
-       new UMLGUI();
+        new UMLGUI();
     }
 }
